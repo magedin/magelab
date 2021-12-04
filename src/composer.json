@@ -1,0 +1,25 @@
+{
+    "name": "magedin/magelab",
+    "description": "Your ultimate Magento 2 environment management.",
+    "minimum-stability": "stable",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Tiago Sampaio",
+            "email": "tiago@magedin.com"
+        }
+    ],
+    "require": {
+        "symfony/console": "^5.4",
+        "symfony/yaml": "^5.4",
+        "guzzlehttp/guzzle": "^7.4"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "MageLab\\": "app"
+        }
+    }
+}

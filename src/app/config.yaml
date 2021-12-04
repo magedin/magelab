@@ -1,0 +1,11 @@
+version: 1.0.0
+commands:
+  magento_download:
+    name: Magento Downloader
+    code: magento:download
+    aliases:
+      - download
+      - d
+    description: "Downloads the Magento Open Source version"
+    class: \MageLab\Command\MagentoDownloadCommand
+    config:
