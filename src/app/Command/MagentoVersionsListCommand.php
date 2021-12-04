@@ -68,6 +68,7 @@ class MagentoVersionsListCommand extends Command
     }
 
     /**
+     * @param int $max
      * @param int $page
      * @return array
      * @throws GuzzleException

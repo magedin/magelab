@@ -11,6 +11,7 @@ use GuzzleHttp\RequestOptions;
 use MageLab\Config\Github\DownloadRepo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -54,7 +55,7 @@ class MagentoDownloadCommand extends Command
         $this->checkIfVersionExists($version);
 
         $path = $input->getArgument(self::ARG_PATH);
-        $filepath = "$path/".$this->getFilename($version);
+        $filepath = "$path/" . $this->getFilename($version);
 
         if (realpath($filepath)) {
             $helper = $this->getHelper('question');
@@ -71,23 +72,46 @@ class MagentoDownloadCommand extends Command
         }
 
         $output->writeln("Your Magento copy will be downloaded to: $filepath.");
-        $this->performDownload($version, $filepath);
+        $progressBar = $this->createProgressBar($output);
+        $this->performDownload($version, $filepath, $progressBar);
+        $output->writeln('');
         $output->writeln('Your file was successfully downloaded!');
         return Command::SUCCESS;
     }
 
     /**
+     * @param OutputInterface $output
+     * @return ProgressBar
+     */
+    private function createProgressBar(OutputInterface $output): ProgressBar
+    {
+        $progressBar = new ProgressBar($output);
+        $progressBar->setFormat('debug');
+        $progressBar->setRedrawFrequency(1);
+        return $progressBar;
+    }
+
+    /**
      * @param string $version
      * @param string $filepath
+     * @param ProgressBar $progressBar
      * @return void
      * @throws GuzzleException
      */
-    private function performDownload(string $version, string $filepath)
+    private function performDownload(string $version, string $filepath, ProgressBar $progressBar)
     {
+        $progress = function ($downloadTotal, $downloadedBytes) use ($progressBar) {
+            $progressBar->setMaxSteps($downloadTotal);
+            $progressBar->setProgress($downloadedBytes);
+        };
+
         $options = [
-            RequestOptions::SINK => $filepath
+            RequestOptions::SINK     => $filepath,
+            RequestOptions::PROGRESS => $progress,
         ];
+        $progressBar->start();
         (new HttpClient())->get($this->getDownloadUrl($version), $options);
+        $progressBar->finish();
     }
 
     /**
