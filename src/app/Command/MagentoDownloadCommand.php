@@ -8,6 +8,7 @@ use Exception;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use MageLab\Config\Github\DownloadRepo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,7 +20,6 @@ class MagentoDownloadCommand extends Command
     const ARG_VERSION = 'version';
     const ARG_PATH = 'path';
 
-    const REPO_BASE_URL = 'https://github.com/magedin/magento-opensource-releases/archive/';
     const FILE_EXTENSION = '.tar.gz';
 
     /**
@@ -87,7 +87,7 @@ class MagentoDownloadCommand extends Command
         $options = [
             RequestOptions::SINK => $filepath
         ];
-        (new HttpClient())->get($this->buildDownloadUrl($version), $options);
+        (new HttpClient())->get($this->getDownloadUrl($version), $options);
     }
 
     /**
@@ -99,7 +99,7 @@ class MagentoDownloadCommand extends Command
     private function checkIfVersionExists(string $version): void
     {
         try {
-            (new HttpClient())->head($this->buildDownloadUrl($version), ['timeout' => 1]);
+            (new HttpClient())->head($this->getDownloadUrl($version), ['timeout' => 1]);
         } catch (Exception $e) {
             if (404 === $e->getCode()) {
                 throw new Exception('This version of Magento does not exist. Please try another one.');
@@ -111,9 +111,9 @@ class MagentoDownloadCommand extends Command
      * @param string $version
      * @return string
      */
-    private function buildDownloadUrl(string $version): string
+    private function getDownloadUrl(string $version): string
     {
-        return self::REPO_BASE_URL . $this->getFilename($version);
+        return DownloadRepo::buildDownloadUrl($this->getFilename($version));
     }
 
     /**

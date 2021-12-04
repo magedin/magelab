@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MageLab\Command;
+
+use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\GuzzleException;
+use MageLab\Config\Github\DownloadRepo;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+class MagentoVersionsListCommand extends Command
+{
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws GuzzleException
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $versions = $this->getVersions();
+        arsort($versions);
+
+        $output->writeln("Check the available versions on our repo:\n");
+
+        array_map(function ($version) use ($output) {
+            $output->writeln($version);
+        }, $versions);
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @return array
+     * @throws GuzzleException
+     */
+    private function getVersions(): array
+    {
+        $versions = [];
+        array_map(function (array $tag) use (&$versions) {
+            $versions[] = $tag['name'];
+        }, $this->getTags() ?? []);
+        return $versions;
+    }
+
+    /**
+     * @return array
+     * @throws GuzzleException
+     */
+    private function getTags(): array
+    {
+        $page = 1;
+        $max = 100;
+        $allTags = [];
+
+        do {
+            $currentSet = $this->requestTags($max, $page);
+            $allTags = array_merge($allTags, $currentSet);
+            if (count($currentSet) < $max) {
+                break;
+            }
+            $page++;
+        } while (count($currentSet) <= $max);
+        return $allTags;
+    }
+
+    /**
+     * @param int $page
+     * @return array
+     * @throws GuzzleException
+     */
+    private function requestTags(int $max, int $page = 1): array
+    {
+        $uri = DownloadRepo::getRepoTagsUrl(['per_page' => $max, 'page' => $page]);
+        $client = new HttpClient();
+        $response = $client->get($uri, ['timeout' => 1]);
+        $json = (string) $response->getBody();
+        return (array) json_decode($json, true);
+    }
+}

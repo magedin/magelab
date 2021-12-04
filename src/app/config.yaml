@@ -9,3 +9,10 @@ commands:
     description: "Downloads the Magento Open Source version"
     class: \MageLab\Command\MagentoDownloadCommand
     config:
+  magento_versions:
+    name: Magento Versions
+    code: magento:versions
+    aliases:
+      - versions
+    description: List all the available versions for download with MageLab tool
+    class: \MageLab\Command\MagentoVersionsListCommand
