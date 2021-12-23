@@ -1,25 +1,25 @@
 version: 1.0.0
 commands:
-  magento_download:
-    name: Magento Downloader
-    code: magento:download
-    aliases:
-      - download
-      - d
-    description: "Downloads the Magento Open Source version"
-    class: \MageLab\Command\Magento\MagentoDownloadCommand
-    config:
-  magento_versions:
-    name: Magento Versions
-    code: magento:versions
-    aliases:
-      - versions
-    description: List all the available versions for download with MageLab tool
-    class: \MageLab\Command\Magento\MagentoVersionsListCommand
-  environment_download:
-    name: Environment Download
-    code: environment:download
-    aliases:
-      - download
-    description: Download the Dockerlab docker project to a given directory
-    class: \MageLab\Command\Environment\EnvironmentDownloadCommand
+    magento_download:
+        name: Magento Downloader
+        code: magento:download
+        aliases:
+            - download
+            - d
+        description: "Downloads the Magento Open Source version"
+        class: \MageLab\Command\Magento\MagentoDownloadCommand
+        config:
+    magento_versions:
+        name: Magento Versions
+        code: magento:versions
+        aliases:
+            - versions
+        description: List all the available versions for download with MageLab tool
+        class: \MageLab\Command\Magento\MagentoVersionsListCommand
+    environment_download:
+        name: Environment Download
+        code: environment:download
+        aliases:
+            - download
+        description: Download the Dockerlab docker project to a given directory
+        class: \MageLab\Command\Environment\EnvironmentDownloadCommand
