@@ -11,7 +11,7 @@ class App
 {
     public function run()
     {
-        $console = new ConsoleApplication('Magento DockerLab', Config::get('version'));
+        $console = new ConsoleApplication('MageLab', Config::get('version'));
         $commandsBuilder = new CommandsBuilder();
         /** @var Command $command */
         foreach ($commandsBuilder->build() ?? [] as $command) {

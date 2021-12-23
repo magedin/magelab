@@ -19,6 +19,7 @@ class EnvironmentDownloadCommand extends Command
     const ARG_BRANCH = 'branch';
     const ARG_BRANCH_VALUE = 'master';
     const ARG_DESTINATION = 'destination';
+    const ARG_GIT = 'git';
 
     protected function configure()
     {
@@ -36,6 +37,13 @@ class EnvironmentDownloadCommand extends Command
             InputOption::VALUE_OPTIONAL,
             "Where you want to clone the project.",
             '.'
+        );
+
+        $this->addOption(
+            self::ARG_GIT,
+            'g',
+            InputOption::VALUE_NONE,
+            "Whether you want to keep the git repository references.",
         );
     }
 
@@ -67,7 +75,25 @@ class EnvironmentDownloadCommand extends Command
 
         $output->writeln("Your project was cloned to the following directory: {$realPath}");
         $output->writeln("Using the branch: {$branch}");
+
+        if (!$input->getOption(self::ARG_GIT)) {
+            $this->cleanGitReferences($realPath);
+        }
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param string $realPath
+     * @return void
+     */
+    private function cleanGitReferences(string $realPath): void
+    {
+        $refs = ['.git', '.gitignore', '.gitattributes', '.travis.yml'];
+        foreach ($refs as $ref) {
+            $cleanPath = "{$realPath}/{$ref}";
+            $process = new Process(['rm', '-rf', $cleanPath]);
+            $process->run();
+        }
     }
 
     /**
