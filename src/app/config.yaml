@@ -9,6 +9,7 @@ commands:
         description: "Downloads the Magento Open Source version"
         class: \MageLab\Command\Magento\MagentoDownloadCommand
         config:
+
     magento_versions:
         name: Magento Versions
         code: magento:versions
@@ -16,6 +17,7 @@ commands:
             - versions
         description: List all the available versions for download with MageLab tool
         class: \MageLab\Command\Magento\MagentoVersionsListCommand
+
     environment_download:
         name: Clone Docker Environment
         code: environment:clone
@@ -23,6 +25,7 @@ commands:
             - clone
         description: Download the Dockerlab docker project to a given directory
         class: \MageLab\Command\Environment\DownloadCommand
+
     environment_up:
         name: Get the Environment Up
         code: environment:start
@@ -31,6 +34,7 @@ commands:
             - up
         description: Run the docker-composer command to get the environment up and running
         class: \MageLab\Command\Environment\StartCommand
+
     environment_file_create:
         name: Create the .env file
         code: environment:file:create
@@ -38,3 +42,11 @@ commands:
             - env-create
         description: Create the .env file with the information of the environment.
         class: \MageLab\Command\Environment\EnvFileCreateCommand
+
+    docker_compose:
+        name: Docker Compose Command
+        code: docker-compose
+        aliases:
+            - dc
+        description: Docker Compose Command
+        class: \MageLab\Command\DockerComposeCommand

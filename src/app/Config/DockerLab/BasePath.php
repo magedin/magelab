@@ -18,6 +18,15 @@ class BasePath
      * @param bool $silent
      * @return string|null
      */
+    public static function getAbsoluteRootDir(bool $silent = false): ?string
+    {
+        return realpath(self::getRootDir($silent));
+    }
+
+    /**
+     * @param bool $silent
+     * @return string|null
+     */
     public static function getRootDir(bool $silent = false): ?string
     {
         $dirs = self::buildDirLevels();
