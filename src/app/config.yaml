@@ -22,4 +22,19 @@ commands:
         aliases:
             - clone
         description: Download the Dockerlab docker project to a given directory
-        class: \MageLab\Command\Environment\EnvironmentDownloadCommand
+        class: \MageLab\Command\Environment\DownloadCommand
+    environment_up:
+        name: Get the Environment Up
+        code: environment:start
+        aliases:
+            - start
+            - up
+        description: Run the docker-composer command to get the environment up and running
+        class: \MageLab\Command\Environment\StartCommand
+    environment_file_create:
+        name: Create the .env file
+        code: environment:file:create
+        aliases:
+            - env-create
+        description: Create the .env file with the information of the environment.
+        class: \MageLab\Command\Environment\EnvFileCreateCommand

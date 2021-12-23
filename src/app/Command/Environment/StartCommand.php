@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-class EnvironmentDownloadCommand extends Command
+class StartCommand extends Command
 {
     const ARG_BRANCH = 'branch';
     const ARG_BRANCH_VALUE = 'master';
@@ -75,56 +75,6 @@ class EnvironmentDownloadCommand extends Command
 
         $output->writeln("Your project was cloned to the following directory: {$realPath}");
         $output->writeln("Using the branch: {$branch}");
-
-        if (!$input->getOption(self::ARG_GIT)) {
-            $this->cleanGitReferences($realPath);
-        }
         return Command::SUCCESS;
-    }
-
-    /**
-     * @param string $realPath
-     * @return void
-     */
-    private function cleanGitReferences(string $realPath): void
-    {
-        $refs = ['.git', '.gitignore', '.gitattributes', '.travis.yml'];
-        foreach ($refs as $ref) {
-            $cleanPath = "{$realPath}/{$ref}";
-            $process = new Process(['rm', '-rf', $cleanPath]);
-            $process->run();
-        }
-    }
-
-    /**
-     * @param string $branch
-     * @return bool
-     */
-    private function branchExists(string $branch): bool
-    {
-        if ($branch === self::ARG_BRANCH_VALUE) {
-            return true;
-        }
-
-        $process = new Process(['git', 'ls-remote', '--heads', $this->getRepoSshUrl(), $branch]);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            return false;
-        }
-
-        $output = $process->getOutput();
-        if (empty($output)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return string
-     */
-    private function getRepoSshUrl(): string
-    {
-        return MagentoDockerlabRepo::getRepoSshUrl();
     }
 }
