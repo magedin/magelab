@@ -7,7 +7,7 @@ commands:
       - download
       - d
     description: "Downloads the Magento Open Source version"
-    class: \MageLab\Command\MagentoDownloadCommand
+    class: \MageLab\Command\Magento\MagentoDownloadCommand
     config:
   magento_versions:
     name: Magento Versions
@@ -15,4 +15,11 @@ commands:
     aliases:
       - versions
     description: List all the available versions for download with MageLab tool
-    class: \MageLab\Command\MagentoVersionsListCommand
+    class: \MageLab\Command\Magento\MagentoVersionsListCommand
+  environment_download:
+    name: Environment Download
+    code: environment:download
+    aliases:
+      - download
+    description: Download the Dockerlab docker project to a given directory
+    class: \MageLab\Command\Environment\EnvironmentDownloadCommand

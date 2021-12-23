@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Command;
+namespace MageLab\Command\Magento;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
@@ -77,7 +77,7 @@ class MagentoVersionsListCommand extends Command
     {
         $uri = DownloadRepo::getRepoTagsUrl(['per_page' => $max, 'page' => $page]);
         $client = new HttpClient();
-        $response = $client->get($uri, ['timeout' => 1]);
+        $response = $client->get($uri, ['timeout' => DownloadRepo::getRequestDefaultTimeout()]);
         $json = (string) $response->getBody();
         return (array) json_decode($json, true);
     }

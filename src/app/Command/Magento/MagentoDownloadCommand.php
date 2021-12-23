@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Command;
+namespace MageLab\Command\Magento;
 
 use Exception;
 use GuzzleHttp\Client as HttpClient;
@@ -10,11 +10,11 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use MageLab\Config\Github\DownloadRepo;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class MagentoDownloadCommand extends Command
 {

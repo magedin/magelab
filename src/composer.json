@@ -12,7 +12,8 @@
     "require": {
         "symfony/console": "^5.4",
         "symfony/yaml": "^5.4",
-        "guzzlehttp/guzzle": "^7.4"
+        "guzzlehttp/guzzle": "^7.4",
+        "symfony/process": "^5.4"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.5.6"
