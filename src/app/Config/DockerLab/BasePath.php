@@ -21,15 +21,53 @@ class BasePath
     {
         $dirs = self::buildDirLevels();
         foreach ($dirs as $currentDir) {
-            $verificationFile = realpath("$currentDir/var/.dockerlab");
-            if ($verificationFile && file_exists($verificationFile) && is_readable($verificationFile)) {
-                return realpath($currentDir);
+            if (self::isRootDir($currentDir)) {
+                return $currentDir;
             }
         }
         if ($silent) {
             return null;
         }
         throw new RuntimeException("You are not under a DockerLab project.");
+    }
+
+    /**
+     * @param string $dir
+     * @return bool
+     */
+    private static function isRootDir(string $dir): bool
+    {
+        $verificationFiles = [
+            "var/.dockerlab",
+            "docker-compose.yml",
+            "docker-compose.dev.yml",
+            "docker-compose.dev.mac.yml",
+            "docker-compose.mailhog.yml",
+            "var/template/nginx/upstream.conf",
+            "var/template/nginx/magento2.conf",
+            "var/template/nginx/magento2-ssl.conf",
+        ];
+
+        foreach ($verificationFiles as $verificationFile) {
+            $realFile = realpath("$dir/$verificationFile");
+            if (!$realFile || !self::checkFile($realFile)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $filePath
+     * @return bool
+     */
+    private static function checkFile(string $filePath): bool
+    {
+        if (!$filePath || !file_exists($filePath) && !is_readable($filePath)) {
+            return false;
+        }
+        return true;
     }
 
     /**
