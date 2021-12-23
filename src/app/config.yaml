@@ -17,9 +17,9 @@ commands:
         description: List all the available versions for download with MageLab tool
         class: \MageLab\Command\Magento\MagentoVersionsListCommand
     environment_download:
-        name: Environment Download
-        code: environment:download
+        name: Clone Docker Environment
+        code: environment:clone
         aliases:
-            - download
+            - clone
         description: Download the Dockerlab docker project to a given directory
         class: \MageLab\Command\Environment\EnvironmentDownloadCommand
