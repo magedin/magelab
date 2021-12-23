@@ -60,7 +60,7 @@ class MagentoDownloadCommand extends Command
         if (realpath($filepath)) {
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion(
-                "There is already a file on $filepath. Do you want to replace it (y/n)?",
+                "There is already a file on {$filepath}. Do you want to replace it (y/n)?",
                 false
             );
 

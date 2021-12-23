@@ -10,6 +10,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
 class EnvFileCreateCommand extends Command
@@ -35,19 +36,18 @@ class EnvFileCreateCommand extends Command
     {
         $silent = $input->getOption('silent');
         $basePath = BasePath::getRootDir($silent);
-        $envFilePath = $basePath . '/.env';
+        $envFilePath = realpath($basePath) . '/.env';
         $envFile = realpath($envFilePath);
 
-        if ($envFile && file_exists($envFile)) {
+        $filesystem = new Filesystem();
+        if ($filesystem->exists($envFile)) {
             if (!$silent) {
                 throw new RuntimeException("The environment file already exists.");
             }
             return Command::FAILURE;
         }
 
-        $process = new Process(['touch', $envFilePath]);
-        $process->run();
-
+        $filesystem->touch($envFilePath);
         return Command::SUCCESS;
     }
 }

@@ -11,6 +11,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -88,12 +89,11 @@ class DownloadCommand extends Command
      */
     private function cleanGitReferences(string $realPath): void
     {
-        $refs = ['.git', '.gitignore', '.gitattributes', '.travis.yml'];
-        foreach ($refs as $ref) {
-            $cleanPath = "{$realPath}/{$ref}";
-            $process = new Process(['rm', '-rf', $cleanPath]);
-            $process->run();
-        }
+        $files = ['.git', '.gitignore', '.gitattributes', '.travis.yml'];
+        $refs = array_map(function ($file) use ($realPath) {
+            return "{$realPath}/{$file}";
+        }, $files);
+        (new Filesystem())->remove($refs);
     }
 
     /**

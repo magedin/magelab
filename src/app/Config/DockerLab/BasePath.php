@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MageLab\Config\DockerLab;
 
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Filesystem\Filesystem;
 
 class BasePath
 {
@@ -48,26 +49,11 @@ class BasePath
             "var/template/nginx/magento2-ssl.conf",
         ];
 
-        foreach ($verificationFiles as $verificationFile) {
-            $realFile = realpath("$dir/$verificationFile");
-            if (!$realFile || !self::checkFile($realFile)) {
-                return false;
-            }
-        }
+        $realFiles = array_map(function (string $file) use ($dir) {
+            return realpath("$dir/$file");
+        }, $verificationFiles);
 
-        return true;
-    }
-
-    /**
-     * @param string $filePath
-     * @return bool
-     */
-    private static function checkFile(string $filePath): bool
-    {
-        if (!$filePath || !file_exists($filePath) && !is_readable($filePath)) {
-            return false;
-        }
-        return true;
+        return (new Filesystem())->exists($realFiles);
     }
 
     /**
