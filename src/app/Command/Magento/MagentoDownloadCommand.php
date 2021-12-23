@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Filesystem\Filesystem;
 
 class MagentoDownloadCommand extends Command
 {
@@ -57,7 +58,8 @@ class MagentoDownloadCommand extends Command
         $path = $input->getArgument(self::ARG_PATH);
         $filepath = "$path/" . $this->getFilename($version);
 
-        if (realpath($filepath)) {
+        $filesystem = new Filesystem();
+        if ($filesystem->exists($filepath)) {
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion(
                 "There is already a file on {$filepath}. Do you want to replace it (y/n)?",
@@ -68,7 +70,7 @@ class MagentoDownloadCommand extends Command
                 $output->writeln("Ok. Nothing will be downloaded at this moment.");
                 return Command::FAILURE;
             }
-            unlink($filepath);
+            $filesystem->remove($filepath);
         }
 
         $output->writeln("Your Magento copy will be downloaded to: $filepath.");
