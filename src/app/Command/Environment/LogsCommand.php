@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace MageLab\Command\Environment;
 
 use MageLab\CommandBuilder\DockerCompose;
-use MageLab\Helper\DockerServiceState;
+use MageLab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 class LogsCommand extends Command
 {
@@ -88,8 +87,7 @@ class LogsCommand extends Command
             $command[] = $tail;
         }
 
-        $process = new Process($command);
-        $process->run(function ($type, $buffer) use ($output) {
+        Process::run($command, function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });
 

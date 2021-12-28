@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MageLab\Helper;
 
-use Symfony\Component\Process\Process;
+use MageLab\Model\Process;
 
 class DockerServiceState
 {
@@ -13,8 +13,7 @@ class DockerServiceState
      */
     public function isRunning(): bool
     {
-        $process = new Process(['docker-compose', 'ps', '-q']);
-        $process->run();
+        $process = Process::run(['docker-compose', 'ps', '-q']);
         return !empty($process->getOutput());
     }
 }

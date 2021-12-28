@@ -46,8 +46,6 @@ class ObjectManager
     /**
      * @param string $name
      * @return CommandsBuilder|mixed
-     * @throws DependencyException
-     * @throws NotFoundException
      */
     public function get(string $name)
     {
@@ -58,8 +56,6 @@ class ObjectManager
      * @param string $name
      * @param array $params
      * @return mixed|string
-     * @throws DependencyException
-     * @throws NotFoundException
      */
     public function create(string $name, array $params = [])
     {

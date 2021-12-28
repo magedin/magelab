@@ -18,8 +18,6 @@ class ProcessFactory
      * @param $input
      * @param float|null $timeout
      * @return Process
-     * @throws DependencyException
-     * @throws NotFoundException
      */
     public function create(
         array $command, string $cwd = null, array $env = null, $input = null, ?float $timeout = 60

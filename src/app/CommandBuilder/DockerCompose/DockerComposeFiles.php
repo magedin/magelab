@@ -11,6 +11,14 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class DockerComposeFiles
 {
+    private OperatingSystem $operatingSystem;
+
+    public function __construct(
+        OperatingSystem $operatingSystem
+    ) {
+        $this->operatingSystem = $operatingSystem;
+    }
+
     /**
      * @var array
      */
@@ -33,7 +41,7 @@ class DockerComposeFiles
     private function loadFiles(): void
     {
         $rootDir = BasePath::getAbsoluteRootDir();
-        $isMacOs = (new OperatingSystem())->isMacOs();
+        $isMacOs = $this->operatingSystem->isMacOs();
 
         $this->loadedFiles = ['docker-compose.yml'];
         if (true === $isMacOs) {

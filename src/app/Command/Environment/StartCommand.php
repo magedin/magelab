@@ -6,12 +6,12 @@ namespace MageLab\Command\Environment;
 
 use MageLab\CommandBuilder\DockerCompose;
 use MageLab\Helper\DockerServiceState;
+use MageLab\Model\Process;
 use MageLab\Model\ProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 class StartCommand extends Command
 {
@@ -68,8 +68,7 @@ class StartCommand extends Command
 
         $output->writeln('Starting the containers.');
 
-        $process = $this->processFactory->create($command);
-        $process->run(function ($type, $buffer) use ($output) {
+        Process::run($command, function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });
 

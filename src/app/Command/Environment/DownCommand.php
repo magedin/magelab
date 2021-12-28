@@ -6,14 +6,35 @@ namespace MageLab\Command\Environment;
 
 use MageLab\CommandBuilder\DockerCompose;
 use MageLab\Helper\DockerServiceState;
+use MageLab\Model\Process;
+use MageLab\Model\ProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 class DownCommand extends Command
 {
+    /**
+     * @var DockerServiceState
+     */
+    private DockerServiceState $dockerServiceState;
+
+    /**
+     * @var DockerCompose
+     */
+    private DockerCompose $dockerComposeCommandBuilder;
+
+    public function __construct(
+        DockerServiceState $dockerServiceState,
+        DockerCompose $dockerComposeCommandBuilder,
+        string $name = null
+    ) {
+        parent::__construct($name);
+        $this->dockerServiceState = $dockerServiceState;
+        $this->dockerComposeCommandBuilder = $dockerComposeCommandBuilder;
+    }
+
     protected function configure()
     {
         $this->addOption(
@@ -31,21 +52,18 @@ class DownCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $serviceState = new DockerServiceState();
-        if (!$input->getOption('force') && !$serviceState->isRunning()) {
+        if (!$input->getOption('force') && !$this->dockerServiceState->isRunning()) {
             $output->writeln('The services are already down.');
             return Command::SUCCESS;
         }
 
-        $commandBuilder = new DockerCompose();
-        $command = $commandBuilder->build();
+        $command = $this->dockerComposeCommandBuilder->build();
 
         $command[] = 'down';
 
         $output->writeln('Stopping and removing the containers.');
 
-        $process = new Process($command);
-        $process->run(function ($type, $buffer) use ($output) {
+        Process::run($command, function ($type, $buffer) use ($output) {
             $output->write($buffer);
         });
 

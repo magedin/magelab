@@ -10,6 +10,17 @@ use MageLab\Config\DockerLab\BasePath;
 class DockerCompose
 {
     /**
+     * @var DockerComposeFiles
+     */
+    private DockerComposeFiles $dockerComposeFiles;
+
+    public function __construct(
+        DockerComposeFiles $dockerComposeFiles
+    ) {
+        $this->dockerComposeFiles = $dockerComposeFiles;
+    }
+
+    /**
      * @var array
      */
     private array $command = [];
@@ -25,16 +36,18 @@ class DockerCompose
         return $this->command;
     }
 
+    /**
+     * @return void
+     */
     private function buildCommand(): void
     {
         $rootDir = BasePath::getAbsoluteRootDir();
         $this->command = ['docker-compose'];
-        $dockerComposeFiles = new DockerComposeFiles();
 
         $command = &$this->command;
         array_map(function ($file) use ($rootDir, &$command) {
             $this->command[] = '-f';
             $this->command[] = $rootDir . DIRECTORY_SEPARATOR . $file;
-        }, $dockerComposeFiles->load());
+        }, $this->dockerComposeFiles->load());
     }
 }

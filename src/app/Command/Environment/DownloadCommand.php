@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MageLab\Command\Environment;
 
 use MageLab\Config\Github\MagentoDockerlabRepo;
+use MageLab\Model\Process;
+use MageLab\Model\ProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -13,7 +15,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 
 class DownloadCommand extends Command
 {
@@ -21,6 +22,19 @@ class DownloadCommand extends Command
     const ARG_BRANCH_VALUE = 'master';
     const ARG_DESTINATION = 'destination';
     const ARG_GIT = 'git';
+
+    /**
+     * @var ProcessFactory
+     */
+    private ProcessFactory $processFactory;
+
+    public function __construct(
+        ProcessFactory $processFactory,
+        string $name = null
+    ) {
+        parent::__construct($name);
+        $this->processFactory = $processFactory;
+    }
 
     protected function configure()
     {
@@ -67,8 +81,7 @@ class DownloadCommand extends Command
             throw new InvalidOptionException("The branch '{$branch}' to clone does not exist.");
         }
 
-        $process = new Process(['git', 'clone', '--branch', $branch, $this->getRepoSshUrl(), $destinationPath]);
-        $process->run();
+        $process = Process::run(['git', 'clone', '--branch', $branch, $this->getRepoSshUrl(), $destinationPath]);
 
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
@@ -106,9 +119,7 @@ class DownloadCommand extends Command
             return true;
         }
 
-        $process = new Process(['git', 'ls-remote', '--heads', $this->getRepoSshUrl(), $branch]);
-        $process->run();
-
+        $process = Process::run(['git', 'ls-remote', '--heads', $this->getRepoSshUrl(), $branch]);
         if (!$process->isSuccessful()) {
             return false;
         }

@@ -4,22 +4,26 @@ declare(strict_types=1);
 
 namespace MageLab\Config\Helper;
 
-use Symfony\Component\Process\Process;
+use MageLab\Model\Process;
 
 class OperatingSystem
 {
+    const UNKNOWN_OS = 'Unknown';
+    const LINUX_OS = 'Linux';
+    const MAC_OS = 'Darwin';
+
     /**
      * @return string
      */
     public function getName(): string
     {
-        $operatingSystem = trim($this->buildProcess(['uname'])->getOutput());
+        $operatingSystem = trim(Process::run(['uname'])->getOutput());
 
         if ($operatingSystem) {
             return $operatingSystem;
         }
 
-        return 'Unknown';
+        return self::UNKNOWN_OS;
     }
 
     /**
@@ -27,13 +31,13 @@ class OperatingSystem
      */
     public function getFullName(): string
     {
-        $operatingSystem = trim($this->buildProcess(['uname', '-a'])->getOutput());
+        $operatingSystem = trim(Process::run(['uname', '-a'])->getOutput());
 
         if ($operatingSystem) {
             return $operatingSystem;
         }
 
-        return 'Unknown';
+        return self::UNKNOWN_OS;
     }
 
     /**
@@ -41,7 +45,7 @@ class OperatingSystem
      */
     public function isMacOs(): bool
     {
-        return $this->getName() === 'Darwin';
+        return $this->getName() === self::MAC_OS;
     }
 
     /**
@@ -49,17 +53,6 @@ class OperatingSystem
      */
     public function isLinux(): bool
     {
-        return $this->getName() === 'Linux';
-    }
-
-    /**
-     * @param array $arguments
-     * @return Process
-     */
-    private function buildProcess(array $arguments): Process
-    {
-        $process = new Process($arguments);
-        $process->run();
-        return $process;
+        return $this->getName() === self::LINUX_OS;
     }
 }
