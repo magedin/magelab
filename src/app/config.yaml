@@ -52,6 +52,15 @@ commands:
         description: Get the environment logs
         class: \MageLab\Command\Environment\LogsCommand
 
+    environment:status:
+        name: Show the containers status (same as docker-compose ps).
+        code: environment:status
+        aliases:
+            - status
+            - ps
+        description: Show the containers status (same as docker-compose ps).
+        class: \MageLab\Command\Environment\StatusCommand
+
     environment:file:create:
         name: Create the .env file
         code: environment:file:create

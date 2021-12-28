@@ -7,7 +7,6 @@ namespace MageLab\Command\Environment;
 use MageLab\CommandBuilder\DockerCompose;
 use MageLab\Helper\DockerServiceState;
 use MageLab\Model\Process;
-use MageLab\Model\ProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,18 +24,14 @@ class StartCommand extends Command
      */
     private DockerCompose $dockerComposeCommandBuilder;
 
-    private ProcessFactory $processFactory;
-
     public function __construct(
         DockerServiceState $dockerServiceState,
         DockerCompose $dockerComposeCommandBuilder,
-        ProcessFactory $processFactory,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dockerServiceState = $dockerServiceState;
         $this->dockerComposeCommandBuilder = $dockerComposeCommandBuilder;
-        $this->processFactory = $processFactory;
     }
 
     protected function configure()

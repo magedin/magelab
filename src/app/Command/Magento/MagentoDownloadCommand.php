@@ -62,7 +62,7 @@ class MagentoDownloadCommand extends Command
         if ($filesystem->exists($filepath)) {
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion(
-                "There is already a file on {$filepath}. Do you want to replace it (y/n)?",
+                "There is already a file on $filepath. Do you want to replace it (y/n)?",
                 false
             );
 
@@ -148,6 +148,6 @@ class MagentoDownloadCommand extends Command
      */
     private function getFilename(string $version): string
     {
-        return "{$version}" . self::FILE_EXTENSION;
+        return "$version" . self::FILE_EXTENSION;
     }
 }

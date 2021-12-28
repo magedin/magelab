@@ -6,7 +6,6 @@ namespace MageLab\Command\Environment;
 
 use MageLab\Config\Github\MagentoDockerlabRepo;
 use MageLab\Model\Process;
-use MageLab\Model\ProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -22,19 +21,6 @@ class DownloadCommand extends Command
     const ARG_BRANCH_VALUE = 'master';
     const ARG_DESTINATION = 'destination';
     const ARG_GIT = 'git';
-
-    /**
-     * @var ProcessFactory
-     */
-    private ProcessFactory $processFactory;
-
-    public function __construct(
-        ProcessFactory $processFactory,
-        string $name = null
-    ) {
-        parent::__construct($name);
-        $this->processFactory = $processFactory;
-    }
 
     protected function configure()
     {
@@ -78,7 +64,7 @@ class DownloadCommand extends Command
         }
 
         if (!$this->branchExists($branch)) {
-            throw new InvalidOptionException("The branch '{$branch}' to clone does not exist.");
+            throw new InvalidOptionException("The branch '$branch' to clone does not exist.");
         }
 
         $process = Process::run(['git', 'clone', '--branch', $branch, $this->getRepoSshUrl(), $destinationPath]);
@@ -87,8 +73,8 @@ class DownloadCommand extends Command
             throw new ProcessFailedException($process);
         }
 
-        $output->writeln("Your project was cloned to the following directory: {$realPath}");
-        $output->writeln("Using the branch: {$branch}");
+        $output->writeln("Your project was cloned to the following directory: $realPath");
+        $output->writeln("Using the branch: $branch");
 
         if (!$input->getOption(self::ARG_GIT)) {
             $this->cleanGitReferences($realPath);
@@ -104,7 +90,7 @@ class DownloadCommand extends Command
     {
         $files = ['.git', '.gitignore', '.gitattributes', '.travis.yml'];
         $refs = array_map(function ($file) use ($realPath) {
-            return "{$realPath}/{$file}";
+            return "$realPath/$file";
         }, $files);
         (new Filesystem())->remove($refs);
     }

@@ -6,8 +6,6 @@ namespace MageLab;
 
 use DI\Container;
 use DI\ContainerBuilder;
-use DI\DependencyException;
-use DI\NotFoundException;
 
 class ObjectManager
 {

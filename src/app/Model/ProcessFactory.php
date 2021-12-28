@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MageLab\Model;
 
-use DI\DependencyException;
-use DI\NotFoundException;
 use MageLab\ObjectManager;
 use Symfony\Component\Process\Process;
 
