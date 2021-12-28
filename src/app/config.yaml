@@ -1,6 +1,6 @@
 version: 1.0.0
 commands:
-    magento_download:
+    magento:download:
         name: Magento Downloader
         code: magento:download
         aliases:
@@ -10,7 +10,7 @@ commands:
         class: \MageLab\Command\Magento\MagentoDownloadCommand
         config:
 
-    magento_versions:
+    magento:versions:
         name: Magento Versions
         code: magento:versions
         aliases:
@@ -18,7 +18,7 @@ commands:
         description: List all the available versions for download with MageLab tool
         class: \MageLab\Command\Magento\MagentoVersionsListCommand
 
-    environment_download:
+    environment:download:
         name: Clone Docker Environment
         code: environment:clone
         aliases:
@@ -26,7 +26,7 @@ commands:
         description: Download the Dockerlab docker project to a given directory
         class: \MageLab\Command\Environment\DownloadCommand
 
-    environment_up:
+    environment:up:
         name: Get the Environment Up
         code: environment:start
         aliases:
@@ -35,7 +35,15 @@ commands:
         description: Run the docker-composer command to get the environment up and running
         class: \MageLab\Command\Environment\StartCommand
 
-    environment_file_create:
+    environment:down:
+        name: Get the Environment Down
+        code: environment:down
+        aliases:
+            - down
+        description: Run the docker-composer command to get the environment down
+        class: \MageLab\Command\Environment\DownCommand
+
+    environment:file:create:
         name: Create the .env file
         code: environment:file:create
         aliases:

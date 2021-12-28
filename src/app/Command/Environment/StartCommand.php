@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace MageLab\Command\Environment;
 
-use MageLab\Config\Github\MagentoDockerlabRepo;
+use MageLab\CommandBuilder\DockerCompose;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidOptionException;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class StartCommand extends Command
 {
     protected function configure()
     {
+        $this->addOption(
+            'force',
+            'f',
+            InputOption::VALUE_NONE,
+            'Force to run the containers.'
+        );
     }
 
     /**
@@ -27,6 +30,36 @@ class StartCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$input->getOption('force') && $this->isRunning()) {
+            $output->writeln('The services are already running.');
+            return Command::SUCCESS;
+        }
+
+        $commandBuilder = new DockerCompose();
+        $command = $commandBuilder->build();
+
+        $command[] = 'up';
+        $command[] = '-d';
+
+        $output->writeln('Starting the containers.');
+
+        $process = new Process($command);
+        $process->run(function ($type, $buffer) use ($output) {
+            $output->write($buffer);
+        });
+
+        $output->writeln('Containers has been started.');
+
         return Command::SUCCESS;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isRunning(): bool
+    {
+        $process = new Process(['docker-compose', 'ps', '-q']);
+        $process->run();
+        return !empty($process->getOutput());
     }
 }
