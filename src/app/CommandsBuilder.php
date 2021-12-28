@@ -41,7 +41,7 @@ class CommandsBuilder
         $description = $config['description'] ?? null;
 
         /** @var Command $command */
-        $command = new $config['class']($code);
+        $command = ObjectManager::getInstance()->create($config['class'], ['name' => $code]);
         $command->setAliases($aliases);
         $command->setDescription($description);
         return $command;

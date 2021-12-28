@@ -15,6 +15,22 @@ use Symfony\Component\Process\Process;
 
 class LogsCommand extends Command
 {
+    /**
+     * @var DockerCompose
+     */
+    private DockerCompose $dockerComposeCommandBuilder;
+
+    public function __construct(
+        DockerCompose $dockerComposeCommandBuilder,
+        string $name = null
+    ) {
+        parent::__construct($name);
+        $this->dockerComposeCommandBuilder = $dockerComposeCommandBuilder;
+    }
+
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this->addArgument(
@@ -52,9 +68,7 @@ class LogsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $commandBuilder = new DockerCompose();
-        $command = $commandBuilder->build();
-
+        $command = $this->dockerComposeCommandBuilder->build();
         $command[] = 'logs';
 
         if ($service = $input->getArgument('service')) {
