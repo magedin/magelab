@@ -43,6 +43,15 @@ commands:
         description: Run the docker-composer command to get the environment down
         class: \MageLab\Command\Environment\DownCommand
 
+    environment:logs:
+        name: Get the Environment Logs
+        code: environment:logs
+        aliases:
+            - logs
+            - log
+        description: Get the environment logs
+        class: \MageLab\Command\Environment\LogsCommand
+
     environment:file:create:
         name: Create the .env file
         code: environment:file:create
