@@ -15,6 +15,11 @@ class BasePath
     private static int $maxLevel = 10;
 
     /**
+     * @var string
+     */
+    private static string $rootDir = '';
+
+    /**
      * @param bool $silent
      * @return string|null
      */
@@ -29,10 +34,15 @@ class BasePath
      */
     public static function getRootDir(bool $silent = false): ?string
     {
+        if (self::$rootDir) {
+            return self::$rootDir;
+        }
+
         $dirs = self::buildDirLevels();
         foreach ($dirs as $currentDir) {
             if (self::isRootDir($currentDir)) {
-                return $currentDir;
+                self::$rootDir = $currentDir;
+                return self::$rootDir;
             }
         }
         if ($silent) {
