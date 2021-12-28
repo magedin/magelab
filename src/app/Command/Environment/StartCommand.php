@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MageLab\Command\Environment;
 
 use MageLab\CommandBuilder\DockerCompose;
+use MageLab\Helper\DockerServiceState;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,7 +31,8 @@ class StartCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$input->getOption('force') && $this->isRunning()) {
+        $serviceState = new DockerServiceState();
+        if (!$input->getOption('force') && $serviceState->isRunning()) {
             $output->writeln('The services are already running.');
             return Command::SUCCESS;
         }
@@ -51,15 +53,5 @@ class StartCommand extends Command
         $output->writeln('Containers has been started.');
 
         return Command::SUCCESS;
-    }
-
-    /**
-     * @return bool
-     */
-    private function isRunning(): bool
-    {
-        $process = new Process(['docker-compose', 'ps', '-q']);
-        $process->run();
-        return !empty($process->getOutput());
     }
 }
