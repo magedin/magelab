@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Exception\RuntimeException;
 use Symfony\Component\Yaml\Yaml;
@@ -16,10 +15,13 @@ class Config
      */
     private static array $config = [];
 
-    public static function load()
+    /**
+     * @return void
+     */
+    public static function load(): void
     {
         if (empty(self::$config)) {
-            foreach (self::loadConfigFiles('*.yaml') as $file) {
+            foreach (self::loadConfigFiles() as $file) {
                 self::$config = array_merge(self::$config, (array) Yaml::parse($file->getContents()));
             }
         }
@@ -39,23 +41,16 @@ class Config
     }
 
     /**
-     * @param string|null $pattern
      * @return Finder
      */
-    private static function loadConfigFiles(string $pattern = null): Finder
+    private static function loadConfigFiles(): Finder
     {
         /** @var Finder $finder */
         $finder = ObjectManager::getInstance()->get(Finder::class);
-        $finder->files()
-            ->in(__DIR__ . '/config')
-            ->sortByName(true);
-
-        if ($pattern) {
-            $finder->name($pattern);
-        }
+        $finder->files()->in(CONFIG_DIR)->name(['*.yaml', '*.yml']);
 
         if (!$finder->hasResults()) {
-            throw new RuntimeException('No config files was found.');
+            throw new RuntimeException('No configuration file was found.');
         }
 
         $finder->sort(function (\SplFileInfo $a, \SplFileInfo $b) {

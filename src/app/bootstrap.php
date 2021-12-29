@@ -2,7 +2,7 @@
 
 use MagedIn\Lab\Config;
 
-require_once APP_ROOT . '/vendor/autoload.php';
+require_once ROOT . DS . 'vendor' . DS . 'autoload.php';
 
 Config::load();
 

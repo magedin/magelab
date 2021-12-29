@@ -1,8 +1,11 @@
 <?php
 
-const APP_ROOT = __DIR__;
+const DS = DIRECTORY_SEPARATOR;
+const ROOT = __DIR__;
+const APP_ROOT = ROOT . DS . 'app';
+const CONFIG_DIR = APP_ROOT . DS . 'config';
 
-require_once __DIR__ . '/app/bootstrap.php';
+require_once APP_ROOT . DS . 'bootstrap.php';
 
 use MagedIn\Lab\ObjectManager;
 use MagedIn\Lab\App;
