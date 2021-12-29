@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
-use MagedIn\Lab\CommandBuilder\DockerComposeExec;
+use MagedIn\Lab\CommandBuilder\Magento;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,16 +14,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MagentoCommand extends Command
 {
     /**
-     * @var DockerComposeExec
+     * @var Magento
      */
-    private DockerComposeExec $dockerComposeExecCommandBuilder;
+    private Magento $magentoCommandBuilder;
 
     public function __construct(
-        DockerComposeExec $dockerComposeExecCommandBuilder,
+        Magento $magentoCommandBuilder,
         string $name = null
     ) {
         parent::__construct($name);
-        $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
+        $this->magentoCommandBuilder = $magentoCommandBuilder;
     }
 
     protected function configure()
@@ -42,9 +42,7 @@ class MagentoCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->dockerComposeExecCommandBuilder->build();
-        $command[] = 'php';
-        $command[] = 'bin/magento';
+        $command = $this->magentoCommandBuilder->build();
         $command[] = $input->getArgument('magento-command');
 
         Process::run($command, function ($type, $buffer) use ($output) {
