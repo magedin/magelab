@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-class DownloadCommand extends Command
+class CloneCommand extends Command
 {
     const ARG_BRANCH = 'branch';
     const ARG_BRANCH_VALUE = 'master';

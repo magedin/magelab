@@ -23,7 +23,7 @@ commands:
         aliases:
             - clone
         description: Download the Dockerlab docker project to a given directory
-        class: \MagedIn\Lab\Command\Environment\DownloadCommand
+        class: \MagedIn\Lab\Command\Environment\CloneCommand
 
     environment:up:
         name: Get the Environment Up
