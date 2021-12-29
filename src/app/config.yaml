@@ -69,10 +69,10 @@ commands:
         description: Create the .env file with the information of the environment.
         class: \MageLab\Command\Environment\EnvFileCreateCommand
 
-    docker_compose:
-        name: Docker Compose Command
-        code: docker-compose
+    container:ssh:
+        name: SSH into a service container
+        code: container:ssh
         aliases:
-            - dc
-        description: Docker Compose Command
-        class: \MageLab\Command\DockerComposeCommand
+            - ssh
+        description: SSH into a service container
+        class: \MageLab\Command\Container\SshCommand
