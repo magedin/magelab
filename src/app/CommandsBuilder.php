@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab;
+namespace MagedIn\Lab;
 
 use Symfony\Component\Console\Command\Command;
 
@@ -42,6 +42,10 @@ class CommandsBuilder
 
         /** @var Command $command */
         $command = ObjectManager::getInstance()->create($config['class'], ['name' => $code]);
+        if (!$command instanceof Command) {
+            return null;
+        }
+
         $command->setAliases($aliases);
         $command->setDescription($description);
         return $command;

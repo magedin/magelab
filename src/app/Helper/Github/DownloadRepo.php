@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Helper\Github;
+namespace MagedIn\Lab\Helper\Github;
 
 class DownloadRepo implements RepoInterface
 {

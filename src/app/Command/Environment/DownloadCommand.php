@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Command\Environment;
+namespace MagedIn\Lab\Command\Environment;
 
-use MageLab\Helper\Github\MagentoDockerlabRepo;
-use MageLab\Model\Process;
+use MagedIn\Lab\Helper\Github\MagentoDockerlabRepo;
+use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\RuntimeException;

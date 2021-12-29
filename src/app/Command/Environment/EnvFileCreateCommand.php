@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Command\Environment;
+namespace MagedIn\Lab\Command\Environment;
 
-use MageLab\Helper\DockerLab\BasePath;
+use MagedIn\Lab\Helper\DockerLab\BasePath;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;

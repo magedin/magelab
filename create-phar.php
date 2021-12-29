@@ -1,6 +1,6 @@
 <?php
 
-$filename = 'magelab';
+$filename = 'magedin';
 
 try {
     $pharFile = __DIR__ . "/build/$filename.phar";

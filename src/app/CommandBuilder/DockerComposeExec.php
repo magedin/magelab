@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab\CommandBuilder;
+namespace MagedIn\Lab\CommandBuilder;
 
 class DockerComposeExec
 {

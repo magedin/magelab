@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Helper;
+namespace MagedIn\Lab\Helper;
 
-use MageLab\Model\Process;
+use MagedIn\Lab\Model\Process;
 
 class OperatingSystem
 {

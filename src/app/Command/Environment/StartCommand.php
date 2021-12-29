@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Command\Environment;
+namespace MagedIn\Lab\Command\Environment;
 
-use MageLab\CommandBuilder\DockerCompose;
-use MageLab\Helper\DockerServiceState;
-use MageLab\Model\Process;
+use MagedIn\Lab\CommandBuilder\DockerCompose;
+use MagedIn\Lab\Helper\DockerServiceState;
+use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

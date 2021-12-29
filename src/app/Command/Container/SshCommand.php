@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Command\Container;
+namespace MagedIn\Lab\Command\Container;
 
-use MageLab\CommandBuilder\DockerComposeExec;
-use MageLab\Model\Process;
+use MagedIn\Lab\CommandBuilder\DockerComposeExec;
+use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

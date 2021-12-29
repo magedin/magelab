@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MageLab\CommandBuilder;
+namespace MagedIn\Lab\CommandBuilder;
 
-use MageLab\CommandBuilder\DockerCompose\DockerComposeFiles;
-use MageLab\Helper\DockerLab\BasePath;
+use MagedIn\Lab\CommandBuilder\DockerCompose\DockerComposeFiles;
+use MagedIn\Lab\Helper\DockerLab\BasePath;
 
 class DockerCompose
 {

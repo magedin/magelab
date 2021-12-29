@@ -1,6 +1,6 @@
 <?php
 
-namespace MageLab\Helper\Github;
+namespace MagedIn\Lab\Helper\Github;
 
 trait RepoTrait
 {

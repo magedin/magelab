@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab;
+namespace MagedIn\Lab;
 
 use DI\DependencyException;
 use DI\NotFoundException;
@@ -12,22 +12,30 @@ use Symfony\Component\Console\Command\Command;
 class App
 {
     /**
+     * @var CommandsBuilder
+     */
+    private CommandsBuilder $commandsBuilder;
+
+    public function __construct(
+        CommandsBuilder $commandsBuilder
+    ) {
+        $this->commandsBuilder = $commandsBuilder;
+    }
+
+    /**
      * @return void
      * @throws DependencyException
      * @throws NotFoundException
      */
     public function run()
     {
-        $objectManager = ObjectManager::getInstance();
-
-        $commandsBuilder = $objectManager->get(CommandsBuilder::class);
-        $console = $objectManager->create(ConsoleApplication::class, [
-            'name' => 'MageLab',
+        $console = ObjectManager::getInstance()->create(ConsoleApplication::class, [
+            'name' => 'MagedIn Lab',
             'version' => Config::get('version'),
         ]);
 
         /** @var Command $command */
-        foreach ($commandsBuilder->build() ?? [] as $command) {
+        foreach ($this->commandsBuilder->build() ?? [] as $command) {
             $console->add($command);
         }
         $console->run();

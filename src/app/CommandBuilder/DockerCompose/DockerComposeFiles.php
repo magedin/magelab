@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace MageLab\CommandBuilder\DockerCompose;
+namespace MagedIn\Lab\CommandBuilder\DockerCompose;
 
-use MageLab\Helper\DockerLab\BasePath;
-use MageLab\Helper\OperatingSystem;
+use MagedIn\Lab\Helper\DockerLab\BasePath;
+use MagedIn\Lab\Helper\OperatingSystem;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 

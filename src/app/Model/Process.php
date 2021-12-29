@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Model;
+namespace MagedIn\Lab\Model;
 
-use MageLab\ObjectManager;
+use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Process\Process as ComponentProcess;
 
 class Process

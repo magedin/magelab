@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab;
+namespace MagedIn\Lab;
 
 use DI\Container;
 use DI\ContainerBuilder;

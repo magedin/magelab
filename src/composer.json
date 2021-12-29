@@ -1,5 +1,5 @@
 {
-    "name": "magedin/magelab",
+    "name": "magedin/lab",
     "description": "Your ultimate Magento 2 environment management.",
     "minimum-stability": "stable",
     "license": "proprietary",
@@ -24,7 +24,7 @@
     },
     "autoload": {
         "psr-4": {
-            "MageLab\\": "app"
+            "MagedIn\\Lab\\": "app"
         }
     }
 }

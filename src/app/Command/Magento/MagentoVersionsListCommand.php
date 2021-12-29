@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Command\Magento;
+namespace MagedIn\Lab\Command\Magento;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
-use MageLab\Helper\Github\DownloadRepo;
+use MagedIn\Lab\Helper\Github\DownloadRepo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
