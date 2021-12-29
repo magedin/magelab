@@ -12,7 +12,7 @@ class BasePath
     /**
      * @var int
      */
-    private static int $maxLevel = 10;
+    private static int $maxLevel = 20;
 
     /**
      * @var string
