@@ -19,9 +19,9 @@ class Config
     public static function load()
     {
         if (empty(self::$config)) {
-            foreach (self::loadConfigFiles() as $file) {
+            foreach (self::loadConfigFiles('*.yaml') as $file) {
                 self::$config = array_merge(self::$config, (array) Yaml::parse($file->getContents()));
-            };
+            }
         }
     }
 
@@ -39,17 +39,31 @@ class Config
     }
 
     /**
+     * @param string|null $pattern
      * @return Finder
      */
-    private static function loadConfigFiles(): Finder
+    private static function loadConfigFiles(string $pattern = null): Finder
     {
         /** @var Finder $finder */
         $finder = ObjectManager::getInstance()->get(Finder::class);
-        $finder->files()->in(__DIR__ . '/config')->name('*.yaml');
+        $finder->files()
+            ->in(__DIR__ . '/config')
+            ->sortByName(true);
+
+        if ($pattern) {
+            $finder->name($pattern);
+        }
 
         if (!$finder->hasResults()) {
             throw new RuntimeException('No config files was found.');
         }
+
+        $finder->sort(function (\SplFileInfo $a, \SplFileInfo $b) {
+            if (preg_match('/.*\.dev.(yaml|yml)$/', $a->getFilename())) {
+                return 999999;
+            }
+            return null;
+        });
 
         return $finder;
     }
