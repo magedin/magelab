@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MageLab\Command\Container;
 
-use MageLab\CommandBuilder\DockerCompose;
+use MageLab\CommandBuilder\DockerComposeExec;
 use MageLab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,16 +14,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SshCommand extends Command
 {
     /**
-     * @var DockerCompose
+     * @var DockerComposeExec
      */
-    private DockerCompose $dockerComposeCommandBuilder;
+    private DockerComposeExec $dockerComposeExecCommandBuilder;
 
     public function __construct(
-        DockerCompose $dockerComposeCommandBuilder,
+        DockerComposeExec $dockerComposeExecCommandBuilder,
         string $name = null
     ) {
         parent::__construct($name);
-        $this->dockerComposeCommandBuilder = $dockerComposeCommandBuilder;
+        $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
     }
 
     protected function configure()
@@ -42,8 +42,7 @@ class SshCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->dockerComposeCommandBuilder->build();
-        $command[] = 'exec';
+        $command = $this->dockerComposeExecCommandBuilder->build();
         $command[] = $input->getArgument('service');
         $command[] = 'bash';
 
