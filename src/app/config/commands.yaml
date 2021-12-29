@@ -75,3 +75,13 @@ commands:
             - ssh
         description: SSH into a service container
         class: \MagedIn\Lab\Command\Container\SshCommand
+
+    magento:cli:
+        name: Magento 2 CLI
+        code: magento:cli
+        aliases:
+            - m
+            - magento
+            - mage
+        description: Magento 2 CLI
+        class: \MagedIn\Lab\Command\Magento\MagentoCommand
