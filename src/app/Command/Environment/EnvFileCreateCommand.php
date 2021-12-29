@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MageLab\Command\Environment;
 
-use MageLab\Config\DockerLab\BasePath;
+use MageLab\Helper\DockerLab\BasePath;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;

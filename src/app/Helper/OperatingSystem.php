@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Config\Helper;
+namespace MageLab\Helper;
 
 use MageLab\Model\Process;
 

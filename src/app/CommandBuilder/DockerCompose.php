@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MageLab\CommandBuilder;
 
 use MageLab\CommandBuilder\DockerCompose\DockerComposeFiles;
-use MageLab\Config\DockerLab\BasePath;
+use MageLab\Helper\DockerLab\BasePath;
 
 class DockerCompose
 {

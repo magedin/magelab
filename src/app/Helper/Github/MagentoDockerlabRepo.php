@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Config\Github;
+namespace MageLab\Helper\Github;
 
 class MagentoDockerlabRepo implements RepoInterface
 {

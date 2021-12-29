@@ -1,6 +1,6 @@
 <?php
 
-namespace MageLab\Config\Github;
+namespace MageLab\Helper\Github;
 
 interface RepoInterface
 {

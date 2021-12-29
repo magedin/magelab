@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MageLab\Command\Environment;
 
-use MageLab\Config\Github\MagentoDockerlabRepo;
+use MageLab\Helper\Github\MagentoDockerlabRepo;
 use MageLab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;

@@ -6,7 +6,7 @@ namespace MageLab\Command\Magento;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
-use MageLab\Config\Github\DownloadRepo;
+use MageLab\Helper\Github\DownloadRepo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

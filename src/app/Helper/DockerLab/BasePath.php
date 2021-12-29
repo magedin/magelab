@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageLab\Config\DockerLab;
+namespace MageLab\Helper\DockerLab;
 
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;

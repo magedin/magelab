@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace MageLab\CommandBuilder\DockerCompose;
 
-use MageLab\Config\DockerLab\BasePath;
-use MageLab\Config\Helper\OperatingSystem;
+use MageLab\Helper\DockerLab\BasePath;
+use MageLab\Helper\OperatingSystem;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 
 class DockerComposeFiles
 {
+    /**
+     * @var OperatingSystem
+     */
     private OperatingSystem $operatingSystem;
 
     public function __construct(

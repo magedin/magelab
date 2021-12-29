@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MageLab;
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Exception\RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 
 class Config
@@ -16,9 +19,9 @@ class Config
     public static function load()
     {
         if (empty(self::$config)) {
-            $file = __DIR__ . '/config.yaml';
-            $contents = file_get_contents($file);
-            self::$config = (array) Yaml::parse($contents);
+            foreach (self::loadConfigFiles() as $file) {
+                self::$config = array_merge(self::$config, (array) Yaml::parse($file->getContents()));
+            };
         }
     }
 
@@ -33,5 +36,21 @@ class Config
             return self::$config[$index];
         }
         return null;
+    }
+
+    /**
+     * @return Finder
+     */
+    private static function loadConfigFiles(): Finder
+    {
+        /** @var Finder $finder */
+        $finder = ObjectManager::getInstance()->get(Finder::class);
+        $finder->files()->in(__DIR__ . '/config')->name('*.yaml');
+
+        if (!$finder->hasResults()) {
+            throw new RuntimeException('No config files was found.');
+        }
+
+        return $finder;
     }
 }
