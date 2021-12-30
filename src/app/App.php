@@ -6,7 +6,7 @@ namespace MagedIn\Lab;
 
 use DI\DependencyException;
 use DI\NotFoundException;
-use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 
 class App
@@ -29,7 +29,7 @@ class App
      */
     public function run()
     {
-        $console = ObjectManager::getInstance()->create(ConsoleApplication::class, [
+        $console = ObjectManager::getInstance()->create(Application::class, [
             'name' => 'MagedIn Lab',
             'version' => Config::get('version'),
         ]);
