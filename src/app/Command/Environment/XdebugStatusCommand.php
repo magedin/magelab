@@ -9,6 +9,7 @@ use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class XdebugStatusCommand extends Command
@@ -28,6 +29,12 @@ class XdebugStatusCommand extends Command
 
     protected function configure()
     {
+        $this->addOption(
+            'silent',
+            's',
+            InputOption::VALUE_NONE,
+            'Run command silently.'
+        );
     }
 
     /**
@@ -46,18 +53,24 @@ class XdebugStatusCommand extends Command
         $result = $process->getOutput();
 
         preg_match("/.*Xdebug.*Copyright.*/", $result, $matches);
+
         if (empty($matches)) {
             $messages = [
                 "<fg=yellow>Xdebug is currently DISABLED.</>",
             ];
+            $result = Command::FAILURE;
         } else {
             $messages = [
                 "<fg=green>Xdebug is currently ENABLED.</>",
                 "<fg=white>Keeping Xdebug always enabled may affect PHP performance.</>",
                 "<fg=white>Try to disabled when you do not need it.</>"
             ];
+            $result = Command::SUCCESS;
         }
-        $output->writeln($messages);
-        return Command::SUCCESS;
+
+        if (!$input->getOption('silent')) {
+            $output->writeln($messages);
+        }
+        return $result;
     }
 }

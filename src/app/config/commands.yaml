@@ -76,6 +76,31 @@ commands:
         description: Show whether Xdebug is enabled or not
         class: \MagedIn\Lab\Command\Environment\XdebugStatusCommand
 
+    environment:xdebug:toggle:
+        name: Toggle Xdebug status (enabled/disabled)
+        code: environment:xdebug
+        aliases:
+            - xdebug
+            - xdebug-toggle
+        description: Toggle Xdebug status (enabled/disabled)
+        class: \MagedIn\Lab\Command\Environment\XdebugToggleCommand
+
+    environment:xdebug:enabled:
+        name: Enable Xdebug
+        code: environment:xdebug:enable
+        aliases:
+            - xdebug-enable
+        description: Enable Xdebug
+        class: \MagedIn\Lab\Command\Environment\XdebugEnableCommand
+
+    environment:xdebug:disable:
+        name: Disable Xdebug
+        code: environment:xdebug:disable
+        aliases:
+            - xdebug-disable
+        description: Disable Xdebug
+        class: \MagedIn\Lab\Command\Environment\XdebugDisableCommand
+
     container:ssh:
         name: SSH into a service container
         code: container:ssh
