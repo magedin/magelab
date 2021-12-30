@@ -78,7 +78,7 @@ commands:
 
     environment:xdebug:toggle:
         name: Toggle Xdebug status (enabled/disabled)
-        code: environment:xdebug
+        code: environment:xdebug:toggle
         aliases:
             - xdebug
             - xdebug-toggle
