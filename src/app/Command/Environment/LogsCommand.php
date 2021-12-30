@@ -87,9 +87,11 @@ class LogsCommand extends Command
             $command[] = $tail;
         }
 
-        Process::run($command, function ($type, $buffer) use ($output) {
-            $output->write($buffer);
-        });
+        Process::run($command, [
+            'callback' => function ($type, $buffer) use ($output) {
+                $output->write($buffer);
+            }
+        ]);
 
         return Command::SUCCESS;
     }

@@ -105,7 +105,8 @@ class CloneCommand extends Command
             return true;
         }
 
-        $process = Process::run(['git', 'ls-remote', '--heads', $this->getRepoSshUrl(), $branch]);
+        $command = ['git', 'ls-remote', '--heads', $this->getRepoSshUrl(), $branch];
+        $process = Process::run($command);
         if (!$process->isSuccessful()) {
             return false;
         }

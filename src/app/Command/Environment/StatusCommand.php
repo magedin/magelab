@@ -96,9 +96,11 @@ class StatusCommand extends Command
             $command[] = $filter;
         }
 
-        Process::run($command, function ($type, $buffer) use ($output) {
-            $output->writeln($buffer);
-        });
+        Process::run($command, [
+            'callback' => function ($type, $buffer) use ($output) {
+                $output->writeln($buffer);
+            }
+        ]);
 
         return Command::SUCCESS;
     }

@@ -76,38 +76,46 @@ commands:
         description: Create the .env file with the information of the environment.
         class: \MagedIn\Lab\Command\Environment\EnvFileCreateCommand
 
-    environment:xdebug:status:
+    php:xdebug:status:
         name: Show whether Xdebug is enabled or not
-        code: environment:xdebug:status
+        code: php:xdebug:status
         aliases:
             - xdebug-status
         description: Show whether Xdebug is enabled or not
-        class: \MagedIn\Lab\Command\Environment\XdebugStatusCommand
+        class: \MagedIn\Lab\Command\Php\XdebugStatusCommand
 
-    environment:xdebug:toggle:
+    php:xdebug:toggle:
         name: Toggle Xdebug status (enabled/disabled)
-        code: environment:xdebug:toggle
+        code: php:xdebug:toggle
         aliases:
             - xdebug
             - xdebug-toggle
         description: Toggle Xdebug status (enabled/disabled)
-        class: \MagedIn\Lab\Command\Environment\XdebugToggleCommand
+        class: \MagedIn\Lab\Command\Php\XdebugToggleCommand
 
-    environment:xdebug:enabled:
+    php:xdebug:enabled:
         name: Enable Xdebug
-        code: environment:xdebug:enable
+        code: php:xdebug:enable
         aliases:
             - xdebug-enable
         description: Enable Xdebug
-        class: \MagedIn\Lab\Command\Environment\XdebugEnableCommand
+        class: \MagedIn\Lab\Command\Php\XdebugEnableCommand
 
-    environment:xdebug:disable:
+    php:xdebug:disable:
         name: Disable Xdebug
-        code: environment:xdebug:disable
+        code: php:xdebug:disable
         aliases:
             - xdebug-disable
         description: Disable Xdebug
-        class: \MagedIn\Lab\Command\Environment\XdebugDisableCommand
+        class: \MagedIn\Lab\Command\Php\XdebugDisableCommand
+
+    php:composer:
+        name: Run Composer
+        code: php:composer
+        aliases:
+            - composer
+        description: Run Composer
+        class: \MagedIn\Lab\Command\Php\ComposerCommand
 
     container:ssh:
         name: SSH into a service container

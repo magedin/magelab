@@ -10,32 +10,34 @@ use Symfony\Component\Process\Process as ComponentProcess;
 class Process
 {
     /**
+     * @var array
+     */
+    private static array $defaultOptions = [
+        'callback' => null,
+        'tty'      => false,
+        'pty'      => false,
+        'env'      => [],
+        'cwd'      => null,
+        'input'    => null,
+        'timeout'  => 60,
+    ];
+
+    /**
      * @param array $command
-     * @param callable|null $callback
-     * @param bool $tty
-     * @param bool $pty
-     * @param array $env
-     * @param string|null $cwd
-     * @param null $input
-     * @param float|null $timeout
+     * @param array $options
      * @return ComponentProcess
      */
-    public static function run(
-        array $command,
-        callable $callback = null,
-        bool $tty = false,
-        bool $pty = false,
-        array $env = [],
-        string $cwd = null,
-        $input = null,
-        ?float $timeout = 60
-    ): ComponentProcess {
+    public static function run(array $command, array $options = []): ComponentProcess
+    {
         /** @var ProcessFactory $processFactory */
         $processFactory = ObjectManager::getInstance()->create(ProcessFactory::class);
-        $process = $processFactory->create($command, $cwd, $env, $input, $timeout);
-        $process->setTty($tty);
-        $process->setPty($pty);
-        $process->run($callback, $env);
+        $opt = array_merge(self::$defaultOptions, $options);
+
+        $process = $processFactory->create($command, $opt['cwd'], $opt['env'], $opt['input'], $opt['timeout']);
+        $process->setTty($opt['tty']);
+        $process->setPty($opt['pty']);
+        $process->run($opt['callback'], $opt['env']);
+
         return $process;
     }
 }

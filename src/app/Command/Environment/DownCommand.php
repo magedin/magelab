@@ -62,9 +62,11 @@ class DownCommand extends Command
 
         $output->writeln('Stopping and removing the containers.');
 
-        Process::run($command, function ($type, $buffer) use ($output) {
-            $output->write($buffer);
-        });
+        Process::run($command, [
+            'callback' => function ($type, $buffer) use ($output) {
+                $output->write($buffer);
+            },
+        ]);
 
         $output->writeln('Containers has been removed.');
 

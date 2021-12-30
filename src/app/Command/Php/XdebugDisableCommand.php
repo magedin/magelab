@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab\Command\Environment;
+namespace MagedIn\Lab\Command\Php;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableDisableInterface
+class XdebugDisableCommand extends XdebugAbstractCommand implements XdebugEnableDisableInterface
 {
     /**
      * @inheritDoc
      */
     public function writeCheckResult(OutputInterface $output): void
     {
-        $output->writeln('<fg=yellow>Xdebug is already ENABLED. No changes applied.</>');
+        $output->writeln('<fg=yellow>Xdebug is already DISABLED. No changes applied.</>');
     }
 
     /**
@@ -22,7 +22,7 @@ class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableD
      */
     public function writeEndResult(OutputInterface $output): void
     {
-        $output->writeln('<fg=green>Xdebug is now ENABLED.</>');
+        $output->writeln('<fg=yellow>Xdebug is now DISABLED.</>');
     }
 
     /**
@@ -30,7 +30,7 @@ class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableD
      */
     public function getSedPattern(): string
     {
-        return $this->xdebugInfo->getSedEnablePattern();
+        return $this->xdebugInfo->getSedDisablePattern();
     }
 
     /**
@@ -38,7 +38,7 @@ class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableD
      */
     public function getCheckCode(): int
     {
-        /** Xdebug is already ENABLED. */
-        return Command::SUCCESS;
+        /** Xdebug is already DISABLED. */
+        return Command::FAILURE;
     }
 }

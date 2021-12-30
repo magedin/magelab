@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab\Command\Environment;
+namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;

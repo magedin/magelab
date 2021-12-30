@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab\Command\Environment;
+namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\Helper\Container\Php\XdebugInfo;
@@ -71,7 +71,7 @@ abstract class XdebugAbstractCommand extends Command
         $command[] = $this->getSedPattern();
         $command[] = $this->xdebugInfo->getActivateFileName();
 
-        Process::run($command, null, true);
+        Process::run($command, ['tty' => true]);
         $this->writeEndResult($output);
         $this->restartServices($output);
         return Command::SUCCESS;

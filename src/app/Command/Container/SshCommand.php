@@ -6,7 +6,9 @@ namespace MagedIn\Lab\Command\Container;
 
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\Model\Process;
+use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,7 +32,7 @@ class SshCommand extends Command
     {
         $this->addArgument(
             'service',
-            InputArgument::REQUIRED,
+            InputArgument::OPTIONAL,
             'Select a specific service container'
         );
     }
@@ -42,14 +44,42 @@ class SshCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$input->getArgument('service')) {
+            $this->showOptions($output);
+            return Command::FAILURE;
+        }
+
         $command = $this->dockerComposeExecCommandBuilder->build();
         $command[] = $input->getArgument('service');
         $command[] = 'bash';
 
-        Process::run($command, function ($type, $buffer) use ($output) {
-            $output->writeln($buffer);
-        }, true);
+        Process::run($command, [
+            'tty' => true,
+            'callback' => function ($type, $buffer) use ($output) {
+                $output->writeln($buffer);
+            },
+        ]);
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return void
+     * @throws \Exception
+     */
+    private function showOptions(OutputInterface $output): void
+    {
+        $output->writeln([
+            '<comment>You need to provid one of the following service names to SSH command:</comment>',
+            null
+        ]);
+        $command = $this->getApplication()->find('status');
+        $input = ObjectManager::getInstance()->create(ArrayInput::class, [
+            'parameters' => [
+                '--services' => true
+            ]
+        ]);
+        $command->run($input, $output);
     }
 }

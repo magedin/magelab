@@ -68,9 +68,12 @@ class MagentoCommand extends Command
             $command[] = '--help';
         }
 
-        Process::run($command, function ($type, $buffer) use ($output) {
-            $output->writeln($buffer);
-        }, true);
+        Process::run($command, [
+            'tty' => true,
+            'callback' => function ($type, $buffer) use ($output) {
+                $output->writeln($buffer);
+            },
+        ]);
 
         return Command::SUCCESS;
     }

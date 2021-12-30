@@ -1,6 +1,6 @@
 <?php
 
-namespace MagedIn\Lab\Command\Environment;
+namespace MagedIn\Lab\Command\Php;
 
 use Symfony\Component\Console\Output\OutputInterface;
 

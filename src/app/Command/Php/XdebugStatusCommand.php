@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab\Command\Environment;
+namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -49,7 +48,7 @@ class XdebugStatusCommand extends Command
         $command[] = 'php';
         $command[] = '--version';
 
-        $process = Process::run($command, null, false, true);
+        $process = Process::run($command, ['pty' => true]);
         $result = $process->getOutput();
 
         preg_match("/.*Xdebug.*Copyright.*/", $result, $matches);
