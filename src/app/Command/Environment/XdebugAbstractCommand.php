@@ -73,7 +73,19 @@ abstract class XdebugAbstractCommand extends Command
 
         Process::run($command, null, true);
         $this->writeEndResult($output);
+        $this->restartServices($output);
         return Command::SUCCESS;
+    }
+
+    protected function restartServices(OutputInterface $output)
+    {
+        $xdebugCommand = $this->getApplication()->find('restart');
+        $emptyInput = ObjectManager::getInstance()->create(ArrayInput::class, [
+            'parameters' => [
+                'services' => ['php'],
+            ]
+        ]);
+        $xdebugCommand->run($emptyInput, $output);
     }
 
     /**

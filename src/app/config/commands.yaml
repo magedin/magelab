@@ -34,6 +34,14 @@ commands:
         description: Run the docker-composer command to get the environment up and running
         class: \MagedIn\Lab\Command\Environment\StartCommand
 
+    environment:restart:
+        name: Restart the service containers
+        code: environment:restart
+        aliases:
+            - restart
+        description: Restart the service containers
+        class: \MagedIn\Lab\Command\Environment\RestartCommand
+
     environment:down:
         name: Get the Environment Down
         code: environment:down
