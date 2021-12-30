@@ -68,6 +68,14 @@ commands:
         description: Create the .env file with the information of the environment.
         class: \MagedIn\Lab\Command\Environment\EnvFileCreateCommand
 
+    environment:xdebug:status:
+        name: Show whether Xdebug is enabled or not
+        code: environment:xdebug:status
+        aliases:
+            - xdebug-status
+        description: Show whether Xdebug is enabled or not
+        class: \MagedIn\Lab\Command\Environment\XdebugStatusCommand
+
     container:ssh:
         name: SSH into a service container
         code: container:ssh
