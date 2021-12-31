@@ -58,12 +58,16 @@ class CommandsBuilder
             return null;
         }
 
+        $command->setAliases($aliases);
+        $command->setDescription($description);
+
+        /**
+         * Register special commands so the default options will be omitted when called.
+         */
         if ($override) {
             $this->specialCommands->add($code)->addAliases($aliases);
         }
 
-        $command->setAliases($aliases);
-        $command->setDescription($description);
         return $command;
     }
 }

@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
-use MagedIn\Lab\CommandBuilder\Magento;
+use MagedIn\Lab\Command\SpecialCommand;
+use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
+use MagedIn\Lab\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class N98Command extends Command
+class N98Command extends SpecialCommand
 {
     /**
-     * @var Magento
+     * @var DockerComposePhpExec
      */
-    private Magento $magentoCommandBuilder;
+    private DockerComposePhpExec $dockerComposePhpExecCommandBuilder;
 
     public function __construct(
-        Magento $magentoCommandBuilder,
+        DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
+        NonDefaultOptions $nonDefaultOptions,
         string $name = null
     ) {
-        parent::__construct($name);
-        $this->magentoCommandBuilder = $magentoCommandBuilder;
+        parent::__construct($nonDefaultOptions, $name);
+        $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
     }
 
     protected function configure()
@@ -57,18 +59,10 @@ class N98Command extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->magentoCommandBuilder->build();
-        array_pop($command);
+        $command = $this->dockerComposePhpExecCommandBuilder->build();
         $command[] = 'n98';
-        $argv = $argv ?? $_SERVER['argv'] ?? [];
-        array_shift($argv);
-        array_shift($argv);
-
+        $argv = $this->getShiftedArgv();
         $command = array_merge($command, $argv);
-
-        if ($input->getOption('describe')) {
-            $command[] = '--help';
-        }
 
         Process::run($command, [
             'tty' => true,
@@ -78,41 +72,5 @@ class N98Command extends Command
         ]);
 
         return Command::SUCCESS;
-    }
-
-    public function getDefinition()
-    {
-        $options = $this->filterOptions();
-        foreach ($options as $option) {
-            $this->addOption($option);
-        }
-        return parent::getDefinition();
-    }
-
-    /**
-     * @return array
-     */
-    private function filterOptions(): array
-    {
-        $argv = $argv ?? $_SERVER['argv'] ?? [];
-        array_shift($argv);
-
-        $options = array_map(function (&$option) {
-            if (str_starts_with($option, '--')) {
-                return substr($option, 2);
-            }
-            if (str_starts_with($option, '-')) {
-                return substr($option, 1);
-            }
-            return false;
-        }, $argv);
-        $options = array_filter($options, function ($option) {
-            $restricted = ['version', 'help'];
-            if (!$option || in_array($option, $restricted)) {
-                return false;
-            }
-            return $option;
-        });
-        return $options;
     }
 }

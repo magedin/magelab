@@ -7,14 +7,14 @@ namespace MagedIn\Lab\CommandBuilder;
 class Magento
 {
     /**
-     * @var DockerComposeExec
+     * @var DockerComposePhpExec
      */
-    private DockerComposeExec $dockerComposeExec;
+    private DockerComposePhpExec $dockerComposePhpExec;
 
     public function __construct(
-        DockerComposeExec $dockerComposeExec
+        DockerComposePhpExec $dockerComposePhpExec
     ) {
-        $this->dockerComposeExec = $dockerComposeExec;
+        $this->dockerComposePhpExec = $dockerComposePhpExec;
     }
 
     /**
@@ -22,8 +22,7 @@ class Magento
      */
     public function build(): array
     {
-        $command = $this->dockerComposeExec->build();
-        $command[] = 'php';
+        $command = $this->dockerComposePhpExec->build();
         $command[] = 'bin/magento';
         return $command;
     }
