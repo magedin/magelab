@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Mkcert;
 
-use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -66,7 +65,7 @@ class MkcertSslGenerateCommand extends Command
         }
 
         $command = array_merge($command, $domains);
-        Process::run($command, ['tty' => true]);
+        Process::run($command, ['pty' => true]);
         return Command::SUCCESS;
     }
 }
