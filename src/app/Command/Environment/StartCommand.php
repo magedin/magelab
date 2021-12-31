@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Environment;
 
 use MagedIn\Lab\CommandBuilder\DockerCompose;
+use MagedIn\Lab\Console\Output\OutputWrapperBuilder;
 use MagedIn\Lab\Helper\DockerServiceState;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
@@ -24,14 +25,21 @@ class StartCommand extends Command
      */
     private DockerCompose $dockerComposeCommandBuilder;
 
+    /**
+     * @var OutputWrapperBuilder
+     */
+    private OutputWrapperBuilder $outputWrapperBuilder;
+
     public function __construct(
         DockerServiceState $dockerServiceState,
         DockerCompose $dockerComposeCommandBuilder,
+        OutputWrapperBuilder $outputWrapperBuilder,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dockerServiceState = $dockerServiceState;
         $this->dockerComposeCommandBuilder = $dockerComposeCommandBuilder;
+        $this->outputWrapperBuilder = $outputWrapperBuilder;
     }
 
     protected function configure()
@@ -61,15 +69,14 @@ class StartCommand extends Command
         $command[] = 'up';
         $command[] = '-d';
 
-        $output->writeln('Starting the containers.');
-
+        $output->writelnInfo('Starting the containers.');
+        $outputWrapper = $this->outputWrapperBuilder->build($output);
         Process::run($command, [
-            'callback' => function ($type, $buffer) use ($output) {
-                $output->write($buffer);
+            'callback' => function ($type, $buffer) use ($outputWrapper) {
+                $outputWrapper->overwrite($buffer);
             }
         ]);
-
-        $output->writeln('Containers has been started.');
+        $output->writelnInfo('Containers has been started.');
 
         return Command::SUCCESS;
     }

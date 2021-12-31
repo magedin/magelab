@@ -5,25 +5,26 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Console;
 
 use MagedIn\Lab\Config;
-use MagedIn\Lab\Console\Input\ArgvInput;
 use Symfony\Component\Console\Command\Command;
 
 class ConsoleBuilder
 {
+    /**
+     * @var CommandsBuilder
+     */
     private CommandsBuilder $commandsBuilder;
 
+    /**
+     * @var Application
+     */
     private Application $application;
-
-    private ArgvInput $argvInput;
 
     public function __construct(
         CommandsBuilder $commandsBuilder,
-        Application $application,
-        ArgvInput $argvInput
+        Application $application
     ) {
         $this->commandsBuilder = $commandsBuilder;
         $this->application = $application;
-        $this->argvInput = $argvInput;
     }
 
     public function build()

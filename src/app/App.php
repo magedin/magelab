@@ -6,6 +6,7 @@ namespace MagedIn\Lab;
 
 use MagedIn\Lab\Console\ConsoleBuilder;
 use MagedIn\Lab\Console\Input\ArgvInput;
+use MagedIn\Lab\Console\Output\ConsoleOutput;
 
 class App
 {
@@ -19,12 +20,19 @@ class App
      */
     private ArgvInput $input;
 
+    /**
+     * @var ConsoleOutput
+     */
+    private ConsoleOutput $consoleOutput;
+
     public function __construct(
         ConsoleBuilder $consoleBuilder,
-        ArgvInput $input
+        ArgvInput $input,
+        ConsoleOutput $consoleOutput
     ) {
         $this->consoleBuilder = $consoleBuilder;
         $this->input = $input;
+        $this->consoleOutput = $consoleOutput;
     }
 
     /**
@@ -34,6 +42,6 @@ class App
     public function run()
     {
         $console = $this->consoleBuilder->build();
-        $console->run($this->input);
+        $console->run($this->input, $this->consoleOutput);
     }
 }
