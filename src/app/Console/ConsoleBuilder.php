@@ -6,8 +6,6 @@ namespace MagedIn\Lab\Console;
 
 use MagedIn\Lab\Config;
 use MagedIn\Lab\Console\Input\ArgvInput;
-use MagedIn\Lab\ObjectManager;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 
 class ConsoleBuilder

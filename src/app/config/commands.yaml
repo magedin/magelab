@@ -116,7 +116,6 @@ commands:
             - composer
         description: Run Composer
         class: \MagedIn\Lab\Command\Php\ComposerCommand
-        override: true
 
     container:ssh:
         name: SSH into a service container
@@ -135,7 +134,6 @@ commands:
             - mage
         description: Magento 2 CLI
         class: \MagedIn\Lab\Command\Magento\MagentoCommand
-        override: true
 
     n98:
         name: n98 Magerun Script
@@ -143,4 +141,3 @@ commands:
         aliases:
         description: n98 Magerun Script
         class: \MagedIn\Lab\Command\Magento\N98Command
-        override: true

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Console;
 
+use MagedIn\Lab\Command\SpecialCommand;
 use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper;
 use MagedIn\Lab\ObjectManager;
@@ -64,7 +65,7 @@ class CommandsBuilder
         /**
          * Register special commands so the default options will be omitted when called.
          */
-        if ($override) {
+        if ($command instanceof SpecialCommand) {
             $this->specialCommands->add($code)->addAliases($aliases);
         }
 

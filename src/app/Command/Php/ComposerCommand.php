@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\Command\SpecialCommand;
-use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
 use MagedIn\Lab\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
