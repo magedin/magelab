@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab;
 
+use MagedIn\Lab\Console\Input\ArgvInput;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArgvInput;
-use MagedIn\Lab\Console\Input\InputDefinition;
 
 class App
 {
@@ -37,6 +36,7 @@ class App
         foreach ($this->commandsBuilder->build() ?? [] as $command) {
             $console->add($command);
         }
-        $console->run();
+        $input = ObjectManager::getInstance()->create(ArgvInput::class);
+        $console->run($input);
     }
 }

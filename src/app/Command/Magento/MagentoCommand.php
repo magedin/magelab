@@ -104,7 +104,13 @@ class MagentoCommand extends Command
             }
             return false;
         }, $argv);
-        $options = array_filter($options);
+        $options = array_filter($options, function ($option) {
+            $restricted = ['version', 'help'];
+            if (!$option || in_array($option, $restricted)) {
+                return false;
+            }
+            return $option;
+        });
         return $options;
     }
 }
