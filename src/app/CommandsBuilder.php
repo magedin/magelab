@@ -8,6 +8,14 @@ use Symfony\Component\Console\Command\Command;
 
 class CommandsBuilder
 {
+    private Helper\SpecialCommands $specialCommands;
+
+    public function __construct(
+        \MagedIn\Lab\Helper\SpecialCommands $specialCommands
+    ) {
+        $this->specialCommands = $specialCommands;
+    }
+
     /**
      * @return array
      */
@@ -39,11 +47,16 @@ class CommandsBuilder
         $code = $config['code'] ?? null;
         $aliases = (array) $config['aliases'] ?? null;
         $description = $config['description'] ?? null;
+        $override = $config['override'] ?? false;
 
         /** @var Command $command */
         $command = ObjectManager::getInstance()->create($config['class'], ['name' => $code]);
         if (!$command instanceof Command) {
             return null;
+        }
+
+        if ($override) {
+            $this->specialCommands->add($code)->addAliases($aliases);
         }
 
         $command->setAliases($aliases);
