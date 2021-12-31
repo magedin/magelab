@@ -1,4 +1,12 @@
 <?php
+/**
+ * MagedIn Technology
+ *
+ * @category  MagedIn MageLab
+ * @copyright Copyright (c) 2021 MagedIn Technology.
+ *
+ * @author    Tiago Sampaio <tiago.sampaio@magedin.com>
+ */
 
 declare(strict_types=1);
 
@@ -50,6 +58,7 @@ abstract class XdebugAbstractCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -76,6 +85,11 @@ abstract class XdebugAbstractCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * @param OutputInterface $output
+     * @return void
+     * @throws \Exception
+     */
     protected function restartServices(OutputInterface $output)
     {
         $xdebugCommand = $this->getApplication()->find('restart');
