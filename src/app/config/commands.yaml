@@ -155,5 +155,29 @@ commands:
         name: n98 Magerun Script
         code: n98
         aliases:
+            - magerun
         description: n98 Magerun Script
         class: \MagedIn\Lab\Command\Magento\N98Command
+
+    mkcert:ssl:generate:
+        name: Generate self-signed SSL files for local development
+        code: mkcert:ssl:generate
+        aliases:
+            - ssl:generate
+            - ssl
+        description: Generate self-signed SSL files for local development
+        class: \MagedIn\Lab\Command\Mkcert\MkcertSslGenerateCommand
+
+    mkcert:install:
+        name: Install the local CA in the system trust store.
+        code: mkcert:install
+        aliases:
+        description: Install the local CA in the system trust store.
+        class: \MagedIn\Lab\Command\Mkcert\MkcertInstallCommand
+
+    mkcert:uninstall:
+        name: Uninstall the local CA (but do not delete it).
+        code: mkcert:uninstall
+        aliases:
+        description: Uninstall the local CA (but do not delete it).
+        class: \MagedIn\Lab\Command\Mkcert\MkcertUninstallCommand

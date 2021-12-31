@@ -4,6 +4,7 @@ const DS = DIRECTORY_SEPARATOR;
 const ROOT = __DIR__;
 const APP_ROOT = ROOT . DS . 'app';
 const CONFIG_DIR = APP_ROOT . DS . 'config';
+const BIN_DIR = APP_ROOT . DS . 'bin';
 
 require_once APP_ROOT . DS . 'bootstrap.php';
 
