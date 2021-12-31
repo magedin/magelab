@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Php;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableDisableInterface
@@ -20,7 +21,7 @@ class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableD
     /**
      * @inheritDoc
      */
-    public function writeEndResult(OutputInterface $output): void
+    public function writeEndResult(InputInterface $input, OutputInterface $output): void
     {
         $output->writeln('<fg=green>Xdebug is now ENABLED.</>');
     }
@@ -28,7 +29,7 @@ class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableD
     /**
      * @inheritDoc
      */
-    public function getSedPattern(): string
+    public function getSedPattern(InputInterface $input): string
     {
         return $this->xdebugInfo->getSedEnablePattern();
     }
@@ -40,5 +41,13 @@ class XdebugEnableCommand extends XdebugAbstractCommand implements XdebugEnableD
     {
         /** Xdebug is already ENABLED. */
         return Command::SUCCESS;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIniFilename(): string
+    {
+        return $this->xdebugInfo->getActivateFileName();
     }
 }

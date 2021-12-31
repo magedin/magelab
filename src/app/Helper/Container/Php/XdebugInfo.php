@@ -66,4 +66,22 @@ class XdebugInfo
     {
         return 's/^zend_extension/\;zend_extension/g';
     }
+
+    /**
+     * @param string $requestMode
+     * @return string
+     */
+    public function getSedRequestModeChangePattern(string $requestMode): string
+    {
+        return "s/^xdebug.start_with_request.*/xdebug.start_with_request = $requestMode/g";
+    }
+
+    /**
+     * @param string $mode
+     * @return string
+     */
+    public function getSedModeChangePattern(string $mode): string
+    {
+        return "s/^xdebug.mode.*/xdebug.mode = $mode/g";
+    }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Php;
 
-use MagedIn\Lab\CommandBuilder\DockerComposeExec;
+use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
 use MagedIn\Lab\Helper\Container\Php\XdebugInfo;
 use MagedIn\Lab\Model\Process;
 use MagedIn\Lab\ObjectManager;
@@ -17,9 +17,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class XdebugAbstractCommand extends Command
 {
     /**
-     * @var DockerComposeExec
+     * @var DockerComposePhpExec
      */
-    private DockerComposeExec $dockerComposeExecCommandBuilder;
+    private DockerComposePhpExec $dockerComposePhpExecCommandBuilder;
 
     /**
      * @var XdebugInfo
@@ -27,12 +27,12 @@ abstract class XdebugAbstractCommand extends Command
     protected XdebugInfo $xdebugInfo;
 
     public function __construct(
-        DockerComposeExec $dockerComposeExecCommandBuilder,
+        DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
         XdebugInfo $xdebugInfo,
         string $name = null
     ) {
         parent::__construct($name);
-        $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
+        $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
         $this->xdebugInfo = $xdebugInfo;
     }
 
@@ -53,7 +53,7 @@ abstract class XdebugAbstractCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $skipChecks = $input->getOption('skip-checks');
+        $skipChecks = $this->skipChecks($input);
         if (!$skipChecks) {
             $returnCode = $this->checkXdebugStatus($output);
         }
@@ -63,16 +63,15 @@ abstract class XdebugAbstractCommand extends Command
             return Command::SUCCESS;
         }
 
-        $command = $this->dockerComposeExecCommandBuilder->build();
-        $command[] = 'php'; /** container where the exec will run. */
+        $command = $this->dockerComposePhpExecCommandBuilder->build();
         $command[] = 'sed';
         $command[] = '-i';
         $command[] = '-e';
-        $command[] = $this->getSedPattern();
-        $command[] = $this->xdebugInfo->getActivateFileName();
+        $command[] = $this->getSedPattern($input);
+        $command[] = $this->getIniFilename();
 
         Process::run($command, ['tty' => true]);
-        $this->writeEndResult($output);
+        $this->writeEndResult($input, $output);
         $this->restartServices($output);
         return Command::SUCCESS;
     }
@@ -101,5 +100,14 @@ abstract class XdebugAbstractCommand extends Command
         ]);
 
         return $xdebugCommand->run($emptyInput, $output);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return bool
+     */
+    protected function skipChecks(InputInterface $input): bool
+    {
+        return (bool) $input->getOption('skip-checks');
     }
 }

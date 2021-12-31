@@ -109,6 +109,22 @@ commands:
         description: Disable Xdebug
         class: \MagedIn\Lab\Command\Php\XdebugDisableCommand
 
+    php:xdebug:request-mode:
+        name: Change Xdebug Request Mode
+        code: php:xdebug:request-mode
+        aliases:
+            - xdebug-request-mode
+        description: Change Xdebug Request Mode
+        class: \MagedIn\Lab\Command\Php\XdebugRequestModeCommand
+
+    php:xdebug:mode:
+        name: Change Xdebug Mode
+        code: php:xdebug:mode
+        aliases:
+            - xdebug-mode
+        description: Change Xdebug Mode
+        class: \MagedIn\Lab\Command\Php\XdebugModeCommand
+
     php:composer:
         name: Run Composer
         code: php:composer
