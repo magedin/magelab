@@ -6,7 +6,7 @@ namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\Command\SpecialCommand;
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
-use MagedIn\Lab\Console\NonDefaultOptions;
+use MagedIn\Lab\Helper\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab\Console;
+namespace MagedIn\Lab\Helper\Console;
 
 class NonDefaultOptions
 {

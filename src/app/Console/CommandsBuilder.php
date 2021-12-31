@@ -6,16 +6,19 @@ namespace MagedIn\Lab\Console;
 
 use MagedIn\Lab\Command\SpecialCommand;
 use MagedIn\Lab\Config;
-use MagedIn\Lab\Helper;
+use MagedIn\Lab\Helper\SpecialCommands;
 use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
 
 class CommandsBuilder
 {
-    private Helper\SpecialCommands $specialCommands;
+    /**
+     * @var SpecialCommands
+     */
+    private SpecialCommands $specialCommands;
 
     public function __construct(
-        \MagedIn\Lab\Helper\SpecialCommands $specialCommands
+        SpecialCommands $specialCommands
     ) {
         $this->specialCommands = $specialCommands;
     }

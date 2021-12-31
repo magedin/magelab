@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Console\Input;
 
-use MagedIn\Lab\Console\DefaultOptions;
+use MagedIn\Lab\Helper\Console\DefaultOptions;
 use MagedIn\Lab\Helper\SpecialCommands;
 use Symfony\Component\Console\Input\InputDefinition;
 
