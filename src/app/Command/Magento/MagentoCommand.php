@@ -8,6 +8,7 @@ use MagedIn\Lab\CommandBuilder\Magento;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,12 +58,11 @@ class MagentoCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $command = $this->magentoCommandBuilder->build();
-        $command[] = $input->getArgument('magento-command');
+        $argv = $argv ?? $_SERVER['argv'] ?? [];
+        array_shift($argv);
+        array_shift($argv);
 
-        $subcommand = $input->getArgument('subcommand');
-        if ($subcommand) {
-            $command = array_merge($command, $subcommand);
-        }
+        $command = array_merge($command, $argv);
 
         if ($input->getOption('describe')) {
             $command[] = '--help';
@@ -76,5 +76,35 @@ class MagentoCommand extends Command
         ]);
 
         return Command::SUCCESS;
+    }
+
+    public function getDefinition()
+    {
+        $options = $this->filterOptions();
+        foreach ($options as $option) {
+            $this->addOption($option);
+        }
+        return parent::getDefinition();
+    }
+
+    /**
+     * @return array
+     */
+    private function filterOptions(): array
+    {
+        $argv = $argv ?? $_SERVER['argv'] ?? [];
+        array_shift($argv);
+
+        $options = array_map(function (&$option) {
+            if (str_starts_with($option, '--')) {
+                return substr($option, 2);
+            }
+            if (str_starts_with($option, '-')) {
+                return substr($option, 1);
+            }
+            return false;
+        }, $argv);
+        $options = array_filter($options);
+        return $options;
     }
 }

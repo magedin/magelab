@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab;
 
-use DI\DependencyException;
-use DI\NotFoundException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArgvInput;
+use MagedIn\Lab\Console\Input\InputDefinition;
 
 class App
 {
@@ -24,13 +24,12 @@ class App
 
     /**
      * @return void
-     * @throws DependencyException
-     * @throws NotFoundException
      */
     public function run()
     {
+        /** @var Application $console */
         $console = ObjectManager::getInstance()->create(Application::class, [
-            'name' => 'MagedIn Lab',
+            'name' => Config::get('name'),
             'version' => Config::get('version'),
         ]);
 
