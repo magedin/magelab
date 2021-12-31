@@ -4,39 +4,36 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab;
 
+use MagedIn\Lab\Console\ConsoleBuilder;
 use MagedIn\Lab\Console\Input\ArgvInput;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
 
 class App
 {
     /**
-     * @var CommandsBuilder
+     * @var ConsoleBuilder
      */
-    private CommandsBuilder $commandsBuilder;
+    private ConsoleBuilder $consoleBuilder;
+
+    /**
+     * @var ArgvInput
+     */
+    private ArgvInput $input;
 
     public function __construct(
-        CommandsBuilder $commandsBuilder
+        ConsoleBuilder $consoleBuilder,
+        ArgvInput $input
     ) {
-        $this->commandsBuilder = $commandsBuilder;
+        $this->consoleBuilder = $consoleBuilder;
+        $this->input = $input;
     }
 
     /**
      * @return void
+     * @throws \Exception
      */
     public function run()
     {
-        /** @var Application $console */
-        $console = ObjectManager::getInstance()->create(Application::class, [
-            'name' => Config::get('name'),
-            'version' => Config::get('version'),
-        ]);
-
-        /** @var Command $command */
-        foreach ($this->commandsBuilder->build() ?? [] as $command) {
-            $console->add($command);
-        }
-        $input = ObjectManager::getInstance()->create(ArgvInput::class);
-        $console->run($input);
+        $console = $this->consoleBuilder->build();
+        $console->run($this->input);
     }
 }

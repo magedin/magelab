@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab;
+namespace MagedIn\Lab\Console;
 
+use MagedIn\Lab\Config;
+use MagedIn\Lab\Helper;
+use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
 
 class CommandsBuilder

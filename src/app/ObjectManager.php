@@ -6,6 +6,7 @@ namespace MagedIn\Lab;
 
 use DI\Container;
 use DI\ContainerBuilder;
+use MagedIn\Lab\Console\CommandsBuilder;
 
 class ObjectManager
 {
