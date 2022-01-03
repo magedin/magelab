@@ -29,6 +29,11 @@ abstract class SpecialCommand extends Command
      */
     private NonDefaultOptions $nonDefaultOptions;
 
+    /**
+     * @var array
+     */
+    protected array $protectedOptions = [];
+
     public function __construct(
         NonDefaultOptions $nonDefaultOptions,
         string $name = null
@@ -44,7 +49,7 @@ abstract class SpecialCommand extends Command
      */
     public function getDefinition()
     {
-        $options = array_diff($this->nonDefaultOptions->getOptions(), $this->getProtectedOptions());
+        $options = array_diff($this->nonDefaultOptions->getOptions(), $this->getProtectedOptions(true));
         foreach ($options as $option) {
             $this->addOption($option);
         }
@@ -62,10 +67,26 @@ abstract class SpecialCommand extends Command
     }
 
     /**
+     * @param array $options
      * @return array
      */
-    protected function getProtectedOptions(): array
+    private function cleanOptions(array $options = []): array
     {
-        return [];
+        return array_map(function (string $option) {
+            return str_replace('-', '', $option);
+        }, $options);
+    }
+
+    /**
+     * @param bool $clean
+     * @return array
+     */
+    protected function getProtectedOptions(bool $clean = false): array
+    {
+        $options = $this->protectedOptions;
+        if (true === $clean) {
+            $options = $this->cleanOptions($options);
+        }
+        return $options;
     }
 }

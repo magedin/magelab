@@ -29,6 +29,11 @@ class ComposerCommand extends SpecialCommand
      */
     private DockerComposePhpExec $dockerComposePhpExecCommandBuilder;
 
+    /**
+     * @var array
+     */
+    protected array $protectedOptions = ['--one', '-1'];
+
     public function __construct(
         DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
         NonDefaultOptions $nonDefaultOptions,
@@ -63,20 +68,13 @@ class ComposerCommand extends SpecialCommand
     {
         $command = $this->dockerComposePhpExecCommandBuilder->build();
         $command[] = $input->getOption('one') ? 'composer1' : 'composer';
-        $command = array_merge($command, $this->getShiftedArgv());
+        $cleanOptions = array_diff($this->getShiftedArgv(), $this->getProtectedOptions());
+        $command = array_merge($command, $cleanOptions);
 
         Process::run($command, [
             'tty' => true,
             'timeout' => null, /** In case of composer let's just remove the time limit. */
         ]);
         return Command::SUCCESS;
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getProtectedOptions(): array
-    {
-        return ['one', '1'];
     }
 }
