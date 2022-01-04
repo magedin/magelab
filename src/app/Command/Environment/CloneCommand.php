@@ -65,11 +65,7 @@ class CloneCommand extends Command
     {
         $branch = $input->getOption(self::ARG_BRANCH);
         $destinationPath = $input->getOption(self::ARG_DESTINATION);
-        $realPath = realpath($destinationPath);
-
-        if (!is_writeable($realPath)) {
-            throw new RuntimeException("The destination provided is not writeable. Please check and run the comment again.");
-        }
+        $realPath = $this->prepareDestination($input);
 
         if (!$this->branchExists($branch)) {
             throw new InvalidOptionException("The branch '$branch' to clone does not exist.");
@@ -132,5 +128,30 @@ class CloneCommand extends Command
     private function getRepoSshUrl(): string
     {
         return MagentoDockerlabRepo::getRepoSshUrl();
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return string
+     */
+    private function prepareDestination(InputInterface $input): string
+    {
+        $destinationPath = $input->getOption(self::ARG_DESTINATION);
+        $realPath = realpath($destinationPath);
+
+        /** The destination does not exist. */
+        if (false === $realPath) {
+            $process = Process::run(['mkdir', $destinationPath]);
+            if (!$process->isSuccessful()) {
+                throw new RuntimeException("the destination provided does not exist and could not be created.");
+            }
+            $realPath = realpath($destinationPath);
+        }
+
+        if (!$realPath || !is_writeable($realPath)) {
+            throw new RuntimeException("The destination provided is not writeable. Please check and run the comment again.");
+        }
+
+        return $realPath;
     }
 }
