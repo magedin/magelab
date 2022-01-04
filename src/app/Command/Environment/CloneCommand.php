@@ -149,7 +149,9 @@ class CloneCommand extends Command
         }
 
         if (!$realPath || !is_writeable($realPath)) {
-            throw new RuntimeException("The destination provided is not writeable. Please check and run the comment again.");
+            throw new RuntimeException(
+                "The destination provided is not writeable. Please check and run the comment again."
+            );
         }
 
         return $realPath;

@@ -13,16 +13,82 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Environment;
 
 use MagedIn\Lab\Helper\DockerLab\BasePath;
+use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 
 class EnvFileCreateCommand extends Command
 {
     const ARG_SILENT = 'silent';
+
+    /**
+     * @var string
+     */
+    private string $envFileName = '.env';
+
+    private array $envVariables = [
+        'services' => [
+            'SERVICE_MAILHOG_ENABLED' => [
+                'question' => 'Do you want to use MailHog?',
+                'default' => 'y',
+            ],
+            'SERVICE_KIBANA_ENABLED' => [
+                'question' => 'Do you want to use Kibana?',
+                'default' => 'y',
+            ],
+            'SERVICE_RABBITMQ_ENABLED' => [
+                'question' => 'Do you want to use RabbitMQ?',
+                'default' => 'y',
+            ],
+        ],
+    ];
+
+    /**
+     * @var array|array[]
+     */
+    private array $dumpVariables = [
+        'services' => [],
+        'db' => [
+            'MYSQL_HOST' => 'db',
+            'MYSQL_ROOT_PASSWORD' => 'magento',
+            'MYSQL_DATABASE' => 'magento',
+            'MYSQL_USER' => 'magento',
+            'MYSQL_PASSWORD' => 'magento',
+            'MYSQL_DUMP_DIR' => '/var/dumps',
+        ],
+        'redis' => [
+            'CACHE_BACKEND' => 'redis',
+            'CACHE_BACKEND_REDIS_SERVER' => 'redis',
+            'CACHE_BACKEND_REDIS_DB' => 0,
+
+            'PAGE_CACHE' => 'redis',
+            'PAGE_CACHE_REDIS_SERVER' => 'redis',
+            'PAGE_CACHE_REDIS_DB' => 1,
+
+            'SESSION_SAVE' => 'redis',
+            'SESSION_SAVE_REDIS_HOST' => 'redis',
+            'SESSION_SAVE_REDIS_LOG_LEVEL' => 4,
+            'SESSION_SAVE_REDIS_DB' => 2,
+        ],
+        'rabbitmq' => [
+            'RABBITMQ_HOST' => 'rabbitmq',
+            'RABBITMQ_PORT' => 5672,
+            'RABBITMQ_DEFAULT_USER' => 'magento',
+            'RABBITMQ_DEFAULT_PASS' => 'magento',
+            'RABBITMQ_DEFAULT_VHOST' => 'magento',
+        ],
+        'search engine' => [
+            'SEARCH_ENGINE' => 'elasticsearch7',
+            'ES_HOST' => 'elasticsearch',
+        ],
+    ];
 
     protected function configure()
     {
@@ -41,20 +107,139 @@ class EnvFileCreateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $silent = $input->getOption('silent');
-        $basePath = BasePath::getRootDir($silent);
-        $envFilePath = realpath($basePath) . '/.env';
-        $envFile = realpath($envFilePath);
+        $this->createEnvFile();
+        $this->populateFile($input, $output);
+        return Command::SUCCESS;
+    }
 
-        $filesystem = new Filesystem();
-        if ($filesystem->exists($envFile)) {
-            if (!$silent) {
-                throw new RuntimeException("The environment file already exists.");
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function populateFile(InputInterface $input, OutputInterface $output)
+    {
+        $dotEnv = new Dotenv();
+        $dotEnv->load($this->getEnvFileLocation());
+        $this->populateServices($input, $output);
+        $this->dumpEnvFile();
+    }
+
+    /**
+     * @return void
+     */
+    private function dumpEnvFile(): void
+    {
+        /** @var Filesystem $filesystem */
+        $filesystem = ObjectManager::getInstance()->create(Filesystem::class);
+        foreach ($this->dumpVariables as $serviceKey => $serviceVariables) {
+            $printFooter = false;
+            if (empty($serviceVariables)) {
+                continue;
             }
-            return Command::FAILURE;
+
+            $printHeader = true;
+            foreach ($serviceVariables as $name => $value) {
+                if (isset($_ENV[$name])) {
+                    continue;
+                }
+                if (true === $printHeader) {
+                    $this->printDivisor("$serviceKey Variables");
+                    $printHeader = false;
+                    $printFooter = true;
+                }
+
+                $filesystem->appendToFile($this->getEnvFileLocation(), "$name=$value\n");
+            }
+
+            if (true === $printFooter) {
+                $this->printDivisor(null, 3);
+            }
+        }
+    }
+
+    /**
+     * @param string|null $label
+     * @param int $linebreaks
+     * @return void
+     */
+    private function printDivisor(string $label = null, int $linebreaks = 2)
+    {
+        /** @var Filesystem $filesystem */
+        $filesystem = ObjectManager::getInstance()->create(Filesystem::class);
+
+        if (empty($label)) {
+            $filesystem->appendToFile($this->getEnvFileLocation(), "\n");
+        } else {
+            $label = strtoupper($label);
         }
 
-        $filesystem->touch($envFilePath);
-        return Command::SUCCESS;
+        $pad = str_pad("# $label", 80, '-');
+        $filesystem->appendToFile($this->getEnvFileLocation(), $pad);
+        $pad = str_pad("", $linebreaks, "\n");
+        $filesystem->appendToFile($this->getEnvFileLocation(), $pad);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function populateServices(InputInterface $input, OutputInterface $output): void
+    {
+        foreach ($this->envVariables['services'] as $serviceKey => $serviceData) {
+            if (isset($_ENV[$serviceKey])) {
+                continue;
+            }
+            $question = $serviceData['question'];
+            $default = $serviceData['default'];
+            $use = $this->ask($input, $output, "<question>$question</question>", $default);
+            $this->dumpVariables['services'][$serviceKey] = $use;
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param string $question
+     * @param string $default
+     * @return bool
+     */
+    private function ask(InputInterface $input, OutputInterface $output, string $question, string $default): bool
+    {
+        $dialog = $this->getHelper('question');
+        /** @var Question $question */
+        $questionObject = ObjectManager::getInstance()->create(Question::class, [
+            'question' => "<question>$question</question>",
+            'default' => $default
+        ]);
+        $response = $dialog->ask($input, $output, $questionObject);
+        if ('y' === strtolower(substr($response, 0, 1))) {
+            return true;
+        };
+        return false;
+    }
+
+    /**
+     * @return void
+     */
+    private function createEnvFile(): void
+    {
+        $envFileLocation = $this->getEnvFileLocation();
+        $envFile = realpath($envFileLocation);
+
+        $filesystem = new Filesystem();
+        if (!$envFile || !$filesystem->exists($envFile)) {
+            $filesystem->touch($envFileLocation);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function getEnvFileLocation(): string
+    {
+        $basePath = BasePath::getRootDir();
+        return realpath($basePath) . '/' . $this->envFileName;
     }
 }
