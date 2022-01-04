@@ -15,8 +15,6 @@ namespace MagedIn\Lab\Command\Environment;
 use MagedIn\Lab\Helper\DockerLab\BasePath;
 use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -38,14 +36,23 @@ class EnvFileCreateCommand extends Command
             'SERVICE_MAILHOG_ENABLED' => [
                 'question' => 'Do you want to use MailHog?',
                 'default' => 'y',
+                'type' => 'confirm',
             ],
             'SERVICE_KIBANA_ENABLED' => [
                 'question' => 'Do you want to use Kibana?',
                 'default' => 'y',
+                'type' => 'confirm',
             ],
             'SERVICE_RABBITMQ_ENABLED' => [
                 'question' => 'Do you want to use RabbitMQ?',
                 'default' => 'y',
+                'type' => 'confirm',
+            ],
+        ],
+        'magento' => [
+            'BASE_URL' => [
+                'question' => 'Please inform the Base URL for your store:',
+                'default' => 'magento2.test',
             ],
         ],
     ];
@@ -55,6 +62,15 @@ class EnvFileCreateCommand extends Command
      */
     private array $dumpVariables = [
         'services' => [],
+        'magento' => [
+            'BASE_URL' => null,
+            'ADMIN_URI' => 'backend',
+            'ADMIN_FIRSTNAME' => 'Admin',
+            'ADMIN_LASTNAME' => 'User',
+            'ADMIN_USER' => 'admin.user',
+            'ADMIN_EMAIL' => 'admin.user@example.com',
+            'ADMIN_PASSWORD' => 'Password@123',
+        ],
         'db' => [
             'MYSQL_HOST' => 'db',
             'MYSQL_ROOT_PASSWORD' => 'magento',
@@ -122,6 +138,7 @@ class EnvFileCreateCommand extends Command
         $dotEnv = new Dotenv();
         $dotEnv->load($this->getEnvFileLocation());
         $this->populateServices($input, $output);
+        $this->populateMagento($input, $output);
         $this->dumpEnvFile();
     }
 
@@ -187,14 +204,41 @@ class EnvFileCreateCommand extends Command
      */
     private function populateServices(InputInterface $input, OutputInterface $output): void
     {
-        foreach ($this->envVariables['services'] as $serviceKey => $serviceData) {
+        $this->populateNode('services', $input, $output);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function populateMagento(InputInterface $input, OutputInterface $output): void
+    {
+        $this->populateNode('magento', $input, $output);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function populateNode(string $node, InputInterface $input, OutputInterface $output): void
+    {
+        foreach ($this->envVariables[$node] as $serviceKey => $serviceData) {
             if (isset($_ENV[$serviceKey])) {
                 continue;
             }
             $question = $serviceData['question'];
             $default = $serviceData['default'];
-            $use = $this->ask($input, $output, "<question>$question</question>", $default);
-            $this->dumpVariables['services'][$serviceKey] = $use;
+            $type = $serviceData['type'] ?? 'question';
+
+            if ($type === 'confirm') {
+                $answer = $this->confirm($input, $output, "<question>$question</question>", $default);
+            } else {
+                $answer = $this->ask($input, $output, "<question>$question</question>", $default);
+            }
+
+            $this->dumpVariables[$node][$serviceKey] = $answer;
         }
     }
 
@@ -205,7 +249,23 @@ class EnvFileCreateCommand extends Command
      * @param string $default
      * @return bool
      */
-    private function ask(InputInterface $input, OutputInterface $output, string $question, string $default): bool
+    private function confirm(InputInterface $input, OutputInterface $output, string $question, string $default)
+    {
+        $answer = $this->ask($input, $output, $question, $default);
+        if ('y' === strtolower(substr($answer, 0, 1))) {
+            return true;
+        };
+        return false;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param string $question
+     * @param string $default
+     * @return string
+     */
+    private function ask(InputInterface $input, OutputInterface $output, string $question, string $default): string
     {
         $dialog = $this->getHelper('question');
         /** @var Question $question */
@@ -213,11 +273,7 @@ class EnvFileCreateCommand extends Command
             'question' => "<question>$question</question>",
             'default' => $default
         ]);
-        $response = $dialog->ask($input, $output, $questionObject);
-        if ('y' === strtolower(substr($response, 0, 1))) {
-            return true;
-        };
-        return false;
+        return $dialog->ask($input, $output, $questionObject);
     }
 
     /**
