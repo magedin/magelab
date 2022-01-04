@@ -76,6 +76,14 @@ commands:
         description: Create the .env file with the information of the environment.
         class: \MagedIn\Lab\Command\Environment\EnvFileCreateCommand
 
+    environment:vhost:setup:
+        name: Setup one or more vhost on Nginx
+        code: environment:vhost:setup
+        aliases:
+            - vhost-setup
+        description: Setup one or more vhost on Nginx
+        class: \MagedIn\Lab\Command\Environment\VhostSetupCommand
+
     php:xdebug:status:
         name: Show whether Xdebug is enabled or not
         code: php:xdebug:status
