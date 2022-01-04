@@ -12,40 +12,40 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Environment;
 
+use MagedIn\Lab\Helper\Console\Question as QuestionHelper;
 use MagedIn\Lab\Helper\DockerLab\BasePath;
 use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Filesystem;
 
 class EnvFileCreateCommand extends Command
 {
-    const ARG_SILENT = 'silent';
-
     /**
      * @var string
      */
     private string $envFileName = '.env';
 
+    /**
+     * @var array
+     */
     private array $envVariables = [
         'services' => [
             'SERVICE_MAILHOG_ENABLED' => [
                 'question' => 'Do you want to use MailHog?',
-                'default' => 'y',
+                'default' => true,
                 'type' => 'confirm',
             ],
             'SERVICE_KIBANA_ENABLED' => [
                 'question' => 'Do you want to use Kibana?',
-                'default' => 'y',
+                'default' => true,
                 'type' => 'confirm',
             ],
             'SERVICE_RABBITMQ_ENABLED' => [
                 'question' => 'Do you want to use RabbitMQ?',
-                'default' => 'y',
+                'default' => true,
                 'type' => 'confirm',
             ],
         ],
@@ -106,14 +106,21 @@ class EnvFileCreateCommand extends Command
         ],
     ];
 
+    /**
+     * @var QuestionHelper
+     */
+    private QuestionHelper $question;
+
+    public function __construct(
+        QuestionHelper $question,
+        string $name = null
+    ) {
+        parent::__construct($name);
+        $this->question = $question;
+    }
+
     protected function configure()
     {
-        $this->addOption(
-            self::ARG_SILENT,
-            's',
-            InputOption::VALUE_NONE,
-            "Silently exists if an error happens.",
-        );
     }
 
     /**
@@ -191,7 +198,7 @@ class EnvFileCreateCommand extends Command
             $label = strtoupper($label);
         }
 
-        $pad = str_pad("# $label", 80, '-');
+        $pad = str_pad("# $label ", 80, '-');
         $filesystem->appendToFile($this->getEnvFileLocation(), $pad);
         $pad = str_pad("", $linebreaks, "\n");
         $filesystem->appendToFile($this->getEnvFileLocation(), $pad);
@@ -218,6 +225,7 @@ class EnvFileCreateCommand extends Command
     }
 
     /**
+     * @param string $node
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return void
@@ -233,51 +241,13 @@ class EnvFileCreateCommand extends Command
             $type = $serviceData['type'] ?? 'question';
 
             if ($type === 'confirm') {
-                $answer = $this->confirm($input, $output, "<question>$question</question>", $default);
+                $answer = $this->question->confirm($input, $output, $question, $default);
             } else {
-                $answer = $this->ask($input, $output, "<question>$question</question>", $default);
+                $answer = $this->question->ask($input, $output, $question, $default);
             }
 
             $this->dumpVariables[$node][$serviceKey] = $answer;
         }
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param string $question
-     * @param string $default
-     * @return bool
-     */
-    private function confirm(InputInterface $input, OutputInterface $output, string $question, string $default): bool
-    {
-        $answer = $this->ask($input, $output, $question, $default);
-        if ('y' === strtolower(substr($answer, 0, 1))) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param string $question
-     * @param string $default
-     * @return string
-     */
-    private function ask(InputInterface $input, OutputInterface $output, string $question, string $default): string
-    {
-        $dialog = $this->getHelper('question');
-
-        if (!empty($default)) {
-            $question .= " (default: $default)";
-        }
-
-        $questionObject = ObjectManager::getInstance()->create(Question::class, [
-            'question' => "<question>$question</question>",
-            'default' => $default
-        ]);
-        return $dialog->ask($input, $output, $questionObject);
     }
 
     /**
