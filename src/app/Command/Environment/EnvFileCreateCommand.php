@@ -249,12 +249,12 @@ class EnvFileCreateCommand extends Command
      * @param string $default
      * @return bool
      */
-    private function confirm(InputInterface $input, OutputInterface $output, string $question, string $default)
+    private function confirm(InputInterface $input, OutputInterface $output, string $question, string $default): bool
     {
         $answer = $this->ask($input, $output, $question, $default);
         if ('y' === strtolower(substr($answer, 0, 1))) {
             return true;
-        };
+        }
         return false;
     }
 
@@ -268,7 +268,11 @@ class EnvFileCreateCommand extends Command
     private function ask(InputInterface $input, OutputInterface $output, string $question, string $default): string
     {
         $dialog = $this->getHelper('question');
-        /** @var Question $question */
+
+        if (!empty($default)) {
+            $question .= " (default: $default)";
+        }
+
         $questionObject = ObjectManager::getInstance()->create(Question::class, [
             'question' => "<question>$question</question>",
             'default' => $default
