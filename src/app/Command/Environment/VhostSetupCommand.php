@@ -15,6 +15,8 @@ namespace MagedIn\Lab\Command\Environment;
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Template\TemplateLoader;
+use MagedIn\Lab\ObjectManager;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -70,9 +72,28 @@ class VhostSetupCommand extends Command
     {
         $domains = $input->getArgument('domains');
         foreach ($domains as $domain) {
+            $this->setupCertificates($domain, $output);
             $this->setupDomain($domain);
         }
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param string $domain
+     * @param OutputInterface $output
+     * @return void
+     * @throws \Exception
+     */
+    private function setupCertificates(string $domain, OutputInterface $output)
+    {
+        $sslCommand = $this->getApplication()->find('ssl:setup');
+        /** @var ArrayInput $input */
+        $input = ObjectManager::getInstance()->create(ArrayInput::class, [
+            'parameters' => [
+                'domains' => [$domain],
+            ]
+        ]);
+        $sslCommand->run($input, $output);
     }
 
     /**

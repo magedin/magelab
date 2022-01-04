@@ -80,9 +80,18 @@ commands:
         name: Setup one or more vhost on Nginx
         code: environment:vhost:setup
         aliases:
-            - vhost-setup
+            - vhost:setup
         description: Setup one or more vhost on Nginx
         class: \MagedIn\Lab\Command\Environment\VhostSetupCommand
+
+    environment:vhost:ssl-setup:
+        name: Setup SSL for a vhost
+        code: environment:vhost:ssl-setup
+        aliases:
+            - vhost:ssl:setup
+            - ssl:setup
+        description: Setup SSL for a vhost
+        class: \MagedIn\Lab\Command\Environment\VhostSslSetupCommand
 
     php:xdebug:status:
         name: Show whether Xdebug is enabled or not
