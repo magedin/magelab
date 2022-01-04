@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Helper\DockerLab;
 
+use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -80,7 +81,9 @@ class BasePath
             return realpath("$dir/$file");
         }, $verificationFiles);
 
-        return (new Filesystem())->exists($realFiles);
+        /** @var Filesystem $filesystem */
+        $filesystem = ObjectManager::getInstance()->create(Filesystem::class);
+        return $filesystem->exists($realFiles);
     }
 
     /**

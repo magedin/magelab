@@ -14,7 +14,6 @@ namespace MagedIn\Lab\Command\Environment;
 
 use MagedIn\Lab\Helper\Console\Question as QuestionHelper;
 use MagedIn\Lab\Helper\DockerLab\BasePath;
-use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -111,12 +110,26 @@ class EnvFileCreateCommand extends Command
      */
     private QuestionHelper $question;
 
+    /**
+     * @var Filesystem
+     */
+    private Filesystem $filesystem;
+
+    /**
+     * @var Dotenv
+     */
+    private Dotenv $dotenv;
+
     public function __construct(
         QuestionHelper $question,
+        Filesystem $filesystem,
+        Dotenv $dotenv,
         string $name = null
     ) {
         parent::__construct($name);
         $this->question = $question;
+        $this->filesystem = $filesystem;
+        $this->dotenv = $dotenv;
     }
 
     protected function configure()
@@ -142,8 +155,7 @@ class EnvFileCreateCommand extends Command
      */
     private function populateFile(InputInterface $input, OutputInterface $output)
     {
-        $dotEnv = new Dotenv();
-        $dotEnv->load($this->getEnvFileLocation());
+        $this->dotenv->load($this->getEnvFileLocation());
         $this->populateServices($input, $output);
         $this->populateMagento($input, $output);
         $this->dumpEnvFile();
@@ -154,8 +166,6 @@ class EnvFileCreateCommand extends Command
      */
     private function dumpEnvFile(): void
     {
-        /** @var Filesystem $filesystem */
-        $filesystem = ObjectManager::getInstance()->create(Filesystem::class);
         foreach ($this->dumpVariables as $serviceKey => $serviceVariables) {
             $printFooter = false;
             if (empty($serviceVariables)) {
@@ -173,7 +183,7 @@ class EnvFileCreateCommand extends Command
                     $printFooter = true;
                 }
 
-                $filesystem->appendToFile($this->getEnvFileLocation(), "$name=$value\n");
+                $this->filesystem->appendToFile($this->getEnvFileLocation(), "$name=$value\n");
             }
 
             if (true === $printFooter) {
@@ -189,19 +199,16 @@ class EnvFileCreateCommand extends Command
      */
     private function printDivisor(string $label = null, int $linebreaks = 2)
     {
-        /** @var Filesystem $filesystem */
-        $filesystem = ObjectManager::getInstance()->create(Filesystem::class);
-
         if (empty($label)) {
-            $filesystem->appendToFile($this->getEnvFileLocation(), "\n");
+            $this->filesystem->appendToFile($this->getEnvFileLocation(), "\n");
         } else {
             $label = strtoupper($label);
         }
 
         $pad = str_pad("# $label ", 80, '-');
-        $filesystem->appendToFile($this->getEnvFileLocation(), $pad);
+        $this->filesystem->appendToFile($this->getEnvFileLocation(), $pad);
         $pad = str_pad("", $linebreaks, "\n");
-        $filesystem->appendToFile($this->getEnvFileLocation(), $pad);
+        $this->filesystem->appendToFile($this->getEnvFileLocation(), $pad);
     }
 
     /**
@@ -258,9 +265,8 @@ class EnvFileCreateCommand extends Command
         $envFileLocation = $this->getEnvFileLocation();
         $envFile = realpath($envFileLocation);
 
-        $filesystem = new Filesystem();
-        if (!$envFile || !$filesystem->exists($envFile)) {
-            $filesystem->touch($envFileLocation);
+        if (!$envFile || !$this->filesystem->exists($envFile)) {
+            $this->filesystem->touch($envFileLocation);
         }
     }
 

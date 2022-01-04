@@ -24,10 +24,24 @@ class DockerComposeFiles
      */
     private OperatingSystem $operatingSystem;
 
+    /**
+     * @var Filesystem
+     */
+    private Filesystem $filesystem;
+
+    /**
+     * @var Dotenv
+     */
+    private Dotenv $dotenv;
+
     public function __construct(
-        OperatingSystem $operatingSystem
+        OperatingSystem $operatingSystem,
+        Filesystem $filesystem,
+        Dotenv $dotenv
     ) {
         $this->operatingSystem = $operatingSystem;
+        $this->filesystem = $filesystem;
+        $this->dotenv = $dotenv;
     }
 
     /**
@@ -61,8 +75,7 @@ class DockerComposeFiles
             $this->loadedFiles[] = 'docker-compose.dev.yml';
         }
 
-        $dotEnv = new Dotenv();
-        $dotEnv->loadEnv($rootDir . '/.env');
+        $this->dotenv->loadEnv($rootDir . '/.env');
 
         $file = 'docker-compose.mailhog.yml';
         $this->loadedFiles[] = $file;
@@ -109,9 +122,8 @@ class DockerComposeFiles
     private function validateService(string $filename, string $variable = null): bool
     {
         $rootDir = BasePath::getAbsoluteRootDir();
-        $filesystem = new Filesystem();
 
-        if (!$filesystem->exists($rootDir . DIRECTORY_SEPARATOR . $filename)) {
+        if (!$this->filesystem->exists($rootDir . DIRECTORY_SEPARATOR . $filename)) {
             return false;
         }
 

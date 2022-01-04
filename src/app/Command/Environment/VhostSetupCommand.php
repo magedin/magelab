@@ -49,6 +49,9 @@ class VhostSetupCommand extends Command
         $this->templateLoader = $templateLoader;
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
         $this->addArgument(

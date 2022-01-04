@@ -30,6 +30,16 @@ class CloneCommand extends Command
     const ARG_DESTINATION = 'destination';
     const ARG_GIT = 'git';
 
+    private Filesystem $filesystem;
+
+    public function __construct(
+        Filesystem $filesystem,
+        string $name = null
+    ) {
+        parent::__construct($name);
+        $this->filesystem = $filesystem;
+    }
+
     protected function configure()
     {
         $this->addOption(
@@ -96,7 +106,7 @@ class CloneCommand extends Command
         $refs = array_map(function ($file) use ($realPath) {
             return "$realPath/$file";
         }, $files);
-        (new Filesystem())->remove($refs);
+        $this->filesystem->remove($refs);
     }
 
     /**

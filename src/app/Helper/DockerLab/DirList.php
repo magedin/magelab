@@ -17,6 +17,17 @@ use Symfony\Component\Filesystem\Filesystem;
 class DirList
 {
     /**
+     * @var Filesystem
+     */
+    private Filesystem $filesystem;
+
+    public function __construct(
+        Filesystem $filesystem
+    ) {
+        $this->filesystem = $filesystem;
+    }
+
+    /**
      * @return string
      */
     public function getVarDir(): string
@@ -61,12 +72,11 @@ class DirList
      */
     public function getNginxConfigDir(string $domain = null, bool $autoCreate = true): string
     {
-        $filesystem = new Filesystem();
         $dir = $this->getConfigDir() . DS . 'nginx' . DS . 'conf.d';
         if (!empty($domain)) {
             $dir .= DS . $domain;
-            if ($autoCreate && !$filesystem->exists($dir)) {
-                $filesystem->mkdir($dir);
+            if ($autoCreate && !$this->filesystem->exists($dir)) {
+                $this->filesystem->mkdir($dir);
             }
         }
         return $dir;

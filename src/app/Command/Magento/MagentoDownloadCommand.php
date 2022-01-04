@@ -33,6 +33,26 @@ class MagentoDownloadCommand extends Command
     const FILE_EXTENSION = '.tar.gz';
 
     /**
+     * @var Filesystem
+     */
+    private Filesystem $filesystem;
+
+    /**
+     * @var HttpClient
+     */
+    private HttpClient $httpClient;
+
+    public function __construct(
+        Filesystem $filesystem,
+        HttpClient $httpClient,
+        string $name = null
+    ) {
+        parent::__construct($name);
+        $this->filesystem = $filesystem;
+        $this->httpClient = $httpClient;
+    }
+
+    /**
      * @return void
      */
     protected function configure(): void
@@ -66,8 +86,7 @@ class MagentoDownloadCommand extends Command
         $path = $input->getArgument(self::ARG_PATH);
         $filepath = "$path/" . $this->getFilename($version);
 
-        $filesystem = new Filesystem();
-        if ($filesystem->exists($filepath)) {
+        if ($this->filesystem->exists($filepath)) {
             $helper = $this->getHelper('question');
             $question = new ConfirmationQuestion(
                 "There is already a file on $filepath. Do you want to replace it (y/n)?",
@@ -78,7 +97,7 @@ class MagentoDownloadCommand extends Command
                 $output->writeln("Ok. Nothing will be downloaded at this moment.");
                 return Command::FAILURE;
             }
-            $filesystem->remove($filepath);
+            $this->filesystem->remove($filepath);
         }
 
         $output->writeln("Your Magento copy will be downloaded to: $filepath.");
@@ -116,11 +135,11 @@ class MagentoDownloadCommand extends Command
         };
 
         $options = [
-            RequestOptions::SINK     => $filepath,
+            RequestOptions::SINK => $filepath,
             RequestOptions::PROGRESS => $progress,
         ];
         $progressBar->start();
-        (new HttpClient())->get($this->getDownloadUrl($version), $options);
+        $this->httpClient->get($this->getDownloadUrl($version), $options);
         $progressBar->finish();
     }
 
@@ -133,7 +152,7 @@ class MagentoDownloadCommand extends Command
     private function checkIfVersionExists(string $version): void
     {
         try {
-            (new HttpClient())->head($this->getDownloadUrl($version), ['timeout' => 1]);
+            $this->httpClient->head($this->getDownloadUrl($version), ['timeout' => 1]);
         } catch (Exception $e) {
             if (404 === $e->getCode()) {
                 throw new Exception('This version of Magento does not exist. Please try another one.');
