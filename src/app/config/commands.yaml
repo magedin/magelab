@@ -72,7 +72,7 @@ commands:
         name: Create the .env file
         code: environment:file:create
         aliases:
-            - env-create
+            - env:create
         description: Create the .env file with the information of the environment.
         class: \MagedIn\Lab\Command\Environment\EnvFileCreateCommand
 
@@ -97,7 +97,7 @@ commands:
         name: Show whether Xdebug is enabled or not
         code: php:xdebug:status
         aliases:
-            - xdebug-status
+            - xdebug:status
         description: Show whether Xdebug is enabled or not
         class: \MagedIn\Lab\Command\Php\XdebugStatusCommand
 
@@ -106,7 +106,7 @@ commands:
         code: php:xdebug:toggle
         aliases:
             - xdebug
-            - xdebug-toggle
+            - xdebug:toggle
         description: Toggle Xdebug status (enabled/disabled)
         class: \MagedIn\Lab\Command\Php\XdebugToggleCommand
 
@@ -114,7 +114,7 @@ commands:
         name: Enable Xdebug
         code: php:xdebug:enable
         aliases:
-            - xdebug-enable
+            - xdebug:enable
         description: Enable Xdebug
         class: \MagedIn\Lab\Command\Php\XdebugEnableCommand
 
@@ -122,7 +122,7 @@ commands:
         name: Disable Xdebug
         code: php:xdebug:disable
         aliases:
-            - xdebug-disable
+            - xdebug:disable
         description: Disable Xdebug
         class: \MagedIn\Lab\Command\Php\XdebugDisableCommand
 
@@ -130,7 +130,7 @@ commands:
         name: Change Xdebug Request Mode
         code: php:xdebug:request-mode
         aliases:
-            - xdebug-request-mode
+            - xdebug:request-mode
         description: Change Xdebug Request Mode
         class: \MagedIn\Lab\Command\Php\XdebugRequestModeCommand
 
@@ -138,7 +138,7 @@ commands:
         name: Change Xdebug Mode
         code: php:xdebug:mode
         aliases:
-            - xdebug-mode
+            - xdebug:mode
         description: Change Xdebug Mode
         class: \MagedIn\Lab\Command\Php\XdebugModeCommand
 

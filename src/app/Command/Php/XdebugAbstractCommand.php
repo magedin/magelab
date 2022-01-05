@@ -108,7 +108,7 @@ abstract class XdebugAbstractCommand extends Command
      */
     protected function checkXdebugStatus(OutputInterface $output)
     {
-        $xdebugCommand = $this->getApplication()->find('xdebug-status');
+        $xdebugCommand = $this->getApplication()->find('xdebug:status');
         $emptyInput = ObjectManager::getInstance()->create(ArrayInput::class, [
             'parameters' => ['--silent' => true]
         ]);

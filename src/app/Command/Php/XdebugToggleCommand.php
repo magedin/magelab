@@ -32,10 +32,10 @@ class XdebugToggleCommand extends XdebugAbstractCommand
         /** Xdebug is Currently DISABLED */
         if ($resultCode === Command::FAILURE) {
             /** Enable Xdebug */
-            $xdebugCommand = $this->getApplication()->find('xdebug-enable');
+            $xdebugCommand = $this->getApplication()->find('xdebug:enable');
         } else {
             /** Disable Xdebug */
-            $xdebugCommand = $this->getApplication()->find('xdebug-disable');
+            $xdebugCommand = $this->getApplication()->find('xdebug:disable');
         }
 
         $emptyInput = ObjectManager::getInstance()->create(ArrayInput::class, [
