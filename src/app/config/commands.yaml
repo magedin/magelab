@@ -43,12 +43,20 @@ commands:
         class: \MagedIn\Lab\Command\Environment\RestartCommand
 
     environment:down:
-        name: Get the Environment Down
+        name: Get the docker containers down.
         code: environment:down
         aliases:
             - down
-        description: Run the docker-composer command to get the environment down
+        description: Stop the docker containers and then remove them.
         class: \MagedIn\Lab\Command\Environment\DownCommand
+
+    environment:stop:
+        name: Stop the docker containers (don't remove the containers).
+        code: environment:stop
+        aliases:
+            - stop
+        description: Stop the docker containers (don't remove the containers).
+        class: \MagedIn\Lab\Command\Environment\StopCommand
 
     environment:logs:
         name: Get the Environment Logs
