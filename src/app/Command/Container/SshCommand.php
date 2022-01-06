@@ -14,6 +14,8 @@ namespace MagedIn\Lab\Command\Container;
 
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
+use MagedIn\Lab\Helper\Console\Question;
+use MagedIn\Lab\Helper\DockerComposeServicesList;
 use MagedIn\Lab\Model\Process;
 use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -32,14 +34,28 @@ class SshCommand extends Command
      */
     private ArrayInputFactory $arrayInputFactory;
 
+    /**
+     * @var Question
+     */
+    private Question $question;
+
+    /**
+     * @var DockerComposeServicesList
+     */
+    private DockerComposeServicesList $servicesList;
+
     public function __construct(
         DockerComposeExec $dockerComposeExecCommandBuilder,
         ArrayInputFactory $arrayInputFactory,
+        Question $question,
+        DockerComposeServicesList $servicesList,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
         $this->arrayInputFactory = $arrayInputFactory;
+        $this->question = $question;
+        $this->servicesList = $servicesList;
     }
 
     protected function configure()
@@ -58,12 +74,16 @@ class SshCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$input->getArgument('service')) {
-            $this->showOptions($output);
-            return Command::FAILURE;
+        $service = $input->getArgument('service');
+        if (!$service) {
+            $services = $this->servicesList->getNames();
+            $service = $this->question->choose($input, $output, 'To which service?', $services);
+            if (!$service) {
+                return Command::FAILURE;
+            }
         }
 
-        $subcommands = [$input->getArgument('service'), 'bash'];
+        $subcommands = [$service, 'bash'];
         $command = $this->dockerComposeExecCommandBuilder->build($subcommands);
         Process::run($command, [
             'tty' => true,

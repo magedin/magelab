@@ -166,6 +166,15 @@ commands:
         description: SSH into a service container
         class: \MagedIn\Lab\Command\Container\SshCommand
 
+    container:copy:
+        name: Copy any file from or to container.
+        code: container:copy
+        aliases:
+            - copy
+            - cp
+        description: Copy any file from or to container.
+        class: \MagedIn\Lab\Command\Container\CopyCommand
+
     magento:cli:
         name: Magento 2 CLI
         code: magento:cli

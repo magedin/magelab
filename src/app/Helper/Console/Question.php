@@ -16,6 +16,7 @@ use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question as ConsoleQuestion;
 
@@ -39,6 +40,29 @@ class Question
             'default' => $default,
         ]);
         return $this->getDialog()->ask($input, $output, $confirmation);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param string $question
+     * @param array $choices
+     * @param string|null $default
+     * @return mixed|string|null
+     */
+    public function choose(
+        InputInterface $input,
+        OutputInterface $output,
+        string $question,
+        array $choices,
+        $default = null
+    ): ?string {
+        $choose = ObjectManager::getInstance()->create(ChoiceQuestion::class, [
+            'question' => "<question>$question</question>",
+            'choices'  => $choices,
+            'default'  => $default,
+        ]);
+        return $this->getDialog()->ask($input, $output, $choose);
     }
 
     /**
