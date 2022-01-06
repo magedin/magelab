@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Mkcert;
 
+use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\Model\Process;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

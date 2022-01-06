@@ -12,10 +12,10 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
+use MagedIn\Lab\Command\Command;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use MagedIn\Lab\Helper\Github\DownloadRepo;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

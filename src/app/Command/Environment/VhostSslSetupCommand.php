@@ -15,7 +15,6 @@ namespace MagedIn\Lab\Command\Environment;
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\DockerLab\DirList;
-use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

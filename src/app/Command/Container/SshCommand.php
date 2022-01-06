@@ -15,7 +15,7 @@ namespace MagedIn\Lab\Command\Container;
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Model\Process;
-use Symfony\Component\Console\Command\Command;
+use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
