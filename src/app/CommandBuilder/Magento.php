@@ -15,11 +15,10 @@ namespace MagedIn\Lab\CommandBuilder;
 class Magento extends DockerComposePhpExec
 {
     /**
-     * @param array $subcommands
-     * @return array
+     * @inheritDoc
      */
-    public function build(array $subcommands = []): array
+    public function build(array $subcommands = [], array $options = []): array
     {
-        return array_merge(parent::build(['bin/magento']), $subcommands);
+        return array_merge(parent::build(['bin/magento']), $options, $subcommands);
     }
 }

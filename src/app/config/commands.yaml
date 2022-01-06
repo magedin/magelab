@@ -185,6 +185,15 @@ commands:
         description: Magento 2 CLI
         class: \MagedIn\Lab\Command\Magento\MagentoCommand
 
+    magento:fix:own:
+        name: Fix owner for Magento project files.
+        code: magento:fix:own
+        aliases:
+            - fix:own
+            - fixown
+        description: Fix owner for Magento project files.
+        class: \MagedIn\Lab\Command\Magento\FixOwnsCommand
+
     n98:
         name: n98 Magerun Script
         code: n98

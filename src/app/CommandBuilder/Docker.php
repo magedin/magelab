@@ -15,12 +15,11 @@ namespace MagedIn\Lab\CommandBuilder;
 class Docker implements CommandBuilderInterface
 {
     /**
-     * @param array $subcommands
-     * @return array
+     * @inheritDoc
      */
-    public function build(array $subcommands = []): array
+    public function build(array $subcommands = [], array $options = []): array
     {
         $command = ['docker'];
-        return array_merge($command, $subcommands);
+        return array_merge($command, $options, $subcommands);
     }
 }

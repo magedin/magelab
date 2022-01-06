@@ -14,7 +14,8 @@ interface CommandBuilderInterface
 {
     /**
      * @param array $subcommands
+     * @param array $options
      * @return array
      */
-    public function build(array $subcommands = []): array;
+    public function build(array $subcommands = [], array $options = []): array;
 }

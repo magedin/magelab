@@ -34,15 +34,14 @@ class DockerCompose implements CommandBuilderInterface
     private array $command = [];
 
     /**
-     * @param array $subcommands
-     * @return array
+     * @inheritDoc
      */
-    public function build(array $subcommands = []): array
+    public function build(array $subcommands = [], array $options = []): array
     {
         if (!$this->command) {
             $this->buildCommand();
         }
-        return array_merge($this->command, $subcommands);
+        return array_merge($this->command, $options, $subcommands);
     }
 
     /**

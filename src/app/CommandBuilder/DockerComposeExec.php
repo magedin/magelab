@@ -15,11 +15,10 @@ namespace MagedIn\Lab\CommandBuilder;
 class DockerComposeExec extends DockerCompose
 {
     /**
-     * @param array $subcommands
-     * @return array
+     * @inheritDoc
      */
-    public function build(array $subcommands = []): array
+    public function build(array $subcommands = [], array $options = []): array
     {
-        return array_merge(parent::build(['exec']), $subcommands);
+        return array_merge(parent::build(['exec']), $options, $subcommands);
     }
 }

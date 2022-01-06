@@ -20,6 +20,7 @@ use MagedIn\Lab\Model\Process;
 use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SshCommand extends Command
@@ -65,6 +66,13 @@ class SshCommand extends Command
             InputArgument::OPTIONAL,
             'Select a specific service container'
         );
+
+        $this->addOption(
+            'root',
+            'r',
+            InputOption::VALUE_NONE,
+            'SSH as root user.'
+        );
     }
 
     /**
@@ -84,7 +92,11 @@ class SshCommand extends Command
         }
 
         $subcommands = [$service, 'bash'];
-        $command = $this->dockerComposeExecCommandBuilder->build($subcommands);
+        $options = [];
+        if ($input->getOption('root')) {
+            $options = ['-u', 'root'];
+        }
+        $command = $this->dockerComposeExecCommandBuilder->build($subcommands, $options);
         Process::run($command, [
             'tty' => true,
             'callback' => function ($type, $buffer) use ($output) {
