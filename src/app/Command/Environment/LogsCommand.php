@@ -49,21 +49,21 @@ class LogsCommand extends Command
         $this->addOption(
             'follow',
             'f',
-            InputOption::VALUE_NONE | InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Follow log output.'
         );
 
         $this->addOption(
             'timestamps',
             't',
-            InputOption::VALUE_NONE | InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Show timestamps.'
         );
 
         $this->addOption(
             'tail',
             null,
-            InputOption::VALUE_OPTIONAL,
+            InputOption::VALUE_NONE,
             'Number of lines to show from the end of the logs for each container.'
         );
     }
@@ -75,26 +75,27 @@ class LogsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->dockerComposeCommandBuilder->build();
-        $command[] = 'logs';
 
-        if ($service = $input->getArgument('service')) {
-            $command = array_merge($command, $service);
-        }
+        $subcommands[] = 'logs';
 
         if ($input->getOption('follow')) {
-            $command[] = '-f';
+            $subcommands[] = '-f';
         }
 
         if ($input->getOption('timestamps')) {
-            $command[] = '-t';
+            $subcommands[] = '-t';
         }
 
         if ($tail = $input->getOption('tail')) {
-            $command[] = '--tail';
-            $command[] = $tail;
+            $subcommands[] = '--tail';
+            $subcommands[] = $tail;
         }
 
+        if ($service = $input->getArgument('service')) {
+            $subcommands = array_merge($subcommands, $service);
+        }
+
+        $command = $this->dockerComposeCommandBuilder->build($subcommands);
         Process::run($command, [
             'callback' => function ($type, $buffer) use ($output) {
                 $output->write($buffer);

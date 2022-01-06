@@ -15,7 +15,7 @@ namespace MagedIn\Lab\CommandBuilder;
 use MagedIn\Lab\CommandBuilder\DockerCompose\DockerComposeFiles;
 use MagedIn\Lab\Helper\DockerLab\BasePath;
 
-class DockerCompose
+class DockerCompose implements CommandBuilderInterface
 {
     /**
      * @var DockerComposeFiles
@@ -34,14 +34,15 @@ class DockerCompose
     private array $command = [];
 
     /**
+     * @param array $subcommands
      * @return array
      */
-    public function build(): array
+    public function build(array $subcommands = []): array
     {
         if (!$this->command) {
             $this->buildCommand();
         }
-        return $this->command;
+        return array_merge($this->command, $subcommands);
     }
 
     /**

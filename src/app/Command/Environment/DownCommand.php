@@ -67,15 +67,12 @@ class DownCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$input->getOption('force') && !$this->dockerServiceState->isRunning()) {
+        if (!$input->getOption('force') && $this->dockerServiceState->isDown()) {
             $output->writeln('The services are already down.');
             return Command::SUCCESS;
         }
 
-        $command = $this->dockerComposeCommandBuilder->build();
-
-        $command[] = 'down';
-
+        $command = $this->dockerComposeCommandBuilder->build(['down']);
         $output->writelnInfo('Stopping and removing the containers.');
         $outputWrapper = $this->outputWrapperBuilder->build($output);
         Process::run($command, [

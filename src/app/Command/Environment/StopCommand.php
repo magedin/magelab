@@ -67,14 +67,12 @@ class StopCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$input->getOption('force') && !$this->dockerServiceState->isRunning()) {
+        if (!$input->getOption('force') && $this->dockerServiceState->isStopped()) {
             $output->writeln('The services are already down.');
             return Command::SUCCESS;
         }
 
-        $command = $this->dockerComposeCommandBuilder->build();
-        $command[] = 'stop';
-
+        $command = $this->dockerComposeCommandBuilder->build(['stop']);
         $output->writelnInfo('Stopping the containers.');
         $outputWrapper = $this->outputWrapperBuilder->build($output);
         Process::run($command, [

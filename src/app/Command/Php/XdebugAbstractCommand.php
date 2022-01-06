@@ -72,13 +72,13 @@ abstract class XdebugAbstractCommand extends Command
             return Command::SUCCESS;
         }
 
-        $command = $this->dockerComposePhpExecCommandBuilder->build();
-        $command[] = 'sed';
-        $command[] = '-i';
-        $command[] = '-e';
-        $command[] = $this->getSedPattern($input);
-        $command[] = $this->getIniFilename();
+        $subcommand[] = 'sed';
+        $subcommand[] = '-i';
+        $subcommand[] = '-e';
+        $subcommand[] = $this->getSedPattern($input);
+        $subcommand[] = $this->getIniFilename();
 
+        $command = $this->dockerComposePhpExecCommandBuilder->build($subcommand);
         Process::run($command, ['tty' => true]);
         $this->writeEndResult($input, $output);
         $this->restartServices($output);

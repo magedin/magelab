@@ -67,8 +67,7 @@ class N98Command extends SpecialCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->dockerComposePhpExecCommandBuilder->build();
-        $command[] = 'n98';
+        $command = $this->dockerComposePhpExecCommandBuilder->build(['n98']);
         $argv = $this->getShiftedArgv();
         $command = array_merge($command, $argv);
 

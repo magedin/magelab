@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\CommandBuilder;
 
-class Magento
+class Magento implements CommandBuilderInterface
 {
     /**
      * @var DockerComposePhpExec
@@ -26,12 +26,12 @@ class Magento
     }
 
     /**
+     * @param array $subcommands
      * @return array
      */
-    public function build(): array
+    public function build(array $subcommands = []): array
     {
-        $command = $this->dockerComposePhpExec->build();
-        $command[] = 'bin/magento';
-        return $command;
+        $command = $this->dockerComposePhpExec->build(['bin/magento']);
+        return array_merge($command, $subcommands);
     }
 }

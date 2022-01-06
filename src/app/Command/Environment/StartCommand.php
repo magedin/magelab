@@ -72,11 +72,7 @@ class StartCommand extends Command
             return Command::SUCCESS;
         }
 
-        $command = $this->dockerComposeCommandBuilder->build();
-
-        $command[] = 'up';
-        $command[] = '-d';
-
+        $command = $this->dockerComposeCommandBuilder->build(['up', '-d']);
         $output->writelnInfo('Starting the containers.');
         $outputWrapper = $this->outputWrapperBuilder->build($output);
         Process::run($command, [

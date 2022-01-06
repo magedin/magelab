@@ -80,33 +80,32 @@ class StatusCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->dockerComposeCommandBuilder->build();
-        $command[] = 'ps';
-
-        if ($service = $input->getArgument('service')) {
-            $command = array_merge($command, $service);
-        }
-
+        $subcommands = ['ps'];
         if ($input->getOption('silent')) {
-            $command[] = '-q';
+            $subcommands[] = '-q';
         }
 
         if ($input->getOption('services')) {
-            $command[] = '--services';
+            $subcommands[] = '--services';
         }
 
         if ($input->getOption('all')) {
-            $command[] = '-a';
+            $subcommands[] = '-a';
         }
 
         if ($filter = $input->getOption('filter')) {
-            $command[] = '--filter';
-            $command[] = $filter;
+            $subcommands[] = '--filter';
+            $subcommands[] = $filter;
         }
 
+        if ($service = $input->getArgument('service')) {
+            $subcommands = array_merge($subcommands, $service);
+        }
+
+        $command = $this->dockerComposeCommandBuilder->build($subcommands);
         Process::run($command, [
             'callback' => function ($type, $buffer) use ($output) {
-                $output->writeln($buffer);
+                $output->write($buffer);
             }
         ]);
 

@@ -67,9 +67,7 @@ class RestartCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->dockerComposeCommandBuilder->build();
-        $command[] = 'restart';
-
+        $command = $this->dockerComposeCommandBuilder->build(['restart']);
         if ($services = $input->getArgument('services')) {
             $command = array_merge($command, $services);
         }
