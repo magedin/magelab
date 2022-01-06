@@ -190,9 +190,16 @@ commands:
         code: magento:fix:own
         aliases:
             - fix:own
-            - fixown
         description: Fix owner for Magento project files.
         class: \MagedIn\Lab\Command\Magento\FixOwnsCommand
+
+    magento:fix:perm:
+        name: Fix permissinos for Magento project files.
+        code: magento:fix:perm
+        aliases:
+            - fix:perm
+        description: Fix permissinos for Magento project files.
+        class: \MagedIn\Lab\Command\Magento\FixPermsCommand
 
     n98:
         name: n98 Magerun Script
