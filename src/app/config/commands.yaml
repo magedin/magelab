@@ -172,7 +172,7 @@ commands:
         aliases:
             - copy
             - cp
-        description: Copy any file from or to container.
+        description: "Copy any file from or to container. For directories inside containers, always use absolute paths (E.g: php:/var/www/html/cron.php)"
         class: \MagedIn\Lab\Command\Container\CopyCommand
 
     magento:cli:

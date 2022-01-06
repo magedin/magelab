@@ -62,7 +62,6 @@ class CommandsBuilder
         $code = $config['code'] ?? null;
         $aliases = (array) $config['aliases'] ?? null;
         $description = $config['description'] ?? null;
-        $override = $config['override'] ?? false;
 
         /** @var Command $command */
         $command = ObjectManager::getInstance()->create($config['class'], ['name' => $code]);

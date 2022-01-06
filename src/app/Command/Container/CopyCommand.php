@@ -47,13 +47,13 @@ class CopyCommand extends Command
         $this->addArgument(
             'origin',
             InputArgument::REQUIRED,
-            'Select a specific service container'
+            'The origin file or directory you want to copy. (E.g. /web/somefile.txt | php:/var/www/html)'
         );
 
         $this->addArgument(
             'destination',
             InputArgument::REQUIRED,
-            'Select a specific service container'
+            'The destination of your file or directory. (E.g. /web/somefile.txt | php:/var/www/html)'
         );
     }
 
