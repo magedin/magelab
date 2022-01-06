@@ -13,10 +13,9 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Container;
 
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
+use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Model\Process;
-use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,12 +27,19 @@ class SshCommand extends Command
      */
     private DockerComposeExec $dockerComposeExecCommandBuilder;
 
+    /**
+     * @var ArrayInputFactory
+     */
+    private ArrayInputFactory $arrayInputFactory;
+
     public function __construct(
         DockerComposeExec $dockerComposeExecCommandBuilder,
+        ArrayInputFactory $arrayInputFactory,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
+        $this->arrayInputFactory = $arrayInputFactory;
     }
 
     protected function configure()
@@ -57,10 +63,8 @@ class SshCommand extends Command
             return Command::FAILURE;
         }
 
-        $command = $this->dockerComposeExecCommandBuilder->build();
-        $command[] = $input->getArgument('service');
-        $command[] = 'bash';
-
+        $subcommands = [$input->getArgument('service'), 'bash'];
+        $command = $this->dockerComposeExecCommandBuilder->build($subcommands);
         Process::run($command, [
             'tty' => true,
             'callback' => function ($type, $buffer) use ($output) {
@@ -79,15 +83,11 @@ class SshCommand extends Command
     private function showOptions(OutputInterface $output): void
     {
         $output->writeln([
-            '<comment>You need to provid one of the following service names to SSH command:</comment>',
+            '<comment>You need to provide one of the following service names to SSH command:</comment>',
             null
         ]);
         $command = $this->getApplication()->find('status');
-        $input = ObjectManager::getInstance()->create(ArrayInput::class, [
-            'parameters' => [
-                '--services' => true
-            ]
-        ]);
+        $input = $this->arrayInputFactory->create(['--services' => true]);
         $command->run($input, $output);
     }
 }

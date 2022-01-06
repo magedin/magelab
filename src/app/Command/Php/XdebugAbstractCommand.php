@@ -13,11 +13,10 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
+use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\Container\Php\XdebugInfo;
 use MagedIn\Lab\Model\Process;
-use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,14 +33,21 @@ abstract class XdebugAbstractCommand extends Command
      */
     protected XdebugInfo $xdebugInfo;
 
+    /**
+     * @var ArrayInputFactory
+     */
+    protected ArrayInputFactory $arrayInputFactory;
+
     public function __construct(
         DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
         XdebugInfo $xdebugInfo,
+        ArrayInputFactory $arrayInputFactory,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
         $this->xdebugInfo = $xdebugInfo;
+        $this->arrayInputFactory = $arrayInputFactory;
     }
 
     protected function configure()
@@ -93,12 +99,10 @@ abstract class XdebugAbstractCommand extends Command
     protected function restartServices(OutputInterface $output)
     {
         $xdebugCommand = $this->getApplication()->find('restart');
-        $emptyInput = ObjectManager::getInstance()->create(ArrayInput::class, [
-            'parameters' => [
-                'services' => ['php'],
-            ]
+        $input = $this->arrayInputFactory->create([
+            'services' => ['php'],
         ]);
-        $xdebugCommand->run($emptyInput, $output);
+        $xdebugCommand->run($input, $output);
     }
 
     /**
@@ -109,11 +113,8 @@ abstract class XdebugAbstractCommand extends Command
     protected function checkXdebugStatus(OutputInterface $output)
     {
         $xdebugCommand = $this->getApplication()->find('xdebug:status');
-        $emptyInput = ObjectManager::getInstance()->create(ArrayInput::class, [
-            'parameters' => ['--silent' => true]
-        ]);
-
-        return $xdebugCommand->run($emptyInput, $output);
+        $input = $this->arrayInputFactory->create(['--silent' => true]);
+        return $xdebugCommand->run($input, $output);
     }
 
     /**

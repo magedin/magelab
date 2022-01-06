@@ -13,10 +13,9 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Environment;
 
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Template\TemplateLoader;
-use MagedIn\Lab\ObjectManager;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,16 +38,23 @@ class VhostSetupCommand extends Command
      */
     private TemplateLoader $templateLoader;
 
+    /**
+     * @var ArrayInputFactory
+     */
+    private ArrayInputFactory $arrayInputFactory;
+
     public function __construct(
         DirList $dirList,
         Filesystem $filesystem,
         TemplateLoader $templateLoader,
+        ArrayInputFactory $arrayInputFactory,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dirList = $dirList;
         $this->filesystem = $filesystem;
         $this->templateLoader = $templateLoader;
+        $this->arrayInputFactory = $arrayInputFactory;
     }
 
     /**
@@ -87,11 +93,8 @@ class VhostSetupCommand extends Command
     private function setupCertificates(string $domain, OutputInterface $output)
     {
         $sslCommand = $this->getApplication()->find('ssl:setup');
-        /** @var ArrayInput $input */
-        $input = ObjectManager::getInstance()->create(ArrayInput::class, [
-            'parameters' => [
-                'domains' => [$domain],
-            ]
+        $input = $this->arrayInputFactory->create([
+            'domains' => [$domain],
         ]);
         $sslCommand->run($input, $output);
     }

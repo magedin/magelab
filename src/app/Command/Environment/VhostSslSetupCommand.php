@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Environment;
 
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -27,12 +28,16 @@ class VhostSslSetupCommand extends Command
      */
     private DirList $dirList;
 
+    private ArrayInputFactory $arrayInputFactory;
+
     public function __construct(
         DirList $dirList,
+        ArrayInputFactory $arrayInputFactory,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dirList = $dirList;
+        $this->arrayInputFactory = $arrayInputFactory;
     }
 
     /**
@@ -76,14 +81,11 @@ class VhostSslSetupCommand extends Command
         ];
 
         /** @var ArrayInput $input */
-        $input = ObjectManager::getInstance()->create(ArrayInput::class, [
-            'parameters' => [
-                'domains' => [$domain],
-                '--cert-file' => $files['cert'],
-                '--key-file' => $files['key'],
-            ]
+        $input = $this->arrayInputFactory->create([
+            'domains' => [$domain],
+            '--cert-file' => $files['cert'],
+            '--key-file' => $files['key'],
         ]);
-
         $sslCommand->run($input, $output);
     }
 

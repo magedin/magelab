@@ -12,26 +12,14 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\CommandBuilder;
 
-class DockerComposeExec implements CommandBuilderInterface
+class DockerComposeExec extends DockerCompose
 {
-    /**
-     * @var DockerCompose
-     */
-    private DockerCompose $dockerCompose;
-
-    public function __construct(
-        DockerCompose $dockerCompose
-    ) {
-        $this->dockerCompose = $dockerCompose;
-    }
-
     /**
      * @param array $subcommands
      * @return array
      */
     public function build(array $subcommands = []): array
     {
-        $command = $this->dockerCompose->build(['exec']);
-        return array_merge($command, $subcommands);
+        return array_merge(parent::build(['exec']), $subcommands);
     }
 }
