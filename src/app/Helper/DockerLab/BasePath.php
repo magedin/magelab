@@ -29,6 +29,17 @@ class BasePath
     private static string $rootDir = '';
 
     /**
+     * @return bool
+     */
+    public static function isValid(): bool
+    {
+        if (self::getRootDir(true)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @param bool $silent
      * @return string|null
      */

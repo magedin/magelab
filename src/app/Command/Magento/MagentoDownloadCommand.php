@@ -33,6 +33,11 @@ class MagentoDownloadCommand extends Command
     const FILE_EXTENSION = '.tar.gz';
 
     /**
+     * @inheritdoc
+     */
+    protected bool $isPrivate = false;
+
+    /**
      * @var Filesystem
      */
     private Filesystem $filesystem;

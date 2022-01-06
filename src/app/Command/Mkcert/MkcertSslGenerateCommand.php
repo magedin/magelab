@@ -21,6 +21,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MkcertSslGenerateCommand extends Command
 {
+    /**
+     * @inheritdoc
+     */
+    protected bool $isPrivate = false;
+
     protected function configure()
     {
         $this->addArgument(

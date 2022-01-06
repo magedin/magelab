@@ -21,6 +21,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MkcertUninstallCommand extends Command
 {
     /**
+     * @inheritdoc
+     */
+    protected bool $isPrivate = false;
+
+    /**
      * @var OperatingSystem
      */
     private OperatingSystem $operatingSystem;

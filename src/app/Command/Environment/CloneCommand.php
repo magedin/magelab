@@ -30,6 +30,14 @@ class CloneCommand extends Command
     const ARG_DESTINATION = 'destination';
     const ARG_GIT = 'git';
 
+    /**
+     * @inheritdoc
+     */
+    protected bool $isPrivate = false;
+
+    /**
+     * @var Filesystem
+     */
     private Filesystem $filesystem;
 
     public function __construct(

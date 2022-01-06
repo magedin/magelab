@@ -22,6 +22,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MagentoVersionsListCommand extends Command
 {
     /**
+     * @inheritdoc
+     */
+    protected bool $isPrivate = false;
+
+    /**
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
