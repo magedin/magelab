@@ -27,7 +27,7 @@ class Process
         'env'      => [],
         'cwd'      => null,
         'input'    => null,
-        'timeout'  => 60,
+        'timeout'  => null, /* Let's give it unlimited time by default. */
     ];
 
     /**
