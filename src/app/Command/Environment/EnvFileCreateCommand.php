@@ -108,7 +108,7 @@ class EnvFileCreateCommand extends Command
             'ELASTICSEARCH_HOSTS' => 'http://elasticsearch:9200',
             'SERVER_NAME' => 'localhost',
             'SERVER_HOST' => '0.0.0.0',
-            'MONITORING_ENABLED' => true
+            'MONITORING_ENABLED' => 'true'
         ],
         'aws' => [
             'AWS_S3_BUCKET' => null,
