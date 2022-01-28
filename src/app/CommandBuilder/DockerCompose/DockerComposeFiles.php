@@ -91,6 +91,12 @@ class DockerComposeFiles
                 'file' => 'docker-compose.pmm.yml',
                 'variable' => 'SERVICE_PMM_ENABLED',
             ], [
+                'file' => 'docker-compose.rabbitmq.yml',
+                'variable' => 'SERVICE_RABBITMQ_ENABLED',
+            ], [
+                'file' => 'docker-compose.varnish.yml',
+                'variable' => 'SERVICE_VARNISH_ENABLED',
+            ], [
                 'file' => 'docker-compose.custom.yml',
             ],
         ];

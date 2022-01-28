@@ -39,12 +39,17 @@ class EnvFileCreateCommand extends Command
             ],
             'SERVICE_KIBANA_ENABLED' => [
                 'question' => 'Do you want to use Kibana?',
-                'default' => true,
+                'default' => false,
                 'type' => 'confirm',
             ],
             'SERVICE_RABBITMQ_ENABLED' => [
                 'question' => 'Do you want to use RabbitMQ?',
-                'default' => true,
+                'default' => false,
+                'type' => 'confirm',
+            ],
+            'SERVICE_VARNISH_ENABLED' => [
+                'question' => 'Do you want to use Varnish?',
+                'default' => false,
                 'type' => 'confirm',
             ],
         ],
@@ -183,6 +188,7 @@ class EnvFileCreateCommand extends Command
                     $printFooter = true;
                 }
 
+                $value = $value ?: '0';
                 $this->filesystem->appendToFile($this->getEnvFileLocation(), "$name=$value\n");
             }
 
