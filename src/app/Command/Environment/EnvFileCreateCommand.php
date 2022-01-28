@@ -104,6 +104,18 @@ class EnvFileCreateCommand extends Command
             'RABBITMQ_DEFAULT_PASS' => 'magento',
             'RABBITMQ_DEFAULT_VHOST' => 'magento',
         ],
+        'kibana' => [
+            'ELASTICSEARCH_HOSTS' => 'http://elasticsearch:9200',
+            'SERVER_NAME' => 'localhost',
+            'SERVER_HOST' => '0.0.0.0',
+            'MONITORING_ENABLED' => true
+        ],
+        'aws' => [
+            'AWS_S3_BUCKET' => null,
+            'AWS_S3_PATH' => null,
+            'AWS_PROFILE' => null,
+
+        ],
         'search engine' => [
             'SEARCH_ENGINE' => 'elasticsearch7',
             'ES_HOST' => 'elasticsearch',
