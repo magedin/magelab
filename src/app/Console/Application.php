@@ -71,7 +71,7 @@ class Application extends BaseApplication
 
         $name = $this->getCommandName($input);
         if ($name) {
-            $command = $this->findCommand($name, $input, $output);
+            $command = $this->findCommand($name);
             if ($command && $command->isProxyCommand()) {
                 return $this->proxyRun($command, $input, $output);
             }
@@ -81,11 +81,9 @@ class Application extends BaseApplication
 
     /**
      * @param string $name
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return Command|null
      */
-    private function findCommand(string $name, InputInterface $input, OutputInterface $output): ?Command
+    private function findCommand(string $name): ?Command
     {
         try {
             /** @var Command $command */
