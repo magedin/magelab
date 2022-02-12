@@ -15,9 +15,14 @@ namespace MagedIn\Lab\Console;
 use Exception;
 use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Symfony\Component\Console\Exception\NamespaceNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Application extends BaseApplication
 {
@@ -66,13 +71,29 @@ class Application extends BaseApplication
 
         $name = $this->getCommandName($input);
         if ($name) {
-            /** @var Command $command */
-            $command = $this->find($name);
-            if ($command->isProxyCommand()) {
+            $command = $this->findCommand($name, $input, $output);
+            if ($command && $command->isProxyCommand()) {
                 return $this->proxyRun($command, $input, $output);
             }
         }
         return $this->run($input, $output);
+    }
+
+    /**
+     * @param string $name
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return Command|null
+     */
+    private function findCommand(string $name, InputInterface $input, OutputInterface $output): ?Command
+    {
+        try {
+            /** @var Command $command */
+            $command = $this->find($name);
+        }  catch (\Throwable $e) {
+            return null;
+        }
+        return $command;
     }
 
     /**
