@@ -16,6 +16,7 @@ use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\Console\Question;
 use MagedIn\Lab\Helper\DockerComposeServicesList;
+use MagedIn\Lab\Helper\DockerServiceState;
 use MagedIn\Lab\Model\Process;
 use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -45,11 +46,17 @@ class SshCommand extends Command
      */
     private DockerComposeServicesList $servicesList;
 
+    /**
+     * @var DockerServiceState
+     */
+    private DockerServiceState $serviceState;
+
     public function __construct(
         DockerComposeExec $dockerComposeExecCommandBuilder,
         ArrayInputFactory $arrayInputFactory,
         Question $question,
         DockerComposeServicesList $servicesList,
+        DockerServiceState $serviceState,
         string $name = null
     ) {
         parent::__construct($name);
@@ -57,6 +64,7 @@ class SshCommand extends Command
         $this->arrayInputFactory = $arrayInputFactory;
         $this->question = $question;
         $this->servicesList = $servicesList;
+        $this->serviceState = $serviceState;
     }
 
     protected function configure()
@@ -82,6 +90,11 @@ class SshCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->serviceState->isRunning()) {
+            $output->writeln('The services are not running.');
+            return Command::FAILURE;
+        }
+
         $service = $input->getArgument('service');
         if (!$service) {
             $services = $this->servicesList->getNames();
@@ -105,21 +118,5 @@ class SshCommand extends Command
         ]);
 
         return Command::SUCCESS;
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @return void
-     * @throws \Exception
-     */
-    private function showOptions(OutputInterface $output): void
-    {
-        $output->writeln([
-            '<comment>You need to provide one of the following service names to SSH command:</comment>',
-            null
-        ]);
-        $command = $this->getApplication()->find('status');
-        $input = $this->arrayInputFactory->create(['--services' => true]);
-        $command->run($input, $output);
     }
 }
