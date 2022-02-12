@@ -14,6 +14,7 @@ namespace MagedIn\Lab;
 
 use Exception;
 use MagedIn\Lab\Console\ConsoleBuilder;
+use MagedIn\Lab\Helper\DockerLab\EnvLoader;
 
 class App
 {
@@ -22,10 +23,14 @@ class App
      */
     private ConsoleBuilder $consoleBuilder;
 
+    private EnvLoader $envLoader;
+
     public function __construct(
-        ConsoleBuilder $consoleBuilder
+        ConsoleBuilder $consoleBuilder,
+        EnvLoader $envLoader
     ) {
         $this->consoleBuilder = $consoleBuilder;
+        $this->envLoader = $envLoader;
     }
 
     /**
@@ -34,6 +39,7 @@ class App
      */
     public function run()
     {
+        $this->envLoader->load();
         $application = $this->consoleBuilder->build();
         $application->execute();
     }

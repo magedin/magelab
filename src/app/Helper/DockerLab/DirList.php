@@ -89,4 +89,12 @@ class DirList
     {
         return BasePath::getRootDir();
     }
+
+    /**
+     * @return string
+     */
+    public function getSrcDir(): string
+    {
+        return $this->getRootDir() . '/' . 'src';
+    }
 }
