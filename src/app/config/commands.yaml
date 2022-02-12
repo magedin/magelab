@@ -110,6 +110,14 @@ commands:
         description: Check the version of the TLS currently used.
         class: \MagedIn\Lab\Command\Environment\TlsVersionCommand
 
+    php:execute:
+        name: Execute PHP command inside PHP docker container.
+        code: php:execute
+        aliases:
+            - php
+        description: Execute PHP command inside PHP docker container.
+        class: \MagedIn\Lab\Command\Php\PhpCommand
+
     php:xdebug:status:
         name: Show whether Xdebug is enabled or not
         code: php:xdebug:status
