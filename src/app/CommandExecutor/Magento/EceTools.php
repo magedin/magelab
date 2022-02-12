@@ -43,13 +43,4 @@ class EceTools extends CommandExecutorAbstract
             'tty' => true,
         ]);
     }
-
-    /**
-     * @return bool
-     */
-    private function isComposerOne(): bool
-    {
-        $args = $this->getShiftedArgv();
-        return in_array('--one', $args) || in_array('-1', $args);
-    }
 }
