@@ -35,7 +35,10 @@ class ConsoleBuilder
         $this->application = $application;
     }
 
-    public function build()
+    /**
+     * @return Application
+     */
+    public function build(): Application
     {
         $this->application->setName(Config::get('name'));
         $this->application->setVersion(Config::get('version'));

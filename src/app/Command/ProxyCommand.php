@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\InputDefinition;
  * This causes conflicts between the default options like --help, --version, --quiet, etc.
  * A special command hand the default options over to the subcommand.
  */
-abstract class SpecialCommand extends Command
+abstract class ProxyCommand extends Command
 {
     /**
      * @var NonDefaultOptions
@@ -87,5 +87,13 @@ abstract class SpecialCommand extends Command
             $options = $this->cleanOptions($options);
         }
         return $options;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isProxyCommand(): bool
+    {
+        return true;
     }
 }

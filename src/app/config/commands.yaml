@@ -101,6 +101,15 @@ commands:
         description: Setup SSL for a vhost
         class: \MagedIn\Lab\Command\Environment\VhostSslSetupCommand
 
+    environment:tls:version:
+        name: Check the version of the TLS currently used.
+        code: environment:tls:version
+        aliases:
+            - tls:version
+            - tls
+        description: Check the version of the TLS currently used.
+        class: \MagedIn\Lab\Command\Environment\TlsVersionCommand
+
     php:xdebug:status:
         name: Show whether Xdebug is enabled or not
         code: php:xdebug:status
@@ -231,3 +240,4 @@ commands:
         aliases:
         description: Uninstall the local CA (but do not delete it).
         class: \MagedIn\Lab\Command\Mkcert\MkcertUninstallCommand
+

@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
-use MagedIn\Lab\Command\SpecialCommand;
+use MagedIn\Lab\Command\ProxyCommand;
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
 use MagedIn\Lab\Helper\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class N98Command extends SpecialCommand
+class N98Command extends ProxyCommand
 {
     /**
      * @var DockerComposePhpExec

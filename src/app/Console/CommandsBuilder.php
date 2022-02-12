@@ -12,25 +12,12 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Console;
 
-use MagedIn\Lab\Command\SpecialCommand;
 use MagedIn\Lab\Config;
-use MagedIn\Lab\Helper\SpecialCommands;
 use MagedIn\Lab\ObjectManager;
 use Symfony\Component\Console\Command\Command;
 
 class CommandsBuilder
 {
-    /**
-     * @var SpecialCommands
-     */
-    private SpecialCommands $specialCommands;
-
-    public function __construct(
-        SpecialCommands $specialCommands
-    ) {
-        $this->specialCommands = $specialCommands;
-    }
-
     /**
      * @return array
      */
@@ -71,13 +58,6 @@ class CommandsBuilder
 
         $command->setAliases($aliases);
         $command->setDescription($description);
-
-        /**
-         * Register special commands so the default options will be omitted when called.
-         */
-        if ($command instanceof SpecialCommand) {
-            $this->specialCommands->add($code)->addAliases($aliases);
-        }
 
         return $command;
     }

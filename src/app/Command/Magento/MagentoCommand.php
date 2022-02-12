@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
-use MagedIn\Lab\Command\SpecialCommand;
+use MagedIn\Lab\Command\ProxyCommand;
 use MagedIn\Lab\CommandBuilder\Magento;
 use MagedIn\Lab\Helper\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MagentoCommand extends SpecialCommand
+class MagentoCommand extends ProxyCommand
 {
     /**
      * @var Magento

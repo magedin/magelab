@@ -12,7 +12,12 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Console;
 
+use Exception;
+use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class Application extends BaseApplication
 {
@@ -30,7 +35,7 @@ class Application extends BaseApplication
     /**
      * @return string
      */
-    public function getHelp()
+    public function getHelp(): string
     {
         return $this->logo . parent::getHelp();
     }
@@ -38,8 +43,47 @@ class Application extends BaseApplication
     /**
      * @return string
      */
-    public function getLongVersion()
+    public function getLongVersion(): string
     {
         return parent::getLongVersion() . ' by <info>MagedIn Technology</info>';
+    }
+
+    /**
+     * @param InputInterface|null $input
+     * @param OutputInterface|null $output
+     * @return int
+     * @throws Exception
+     */
+    public function execute(InputInterface $input = null, OutputInterface $output = null): int
+    {
+        if (null === $input) {
+            $input = new ArgvInput();
+        }
+
+        if (null === $output) {
+            $output = new Output\ConsoleOutput();
+        }
+
+        $name = $this->getCommandName($input);
+        if ($name) {
+            /** @var Command $command */
+            $command = $this->find($name);
+            if ($command->isProxyCommand()) {
+                return $this->proxyRun($command, $input, $output);
+            }
+        }
+        return $this->run($input, $output);
+    }
+
+    /**
+     * @param Command $command
+     * @param InputInterface|null $input
+     * @param OutputInterface|null $output
+     * @return int
+     * @throws Exception
+     */
+    private function proxyRun(Command $command, InputInterface $input = null, OutputInterface $output = null): int
+    {
+        return (int) $command->run($input, $output);
     }
 }

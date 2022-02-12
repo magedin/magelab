@@ -12,9 +12,8 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab;
 
+use Exception;
 use MagedIn\Lab\Console\ConsoleBuilder;
-use MagedIn\Lab\Console\Input\ArgvInput;
-use MagedIn\Lab\Console\Output\ConsoleOutput;
 
 class App
 {
@@ -23,33 +22,19 @@ class App
      */
     private ConsoleBuilder $consoleBuilder;
 
-    /**
-     * @var ArgvInput
-     */
-    private ArgvInput $input;
-
-    /**
-     * @var ConsoleOutput
-     */
-    private ConsoleOutput $consoleOutput;
-
     public function __construct(
-        ConsoleBuilder $consoleBuilder,
-        ArgvInput $input,
-        ConsoleOutput $consoleOutput
+        ConsoleBuilder $consoleBuilder
     ) {
         $this->consoleBuilder = $consoleBuilder;
-        $this->input = $input;
-        $this->consoleOutput = $consoleOutput;
     }
 
     /**
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function run()
     {
-        $console = $this->consoleBuilder->build();
-        $console->run($this->input, $this->consoleOutput);
+        $application = $this->consoleBuilder->build();
+        $application->execute();
     }
 }

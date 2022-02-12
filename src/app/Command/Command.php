@@ -33,4 +33,12 @@ class Command extends BaseCommand
         }
         return parent::isEnabled();
     }
+
+    /**
+     * @return bool
+     */
+    public function isProxyCommand(): bool
+    {
+        return false;
+    }
 }
