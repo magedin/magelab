@@ -17,9 +17,7 @@ use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
 use MagedIn\Lab\Helper\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ComposerCommand extends ProxyCommand
@@ -43,22 +41,6 @@ class ComposerCommand extends ProxyCommand
         $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
     }
 
-    protected function configure()
-    {
-        $this->addArgument(
-            'composer-command',
-            InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-            'Composer command'
-        );
-
-        $this->addOption(
-            'one',
-            '1',
-            InputOption::VALUE_NONE,
-            'Use composer 1'
-        );
-    }
-
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
@@ -67,14 +49,22 @@ class ComposerCommand extends ProxyCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $command = $this->dockerComposePhpExecCommandBuilder->build();
-        $command[] = $input->getOption('one') ? 'composer1' : 'composer';
+        $command[] = $this->isComposerOne() ? 'composer1' : 'composer';
         $cleanOptions = array_diff($this->getShiftedArgv(), $this->getProtectedOptions());
         $command = array_merge($command, $cleanOptions);
 
         Process::run($command, [
             'tty' => true,
-            'timeout' => null, /** In case of composer let's just remove the time limit. */
         ]);
         return Command::SUCCESS;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isComposerOne(): bool
+    {
+        $args = $this->getShiftedArgv();
+        return in_array('--one', $args) || in_array('-1', $args);
     }
 }

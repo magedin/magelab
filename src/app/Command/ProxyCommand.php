@@ -14,6 +14,8 @@ namespace MagedIn\Lab\Command;
 
 use MagedIn\Lab\Helper\Console\NonDefaultOptions;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * We call special commands the commands that need to call other Symfony\Command process.
@@ -39,20 +41,6 @@ abstract class ProxyCommand extends Command
     ) {
         parent::__construct($name);
         $this->nonDefaultOptions = $nonDefaultOptions;
-    }
-
-    /**
-     * Adds the non-default arguments, so they can be validated by the command.
-     * For special commands, we are going to pass all the options and arguments over to it.
-     * @return InputDefinition
-     */
-    public function getDefinition()
-    {
-        $options = array_diff($this->nonDefaultOptions->getOptions(), $this->getProtectedOptions(true));
-        foreach ($options as $option) {
-            $this->addOption($option);
-        }
-        return parent::getDefinition();
     }
 
     /**
@@ -95,5 +83,15 @@ abstract class ProxyCommand extends Command
     public function isProxyCommand(): bool
     {
         return true;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
+    public function run(InputInterface $input, OutputInterface $output): int
+    {
+        return $this->execute($input, $output);
     }
 }

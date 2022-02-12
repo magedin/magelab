@@ -17,7 +17,6 @@ use MagedIn\Lab\CommandBuilder\Magento;
 use MagedIn\Lab\Helper\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -35,21 +34,6 @@ class MagentoCommand extends ProxyCommand
     ) {
         parent::__construct($nonDefaultOptions, $name);
         $this->magentoCommandBuilder = $magentoCommandBuilder;
-    }
-
-    protected function configure()
-    {
-        $this->addArgument(
-            'magento-command',
-            InputArgument::OPTIONAL,
-            'The Magento 2 CLI Command'
-        );
-
-        $this->addArgument(
-            'subcommand',
-            InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-            'The Magento 2 CLI Sub-command'
-        );
     }
 
     /**
