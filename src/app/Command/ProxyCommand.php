@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command;
 
 use MagedIn\Lab\Helper\Console\NonDefaultOptions;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
