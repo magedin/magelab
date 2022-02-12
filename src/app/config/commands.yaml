@@ -17,6 +17,22 @@ commands:
         description: List all the available versions for download with MageLab tool
         class: \MagedIn\Lab\Command\Magento\MagentoVersionsListCommand
 
+    magento:ece-patches:
+        name: Magento ECE Patches
+        code: magento:ece-patches
+        aliases:
+            - ece-patches
+        description: Run Magento ECE Patches tool.
+        class: \MagedIn\Lab\Command\Magento\EcePatchesCommand
+
+    magento:ece-tools:
+        name: Magento ECE Tools
+        code: magento:ece-tools
+        aliases:
+            - ece-tools
+        description: Run Magento ECE Tools tool.
+        class: \MagedIn\Lab\Command\Magento\EceToolsCommand
+
     environment:clone:
         name: Clone Docker Environment
         code: environment:clone
