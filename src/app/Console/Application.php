@@ -15,14 +15,9 @@ namespace MagedIn\Lab\Console;
 use Exception;
 use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
-use Symfony\Component\Console\Exception\CommandNotFoundException;
-use Symfony\Component\Console\Exception\NamespaceNotFoundException;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Application extends BaseApplication
 {
