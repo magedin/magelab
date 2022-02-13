@@ -29,7 +29,12 @@ class EnvLoader
      */
     public function load()
     {
-        $rootDir = BasePath::getAbsoluteRootDir();
-        $this->dotenv->usePutenv(true)->loadEnv($rootDir . '/.env');
+        if (BasePath::isValid()) {
+            $rootDir = BasePath::getAbsoluteRootDir();
+            $enviFile = $rootDir . '/.env';
+            if (file_exists($enviFile) && is_readable($enviFile)) {
+                $this->dotenv->usePutenv(true)->loadEnv($enviFile);
+            }
+        }
     }
 }

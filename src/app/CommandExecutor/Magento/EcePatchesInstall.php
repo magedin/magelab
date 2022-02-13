@@ -10,23 +10,28 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab\CommandExecutor\Php;
+namespace MagedIn\Lab\CommandExecutor\Magento;
 
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
 use MagedIn\Lab\CommandExecutor\CommandExecutorAbstract;
+use MagedIn\Lab\CommandExecutor\Php\Composer;
 use MagedIn\Lab\Model\Process;
 
-class Composer extends CommandExecutorAbstract
+class EcePatchesInstall extends CommandExecutorAbstract
 {
     /**
      * @var DockerComposePhpExec
      */
     private DockerComposePhpExec $dockerComposePhpExecCommandBuilder;
 
+    private Composer $composer;
+
     public function __construct(
-        DockerComposePhpExec $dockerComposePhpExecCommandBuilder
+        DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
+        Composer $composer
     ) {
         $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
+        $this->composer = $composer;
     }
 
     /**
@@ -34,21 +39,7 @@ class Composer extends CommandExecutorAbstract
      */
     protected function doExecute(array $commands = [], array $config = [])
     {
-        $protectedOptions = ['--one', '-1'];
-        $command = $this->dockerComposePhpExecCommandBuilder->build();
-        $command[] = $this->isComposerOne() ? 'composer1' : 'composer';
-
-        if (!empty($commands)) {
-            $command = array_merge($command, $commands);
-        } else {
-            $cleanOptions = array_diff($this->getShiftedArgv(), $protectedOptions);
-            $command = array_merge($command, $cleanOptions);
-        }
-
-
-        Process::run($command, [
-            'tty' => true,
-        ]);
+        $this->composer->execute(['require', 'magento/quality-patches']);
     }
 
     /**

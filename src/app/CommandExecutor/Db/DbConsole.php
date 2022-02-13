@@ -14,7 +14,6 @@ namespace MagedIn\Lab\CommandExecutor\Db;
 
 use MagedIn\Lab\CommandBuilder\DockerComposeDbExec;
 use MagedIn\Lab\CommandExecutor\CommandExecutorAbstract;
-use MagedIn\Lab\Helper\DockerLab\EnvLoader;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Exception\RuntimeException;
 
@@ -34,7 +33,7 @@ class DbConsole extends CommandExecutorAbstract
     /**
      * @return mixed|void
      */
-    protected function doExecute(array $config = [])
+    protected function doExecute(array $commands = [], array $config = [])
     {
         if (!$this->validateVariables()) {
             throw new RuntimeException(

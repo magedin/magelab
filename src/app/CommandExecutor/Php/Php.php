@@ -32,7 +32,7 @@ class Php extends CommandExecutorAbstract
     /**
      * @return mixed|void
      */
-    protected function doExecute(array $config = [])
+    protected function doExecute(array $commands = [], array $config = [])
     {
         $command = $this->dockerComposePhpExecCommandBuilder->build();
         $command[] = 'php';

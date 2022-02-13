@@ -13,8 +13,9 @@ namespace MagedIn\Lab\CommandExecutor;
 interface CommandExecutorInterface
 {
     /**
+     * @param array $commands
      * @param array $config
      * @return mixed
      */
-    public function execute(array $config = []);
+    public function execute(array $commands = [], array $config = []);
 }

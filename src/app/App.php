@@ -15,6 +15,8 @@ namespace MagedIn\Lab;
 use Exception;
 use MagedIn\Lab\Console\ConsoleBuilder;
 use MagedIn\Lab\Helper\DockerLab\EnvLoader;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class App
 {
@@ -39,8 +41,12 @@ class App
      */
     public function run()
     {
-        $this->envLoader->load();
-        $application = $this->consoleBuilder->build();
-        $application->execute();
+        try {
+            $application = $this->consoleBuilder->build();
+            $this->envLoader->load();
+            $application->execute();
+        } catch (\Exception $e) {
+            echo $e->getMessage() . "\n";
+        }
     }
 }

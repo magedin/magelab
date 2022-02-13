@@ -25,6 +25,14 @@ commands:
         description: Run Magento ECE Patches tool.
         class: \MagedIn\Lab\Command\Magento\EcePatchesCommand
 
+    magento:ece-patches:install:
+        name: Install Magento ECE Patches
+        code: magento:ece-patches:install
+        aliases:
+            - ece-patches:install
+        description: Install Magento ECE Patches
+        class: \MagedIn\Lab\Command\Magento\EcePatchesInstallCommand
+
     magento:ece-tools:
         name: Magento ECE Tools
         code: magento:ece-tools

@@ -32,7 +32,7 @@ class EcePatches extends CommandExecutorAbstract
     /**
      * @return mixed|void
      */
-    protected function doExecute(array $config = [])
+    protected function doExecute(array $commands = [], array $config = [])
     {
         $command = $this->dockerComposePhpExecCommandBuilder->build();
         $command[] = '/var/www/html/vendor/bin/ece-patches';
@@ -42,14 +42,5 @@ class EcePatches extends CommandExecutorAbstract
         Process::run($command, [
             'tty' => true,
         ]);
-    }
-
-    /**
-     * @return bool
-     */
-    private function isComposerOne(): bool
-    {
-        $args = $this->getShiftedArgv();
-        return in_array('--one', $args) || in_array('-1', $args);
     }
 }
