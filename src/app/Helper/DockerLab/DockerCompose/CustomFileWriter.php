@@ -20,6 +20,7 @@ use MagedIn\Lab\Helper\DockerIp;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Helper\OperatingSystem;
+use MagedIn\Lab\Model\Config\LocalConfig\Writer;
 use MagedIn\Lab\Model\Config\Services;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -84,6 +85,11 @@ class CustomFileWriter
      */
     private DockerIp $dockerIp;
 
+    /**
+     * @var Writer
+     */
+    private Writer $localConfigWriter;
+
     public function __construct(
         ConfigMerger $configMerger,
         ConfigWriter $configWriter,
@@ -93,7 +99,8 @@ class CustomFileWriter
         Services $services,
         OperatingSystem $operatingSystem,
         Installation $installation,
-        DockerIp $dockerIp
+        DockerIp $dockerIp,
+        Writer $localConfigWriter
     ) {
         $this->configMerger = $configMerger;
         $this->configWriter = $configWriter;
@@ -104,6 +111,7 @@ class CustomFileWriter
         $this->operatingSystem = $operatingSystem;
         $this->installation = $installation;
         $this->dockerIp = $dockerIp;
+        $this->localConfigWriter = $localConfigWriter;
     }
 
     private function prepareDefaultConfig()
@@ -186,7 +194,9 @@ class CustomFileWriter
      */
     private function buildContainerName(string $service): string
     {
-        $prefix = Config::get('project/name');
+        /** Always load the most fresh data from config. */
+        $localConfig = $this->localConfigWriter->load();
+        $prefix = $localConfig['project']['name'] ?? null;
         if ($prefix) {
             $service = $prefix . '_' . $service;
         }

@@ -69,9 +69,18 @@ class Config
     /**
      * @return void
      */
-    private static function load(): void
+    public static function reload(): void
     {
-        if (empty(self::$config)) {
+        self::load(true);
+    }
+
+    /**
+     * @param bool $force
+     * @return void
+     */
+    private static function load(bool $force = false): void
+    {
+        if ($force == false && empty(self::$config)) {
             self::init();
             foreach (self::loadConfigFiles() as $file) {
                 $config = (array) Yaml::parse($file->getContents());
