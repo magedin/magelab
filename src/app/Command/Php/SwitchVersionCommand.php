@@ -25,6 +25,11 @@ class SwitchVersionCommand extends Command
      */
     private CustomFileWriter $customFileWriter;
 
+    /**
+     * @var array|string[]
+     */
+    private array $availableVersions = ['7.2', '7.3', '7.4', '8.0', ' 8.1'];
+
     public function __construct(
         CustomFileWriter $customFileWriter,
         string $name = null
@@ -51,6 +56,13 @@ class SwitchVersionCommand extends Command
     {
         $image = 'magedin/magento2-php';
         $version = $input->getArgument('version');
+        if (!$this-$this->validateVersion($version)) {
+            $output->writelnError(vsprintf(
+                'The PHP version %s is not available. Use of of the following: %s',
+                [$version, implode(', ', $this->availableVersions)]
+            ));
+            return Command::FAILURE;
+        }
         $config = [
             'services' => [
                 'php' => [
@@ -60,5 +72,14 @@ class SwitchVersionCommand extends Command
         ];
         $this->customFileWriter->write($config);
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param string $version
+     * @return bool
+     */
+    private function validateVersion(string $version): bool
+    {
+        return in_array($version, $this->availableVersions);
     }
 }

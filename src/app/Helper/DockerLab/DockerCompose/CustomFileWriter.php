@@ -15,6 +15,7 @@ namespace MagedIn\Lab\Helper\DockerLab\DockerCompose;
 use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\DockerLab\DirList;
+use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\Services;
 use Symfony\Component\Filesystem\Filesystem;
@@ -61,18 +62,25 @@ class CustomFileWriter
      */
     private OperatingSystem $operatingSystem;
 
+    /**
+     * @var Installation
+     */
+    private Installation $installation;
+
     public function __construct(
         ConfigMerger $configMerger,
         Filesystem $filesystem,
         DirList $dirList,
         Services $services,
-        OperatingSystem $operatingSystem
+        OperatingSystem $operatingSystem,
+        Installation $installation
     ) {
         $this->configMerger = $configMerger;
         $this->filesystem = $filesystem;
         $this->dirList = $dirList;
         $this->services = $services;
         $this->operatingSystem = $operatingSystem;
+        $this->installation = $installation;
     }
 
     private function prepareDefaultConfig()
@@ -117,6 +125,9 @@ class CustomFileWriter
      */
     public function write(array $config = []): void
     {
+        if (!$this->installation->isInstalled()) {
+            return;
+        }
         $this->prepareDefaultConfig();
         $finalConfig = $this->defaultConfig;
         if ($this->filesystem->exists($this->getConfigFilename())) {

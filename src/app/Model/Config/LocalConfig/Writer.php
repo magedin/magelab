@@ -14,6 +14,7 @@ namespace MagedIn\Lab\Model\Config\LocalConfig;
 
 use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\DockerLab\DirList;
+use MagedIn\Lab\Helper\DockerLab\Installation;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
@@ -34,14 +35,21 @@ class Writer
      */
     private DirList $dirList;
 
+    /**
+     * @var Installation
+     */
+    private Installation $installation;
+
     public function __construct(
         ConfigMerger $configMerger,
         Filesystem $filesystem,
-        DirList $dirList
+        DirList $dirList,
+        Installation $installation
     ) {
         $this->configMerger = $configMerger;
         $this->filesystem = $filesystem;
         $this->dirList = $dirList;
+        $this->installation = $installation;
     }
 
     /**
@@ -73,6 +81,9 @@ class Writer
      */
     public function write(array $config = [])
     {
+        if (!$this->installation->isInstalled()) {
+            return;
+        }
         $finalConfig = $this->defaultConfig;
         $this->configMerger->merge($config, $finalConfig);
         $yaml = Yaml::dump($finalConfig, 10, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);

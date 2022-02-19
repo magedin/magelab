@@ -87,7 +87,7 @@ class DirList
      */
     public function getRootDir(): string
     {
-        return realpath(BasePath::getRootDir());
+        return realpath(BasePath::getRootDir(true));
     }
 
     /**

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab;
 
 use MagedIn\Lab\Helper\Config\ConfigMerger;
+use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Model\Config\LocalConfig\Writer;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -41,11 +42,18 @@ class Config
      */
     private static ConfigMerger $configMerger;
 
+    /**
+     * @var Installation
+     */
+    private static Installation $installation;
+
     private static function init()
     {
-        self::$filesystem = ObjectManager::getInstance()->get(Filesystem::class);
-        self::$localConfigWriter = ObjectManager::getInstance()->get(Writer::class);
-        self::$configMerger = ObjectManager::getInstance()->get(ConfigMerger::class);
+        $objectManager = ObjectManager::getInstance();
+        self::$filesystem = $objectManager->get(Filesystem::class);
+        self::$localConfigWriter = $objectManager->get(Writer::class);
+        self::$configMerger = $objectManager->get(ConfigMerger::class);
+        self::$installation = $objectManager->get(Installation::class);
     }
 
     /**
@@ -69,8 +77,7 @@ class Config
                 $config = (array) Yaml::parse($file->getContents());
                 self::$configMerger->merge($config, self::$config);
             }
-            $localConfig = (array) Yaml::parse(file_get_contents(self::$localConfigWriter->getConfigFilename()));
-            self::$configMerger->merge($localConfig, self::$config);
+            self::loadLocalConfigFile();
         }
     }
 
@@ -97,8 +104,6 @@ class Config
      */
     private static function loadConfigFiles(): Finder
     {
-        self::createLocalConfig();
-
         /** @var Finder $finder */
         $finder = ObjectManager::getInstance()->get(Finder::class);
         $finder->files()->in(CONFIG_DIR)->name(['*.yaml', '*.yml']);
@@ -115,6 +120,17 @@ class Config
         });
 
         return $finder;
+    }
+
+    private static function loadLocalConfigFile()
+    {
+        /** Application needs to be installed. */
+        if (!self::$installation->isInstalled()) {
+            return;
+        }
+        self::createLocalConfig();
+        $localConfig = (array) Yaml::parse(file_get_contents(self::$localConfigWriter->getConfigFilename()));
+        self::$configMerger->merge($localConfig, self::$config);
     }
 
     /**
