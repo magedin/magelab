@@ -280,3 +280,9 @@ commands:
         description: Access DB console.
         class: \MagedIn\Lab\Command\Db\DbConsoleCommand
 
+    project:name:
+        name: Get or set the project name.
+        code: project:name
+        aliases:
+        description: Get or set the project name.
+        class: \MagedIn\Lab\Command\Project\NameCommand
