@@ -14,6 +14,8 @@ namespace MagedIn\Lab\Helper\DockerLab\DockerCompose;
 
 use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper\Config\ConfigMerger;
+use MagedIn\Lab\Helper\Config\ConfigParser;
+use MagedIn\Lab\Helper\Config\ConfigWriter;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Helper\OperatingSystem;
@@ -27,6 +29,16 @@ class CustomFileWriter
      * @var ConfigMerger
      */
     private ConfigMerger $configMerger;
+
+    /**
+     * @var ConfigWriter
+     */
+    private ConfigWriter $configWriter;
+
+    /**
+     * @var ConfigParser
+     */
+    private ConfigParser $configParser;
 
     /**
      * @var Filesystem
@@ -69,6 +81,8 @@ class CustomFileWriter
 
     public function __construct(
         ConfigMerger $configMerger,
+        ConfigWriter $configWriter,
+        ConfigParser $configParser,
         Filesystem $filesystem,
         DirList $dirList,
         Services $services,
@@ -76,6 +90,8 @@ class CustomFileWriter
         Installation $installation
     ) {
         $this->configMerger = $configMerger;
+        $this->configWriter = $configWriter;
+        $this->configParser = $configParser;
         $this->filesystem = $filesystem;
         $this->dirList = $dirList;
         $this->services = $services;
@@ -131,14 +147,13 @@ class CustomFileWriter
         $this->prepareDefaultConfig();
         $finalConfig = $this->defaultConfig;
         if ($this->filesystem->exists($this->getConfigFilename())) {
-            $fileConfig = Yaml::parse(file_get_contents($this->getConfigFilename()));
+            $fileConfig = $this->configParser->parse($this->getConfigFilename());
             $this->configMerger->merge($fileConfig, $finalConfig);
         }
 
         $this->configMerger->merge($config, $finalConfig);
         $finalConfig = $this->rebuildContainerNames($finalConfig);
-        $yaml = Yaml::dump($finalConfig, 10, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-        $this->filesystem->dumpFile($this->getConfigFilename(), $yaml);
+        $this->configWriter->write($this->getConfigFilename(), $finalConfig);
     }
 
     /**

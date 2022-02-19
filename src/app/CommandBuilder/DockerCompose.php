@@ -14,6 +14,7 @@ namespace MagedIn\Lab\CommandBuilder;
 
 use MagedIn\Lab\CommandBuilder\DockerCompose\DockerComposeFiles;
 use MagedIn\Lab\Helper\DockerLab\BasePath;
+use MagedIn\Lab\Helper\DockerLab\DirList;
 
 class DockerCompose implements CommandBuilderInterface
 {
@@ -22,10 +23,17 @@ class DockerCompose implements CommandBuilderInterface
      */
     private DockerComposeFiles $dockerComposeFiles;
 
+    /**
+     * @var DirList
+     */
+    private DirList $dirList;
+
     public function __construct(
-        DockerComposeFiles $dockerComposeFiles
+        DockerComposeFiles $dockerComposeFiles,
+        DirList $dirList
     ) {
         $this->dockerComposeFiles = $dockerComposeFiles;
+        $this->dirList = $dirList;
     }
 
     /**
@@ -49,7 +57,7 @@ class DockerCompose implements CommandBuilderInterface
      */
     private function buildCommand(): void
     {
-        $rootDir = BasePath::getAbsoluteRootDir();
+        $rootDir = $this->dirList->getRootDir();
         $this->command = ['docker-compose'];
 
         $command = &$this->command;
