@@ -14,6 +14,7 @@ namespace MagedIn\Lab;
 
 use Exception;
 use MagedIn\Lab\Console\ConsoleBuilder;
+use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\EnvLoader;
 
 class App
@@ -23,14 +24,24 @@ class App
      */
     private ConsoleBuilder $consoleBuilder;
 
+    /**
+     * @var EnvLoader
+     */
     private EnvLoader $envLoader;
+
+    /**
+     * @var DirList
+     */
+    private DirList $dirList;
 
     public function __construct(
         ConsoleBuilder $consoleBuilder,
-        EnvLoader $envLoader
+        EnvLoader $envLoader,
+        DirList $dirList
     ) {
         $this->consoleBuilder = $consoleBuilder;
         $this->envLoader = $envLoader;
+        $this->dirList = $dirList;
     }
 
     /**
@@ -42,6 +53,7 @@ class App
         try {
             $application = $this->consoleBuilder->build();
             $this->envLoader->load();
+            $this->dirList->init();
             $application->execute();
         } catch (\Exception $e) {
             echo $e->getMessage() . "\n";

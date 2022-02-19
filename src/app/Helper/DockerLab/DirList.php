@@ -21,10 +21,28 @@ class DirList
      */
     private Filesystem $filesystem;
 
+    /**
+     * @var Installation
+     */
+    private Installation $installation;
+
     public function __construct(
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        Installation $installation
     ) {
         $this->filesystem = $filesystem;
+        $this->installation = $installation;
+    }
+
+    /**
+     * @return void
+     */
+    public function init()
+    {
+        if (!$this->installation->isInstalled()) {
+            return;
+        }
+        $this->getSrcDir();
     }
 
     /**
@@ -95,6 +113,8 @@ class DirList
      */
     public function getSrcDir(): string
     {
-        return $this->getRootDir() . DS . 'src';
+        $srcDir = $this->getRootDir() . DS . 'src';
+        $this->filesystem->mkdir($srcDir);
+        return $srcDir;
     }
 }

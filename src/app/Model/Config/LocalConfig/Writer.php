@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Model\Config\LocalConfig;
 
-use Faker\Factory as FakerFactory;
 use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\Config\ConfigParser;
 use MagedIn\Lab\Helper\Config\ConfigWriter;
@@ -21,7 +20,6 @@ use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Helper\Generator\Username;
 use MagedIn\Lab\Helper\Generator\Uuid;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Yaml;
 
 class Writer
 {

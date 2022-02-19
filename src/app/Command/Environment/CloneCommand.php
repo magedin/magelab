@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Environment;
 
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\Github\MagentoDockerlabRepo;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Exception\InvalidOptionException;
@@ -40,12 +41,19 @@ class CloneCommand extends Command
      */
     private Filesystem $filesystem;
 
+    /**
+     * @var DirList
+     */
+    private DirList $dirList;
+
     public function __construct(
         Filesystem $filesystem,
+        DirList $dirList,
         string $name = null
     ) {
         parent::__construct($name);
         $this->filesystem = $filesystem;
+        $this->dirList = $dirList;
     }
 
     protected function configure()
@@ -95,6 +103,7 @@ class CloneCommand extends Command
             throw new ProcessFailedException($process);
         }
 
+        $this->dirList->init();
         $output->writeln("Your project was cloned to the following directory: $realPath");
         $output->writeln("Using the branch: $branch");
 
