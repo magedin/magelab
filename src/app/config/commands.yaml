@@ -100,14 +100,6 @@ commands:
         description: Show the containers status (same as docker-compose ps).
         class: \MagedIn\Lab\Command\Environment\StatusCommand
 
-    environment:file:create:
-        name: Create the .env file
-        code: environment:file:create
-        aliases:
-            - env:create
-        description: Create the .env file with the information of the environment.
-        class: \MagedIn\Lab\Command\Environment\EnvFileCreateCommand
-
     environment:vhost:setup:
         name: Setup one or more vhost on Nginx
         code: environment:vhost:setup

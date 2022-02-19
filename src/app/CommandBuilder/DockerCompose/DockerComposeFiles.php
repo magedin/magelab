@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\CommandBuilder\DockerCompose;
 
-use MagedIn\Lab\Helper\DockerLab\BasePath;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileWriter;
+use MagedIn\Lab\Helper\DockerLab\EnvFileCreator;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\ConfigFacade;
 use Symfony\Component\Filesystem\Filesystem;
@@ -41,20 +41,30 @@ class DockerComposeFiles
      */
     private DirList $dirList;
 
+    /**
+     * @var CustomFileWriter
+     */
     private CustomFileWriter $customFileWriter;
+
+    /**
+     * @var EnvFileCreator
+     */
+    private EnvFileCreator $envFileCreator;
 
     public function __construct(
         OperatingSystem $operatingSystem,
         Filesystem $filesystem,
         ConfigFacade $configFacade,
         DirList $dirList,
-        CustomFileWriter $customFileWriter
+        CustomFileWriter $customFileWriter,
+        EnvFileCreator $envFileCreator
     ) {
         $this->operatingSystem = $operatingSystem;
         $this->filesystem = $filesystem;
         $this->configFacade = $configFacade;
         $this->dirList = $dirList;
         $this->customFileWriter = $customFileWriter;
+        $this->envFileCreator = $envFileCreator;
     }
 
     /**
@@ -143,5 +153,6 @@ class DockerComposeFiles
             $this->customFileWriter->write();
         }
         $this->loadedFiles[] = $filename;
+        $this->envFileCreator->create();
     }
 }
