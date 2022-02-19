@@ -75,7 +75,7 @@ class Writer
     {
         $finalConfig = $this->defaultConfig;
         $this->configMerger->merge($config, $finalConfig);
-        $yaml = Yaml::dump($finalConfig, 10, 4, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        $yaml = Yaml::dump($finalConfig, 10, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
         $this->filesystem->dumpFile($this->getConfigFilename(), $yaml);
     }
 

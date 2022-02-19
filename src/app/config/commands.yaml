@@ -142,6 +142,13 @@ commands:
         description: Execute PHP command inside PHP docker container.
         class: \MagedIn\Lab\Command\Php\PhpCommand
 
+    php:switch-version:
+        name: Changes the PHP version used on this project.
+        code: php:switch-version
+        aliases:
+        description: Changes the PHP version used on this project.
+        class: \MagedIn\Lab\Command\Php\SwitchVersionCommand
+
     php:xdebug:status:
         name: Show whether Xdebug is enabled or not
         code: php:xdebug:status

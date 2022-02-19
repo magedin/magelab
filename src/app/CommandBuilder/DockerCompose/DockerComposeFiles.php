@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace MagedIn\Lab\CommandBuilder\DockerCompose;
 
 use MagedIn\Lab\Helper\DockerLab\BasePath;
+use MagedIn\Lab\Helper\DockerLab\DirList;
+use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileWriter;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\ConfigFacade;
 use Symfony\Component\Filesystem\Filesystem;
@@ -34,14 +36,25 @@ class DockerComposeFiles
      */
     private ConfigFacade $configFacade;
 
+    /**
+     * @var DirList
+     */
+    private DirList $dirList;
+
+    private CustomFileWriter $customFileWriter;
+
     public function __construct(
         OperatingSystem $operatingSystem,
         Filesystem $filesystem,
-        ConfigFacade $configFacade
+        ConfigFacade $configFacade,
+        DirList $dirList,
+        CustomFileWriter $customFileWriter
     ) {
         $this->operatingSystem = $operatingSystem;
         $this->filesystem = $filesystem;
         $this->configFacade = $configFacade;
+        $this->dirList = $dirList;
+        $this->customFileWriter = $customFileWriter;
     }
 
     /**
@@ -73,7 +86,7 @@ class DockerComposeFiles
             $this->loadedFiles[] = 'docker-compose.dev.yml';
         }
         $this->loadOptionalServices();
-        $this->loadedFiles[] = 'docker-compose.custom.yml';
+        $this->loadCustomerDockerComposeFile();
     }
 
     /**
@@ -114,10 +127,21 @@ class DockerComposeFiles
      */
     private function validateFile(string $filename): bool
     {
-        $rootDir = BasePath::getAbsoluteRootDir();
-        if (!$this->filesystem->exists($rootDir . DS . $filename)) {
+        if (!$this->filesystem->exists($this->dirList->getRootDir() . DS . $filename)) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return void
+     */
+    private function loadCustomerDockerComposeFile()
+    {
+        $filename = 'docker-compose.custom.yml';
+        if (!$this->validateFile($filename)) {
+            $this->customFileWriter->write();
+        }
+        $this->loadedFiles[] = $filename;
     }
 }

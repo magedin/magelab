@@ -33,4 +33,19 @@ class Services
         $services = Config::get('services');
         return array_keys($services);
     }
+
+    /**
+     * @return array
+     */
+    public function getEnabledServices(): array
+    {
+        $services = Config::get('services');
+        foreach ($services as $key => $config) {
+            $isActive = $config['enabled'] ?? false;
+            if (!$isActive) {
+                unset($services[$key]);
+            }
+        }
+        return array_keys($services);
+    }
 }

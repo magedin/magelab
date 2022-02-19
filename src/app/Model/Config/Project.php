@@ -14,5 +14,4 @@ namespace MagedIn\Lab\Model\Config;
 
 class Project
 {
-
 }
