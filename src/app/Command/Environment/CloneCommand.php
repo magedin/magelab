@@ -51,9 +51,9 @@ class CloneCommand extends Command
         DirList $dirList,
         string $name = null
     ) {
-        parent::__construct($name);
         $this->filesystem = $filesystem;
         $this->dirList = $dirList;
+        parent::__construct($name);
     }
 
     protected function configure()

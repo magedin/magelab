@@ -39,9 +39,6 @@ class DirList
      */
     public function init()
     {
-        if (!$this->installation->isInstalled()) {
-            return;
-        }
         $this->getSrcDir();
     }
 
@@ -111,8 +108,11 @@ class DirList
     /**
      * @return string
      */
-    public function getSrcDir(): string
+    public function getSrcDir(): ?string
     {
+        if (!$this->installation->isInstalled()) {
+            return null;
+        }
         $srcDir = $this->getRootDir() . DS . 'src';
         $this->filesystem->mkdir($srcDir);
         return $srcDir;

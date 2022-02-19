@@ -17,6 +17,7 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\Github\DownloadRepo;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -47,14 +48,18 @@ class MagentoDownloadCommand extends Command
      */
     private HttpClient $httpClient;
 
+    private DirList $dirList;
+
     public function __construct(
         Filesystem $filesystem,
         HttpClient $httpClient,
+        DirList $dirList,
         string $name = null
     ) {
-        parent::__construct($name);
         $this->filesystem = $filesystem;
         $this->httpClient = $httpClient;
+        $this->dirList = $dirList;
+        parent::__construct($name);
     }
 
     /**
@@ -73,7 +78,7 @@ class MagentoDownloadCommand extends Command
             self::ARG_PATH,
             InputArgument::OPTIONAL,
             'The path where Magento will be downloaded to.',
-            getcwd()
+            $this->dirList->getSrcDir()
         );
     }
 
