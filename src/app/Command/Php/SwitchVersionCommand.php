@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileWriter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,6 +57,7 @@ class SwitchVersionCommand extends Command
     {
         $image = 'magedin/magento2-php';
         $version = $input->getArgument('version');
+
         if (!$this->validateVersion($version)) {
             $output->writelnError(vsprintf(
                 'The PHP version %s is not available. Use of of the following: %s',
@@ -63,6 +65,12 @@ class SwitchVersionCommand extends Command
             ));
             return Command::FAILURE;
         }
+
+        if ($this->matchVersions($version)) {
+            $output->writelnError(vsprintf('Your environment is already using the PHP version %s.', [$version]));
+            return Command::FAILURE;
+        }
+
         $config = [
             'services' => [
                 'php' => [
@@ -71,6 +79,8 @@ class SwitchVersionCommand extends Command
             ]
         ];
         $this->customFileWriter->write($config);
+        $output->writelnInfo(sprintf('Your PHP version was switched to %s', $version));
+        $output->writelnInfo(sprintf('In order for this change to take effect, please restart your containers.'));
         return Command::SUCCESS;
     }
 
@@ -81,5 +91,21 @@ class SwitchVersionCommand extends Command
     private function validateVersion(string $version): bool
     {
         return in_array($version, $this->availableVersions);
+    }
+
+    /**
+     * Check if current PHP version is equal to the new PHP version.
+     * @param string $newVersion
+     * @return bool
+     */
+    private function matchVersions(string $newVersion): bool
+    {
+        $currentCustomConfig = $this->customFileWriter->loadCurrentContent();
+        $phpImage = $currentCustomConfig['services']['php']['image'] ?? null;
+        if (!$phpImage || !strpos($phpImage, ':')) {
+            return false;
+        }
+        list($image, $oldVersion) = explode(':', $phpImage);
+        return version_compare($newVersion, $oldVersion) === 0;
     }
 }

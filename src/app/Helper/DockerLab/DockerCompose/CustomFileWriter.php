@@ -16,12 +16,12 @@ use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\Config\ConfigParser;
 use MagedIn\Lab\Helper\Config\ConfigWriter;
+use MagedIn\Lab\Helper\DockerIp;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\Services;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Yaml;
 
 class CustomFileWriter
 {
@@ -79,6 +79,11 @@ class CustomFileWriter
      */
     private Installation $installation;
 
+    /**
+     * @var DockerIp
+     */
+    private DockerIp $dockerIp;
+
     public function __construct(
         ConfigMerger $configMerger,
         ConfigWriter $configWriter,
@@ -87,7 +92,8 @@ class CustomFileWriter
         DirList $dirList,
         Services $services,
         OperatingSystem $operatingSystem,
-        Installation $installation
+        Installation $installation,
+        DockerIp $dockerIp
     ) {
         $this->configMerger = $configMerger;
         $this->configWriter = $configWriter;
@@ -97,6 +103,7 @@ class CustomFileWriter
         $this->services = $services;
         $this->operatingSystem = $operatingSystem;
         $this->installation = $installation;
+        $this->dockerIp = $dockerIp;
     }
 
     private function prepareDefaultConfig()
@@ -109,7 +116,8 @@ class CustomFileWriter
             return;
         }
 
-        $dockerIp = "172.17.0.1" /** @todo Change this to make it a dynamic value. */;
+        /** Format $dockerIp = "172.17.0.1" */
+        $dockerIp = $this->dockerIp->get();
         $this->defaultConfig['services'] = [
             'php' => [
                 'extra_hosts' => [
@@ -147,7 +155,7 @@ class CustomFileWriter
         $this->prepareDefaultConfig();
         $finalConfig = $this->defaultConfig;
         if ($this->filesystem->exists($this->getConfigFilename())) {
-            $fileConfig = $this->configParser->parse($this->getConfigFilename());
+            $fileConfig = $this->loadCurrentContent();
             $this->configMerger->merge($fileConfig, $finalConfig);
         }
 
@@ -162,6 +170,14 @@ class CustomFileWriter
     public function getConfigFilename(): string
     {
         return $this->dirList->getRootDir() . DS . 'docker-compose.custom.yml';
+    }
+
+    /**
+     * @return array
+     */
+    public function loadCurrentContent(): array
+    {
+        return $this->configParser->parse($this->getConfigFilename());
     }
 
     /**

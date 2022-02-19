@@ -131,7 +131,7 @@ class EnvFileCreator
                     $printFooter = true;
                 }
 
-                $value = $value ?: '0';
+                $value = $value ?: null;
                 $this->filesystem->appendToFile($this->getEnvFileLocation(), "$name=$value\n");
             }
 
