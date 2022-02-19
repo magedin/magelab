@@ -32,7 +32,7 @@ class DirList
      */
     public function getVarDir(): string
     {
-        return $this->getRootDir() . 'var';
+        return $this->getRootDir() . DS . 'var';
     }
 
     /**
@@ -62,7 +62,7 @@ class DirList
      */
     public function getConfigDir(): string
     {
-        return $this->getRootDir() . 'config';
+        return $this->getRootDir() . DS . 'config';
     }
 
     /**
@@ -87,7 +87,7 @@ class DirList
      */
     public function getRootDir(): string
     {
-        return BasePath::getRootDir();
+        return realpath(BasePath::getRootDir());
     }
 
     /**
@@ -95,6 +95,6 @@ class DirList
      */
     public function getSrcDir(): string
     {
-        return $this->getRootDir() . '/' . 'src';
+        return $this->getRootDir() . DS . 'src';
     }
 }
