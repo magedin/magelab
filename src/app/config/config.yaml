@@ -1,4 +1,5 @@
-name: MagedIn MageLab
-version: 1.0.0
+application:
+    name: MagedIn MageLab
+    version: 1.0.0
+    mode: production
 config:
-mode: production

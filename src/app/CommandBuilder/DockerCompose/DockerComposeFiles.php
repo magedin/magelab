@@ -14,7 +14,7 @@ namespace MagedIn\Lab\CommandBuilder\DockerCompose;
 
 use MagedIn\Lab\Helper\DockerLab\BasePath;
 use MagedIn\Lab\Helper\OperatingSystem;
-use Symfony\Component\Dotenv\Dotenv;
+use MagedIn\Lab\Model\Config\ConfigFacade;
 use Symfony\Component\Filesystem\Filesystem;
 
 class DockerComposeFiles
@@ -30,18 +30,18 @@ class DockerComposeFiles
     private Filesystem $filesystem;
 
     /**
-     * @var Dotenv
+     * @var ConfigFacade
      */
-    private Dotenv $dotenv;
+    private ConfigFacade $configFacade;
 
     public function __construct(
         OperatingSystem $operatingSystem,
         Filesystem $filesystem,
-        Dotenv $dotenv
+        ConfigFacade $configFacade
     ) {
         $this->operatingSystem = $operatingSystem;
         $this->filesystem = $filesystem;
-        $this->dotenv = $dotenv;
+        $this->configFacade = $configFacade;
     }
 
     /**
@@ -55,7 +55,7 @@ class DockerComposeFiles
     public function load(): array
     {
         if (empty($this->loadedFiles)) {
-            $this->loadFiles();
+            $this->collectFiles();
         }
         return $this->loadedFiles;
     }
@@ -63,44 +63,33 @@ class DockerComposeFiles
     /**
      * @return void
      */
-    private function loadFiles(): void
+    private function collectFiles(): void
     {
-        $rootDir = BasePath::getAbsoluteRootDir();
         $isMacOs = $this->operatingSystem->isMacOs();
-
         $this->loadedFiles = ['docker-compose.yml'];
         if (true === $isMacOs) {
             $this->loadedFiles[] = 'docker-compose.dev.mac.yml';
         } else {
             $this->loadedFiles[] = 'docker-compose.dev.yml';
         }
+        $this->loadOptionalServices();
+        $this->loadedFiles[] = 'docker-compose.custom.yml';
+    }
 
-        $this->dotenv->loadEnv($rootDir . '/.env');
-
-        $file = 'docker-compose.mailhog.yml';
-        $this->loadedFiles[] = $file;
-
-        $validations = [
-            [
-                'file' => 'docker-compose.kibana.yml',
-                'variable' => 'SERVICE_KIBANA_ENABLED',
-            ], [
-                'file' => 'docker-compose.jenkins.yml',
-                'variable' => 'SERVICE_JENKINS_ENABLED',
-            ], [
-                'file' => 'docker-compose.pmm.yml',
-                'variable' => 'SERVICE_PMM_ENABLED',
-            ], [
-                'file' => 'docker-compose.rabbitmq.yml',
-                'variable' => 'SERVICE_RABBITMQ_ENABLED',
-            ], [
-                'file' => 'docker-compose.varnish.yml',
-                'variable' => 'SERVICE_VARNISH_ENABLED',
-            ], [
-                'file' => 'docker-compose.custom.yml',
-            ],
-        ];
-
+    /**
+     * @return void
+     */
+    private function loadOptionalServices(): void
+    {
+        $services = $this->configFacade->services()->getNames();
+        $filePattern = 'docker-compose.%s.yml';
+        $validations = [];
+        foreach ($services as $service) {
+            $validations[] = [
+                'file' => sprintf($filePattern, $service),
+                'is_enabled' => $this->configFacade->services()->isEnabled($service),
+            ];
+        }
         foreach ($validations as $validation) {
             $this->loadFileIfValidated($validation);
         }
@@ -112,44 +101,21 @@ class DockerComposeFiles
      */
     private function loadFileIfValidated(array $validation): void
     {
-        $file = $validation['file'];
-        $variable = $validation['variable'] ?? null;
-
-        if ($this->validateService($file, $variable)) {
+        $file      = $validation['file'];
+        $isEnabled = $validation['is_enabled'] ?? false;
+        if ($this->validateFile($file) && $isEnabled === true) {
             $this->loadedFiles[] = $file;
         }
     }
 
     /**
      * @param string $filename
-     * @param string|null $variable
      * @return bool
      */
-    private function validateService(string $filename, string $variable = null): bool
+    private function validateFile(string $filename): bool
     {
         $rootDir = BasePath::getAbsoluteRootDir();
-
-        if (!$this->filesystem->exists($rootDir . DIRECTORY_SEPARATOR . $filename)) {
-            return false;
-        }
-
-        if ($variable && !$this->validateEnvironmentVariable($variable)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string $name
-     * @return bool
-     */
-    private function validateEnvironmentVariable(string $name): bool
-    {
-        if (!isset($_ENV[$name])) {
-            return false;
-        }
-        if (!$_ENV[$name]) {
+        if (!$this->filesystem->exists($rootDir . DS . $filename)) {
             return false;
         }
         return true;

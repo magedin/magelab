@@ -15,8 +15,6 @@ namespace MagedIn\Lab;
 use Exception;
 use MagedIn\Lab\Console\ConsoleBuilder;
 use MagedIn\Lab\Helper\DockerLab\EnvLoader;
-use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class App
 {

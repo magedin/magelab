@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Console;
 
 use MagedIn\Lab\Config;
+use MagedIn\Lab\Model\Config\ConfigFacade;
 use Symfony\Component\Console\Command\Command;
 
 class ConsoleBuilder
@@ -27,12 +28,16 @@ class ConsoleBuilder
      */
     private Application $application;
 
+    private ConfigFacade $configFacade;
+
     public function __construct(
         CommandsBuilder $commandsBuilder,
-        Application $application
+        Application $application,
+        ConfigFacade $configFacade
     ) {
         $this->commandsBuilder = $commandsBuilder;
         $this->application = $application;
+        $this->configFacade = $configFacade;
     }
 
     /**
@@ -40,8 +45,8 @@ class ConsoleBuilder
      */
     public function build(): Application
     {
-        $this->application->setName(Config::get('name'));
-        $this->application->setVersion(Config::get('version'));
+        $this->application->setName($this->configFacade->application()->getName());
+        $this->application->setVersion($this->configFacade->application()->getVersion());
 
         /** @var Command $command */
         foreach ($this->commandsBuilder->build() ?? [] as $command) {
