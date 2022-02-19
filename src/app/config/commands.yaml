@@ -41,6 +41,13 @@ commands:
         description: Run Magento ECE Tools tool.
         class: \MagedIn\Lab\Command\Magento\EceToolsCommand
 
+    magento:install:
+        code: magento:install
+        aliases:
+            - install
+        description: Run Magento 2 installation process.
+        class: \MagedIn\Lab\Command\Magento\InstallCommand
+
     environment:clone:
         name: Clone Docker Environment
         code: environment:clone
