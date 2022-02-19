@@ -13,15 +13,27 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Project;
 
 use MagedIn\Lab\Command\Command;
-use MagedIn\Lab\CommandExecutor\CommandExecutorInterface;
 use MagedIn\Lab\Config;
-use MagedIn\Lab\ObjectManager;
+use MagedIn\Lab\Model\Config\LocalConfig\Writer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class NameCommand extends Command
 {
+    /**
+     * @var Writer
+     */
+    private Writer $localConfigWriter;
+
+    public function __construct(
+        Writer $localConfigWriter,
+        string $name = null
+    ) {
+        parent::__construct($name);
+        $this->localConfigWriter = $localConfigWriter;
+    }
+
     protected function configure()
     {
         $this->addArgument(
@@ -50,10 +62,22 @@ class NameCommand extends Command
             return Command::SUCCESS;
         }
 
-        /** @var CommandExecutorInterface $executor */
-        $executor = ObjectManager::getInstance()->get(\MagedIn\Lab\CommandExecutor\Project\NameExecutor::class);
-        $executor->execute([], ['name' => $name]);
-
+        $name = $this->sanitizeName($name);
+        $localConfig = ['project' => ['name' => $name]];
+        $this->localConfigWriter->write($localConfig);
+        $output->writelnInfo("You project now is called '$name'");
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    private function sanitizeName(string $name): string
+    {
+        $name = preg_replace('/[\s]/', '-', $name);
+        $name = preg_replace('/[^0-9a-zA-Z\_\-]/', '', $name);
+        $name = trim($name, "-_");
+        return strtolower($name);
     }
 }
