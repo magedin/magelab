@@ -58,6 +58,13 @@ class DownCommand extends Command
             InputOption::VALUE_NONE,
             'Force to stop the containers.'
         );
+
+        $this->addOption(
+            'volumes',
+            null,
+            InputOption::VALUE_NONE,
+            'Remove the volumes as well'
+        );
     }
 
     /**
@@ -73,6 +80,9 @@ class DownCommand extends Command
         }
 
         $command = $this->dockerComposeCommandBuilder->build(['down']);
+        if ($input->getOption('volumes')) {
+            $command[] = '--volumes';
+        }
         $output->writelnInfo('Stopping and removing the containers.');
         $outputWrapper = $this->outputWrapperBuilder->build($output);
         Process::run($command, [
