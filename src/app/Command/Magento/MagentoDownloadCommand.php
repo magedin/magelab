@@ -12,26 +12,21 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
-use Exception;
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\CommandExecutor\Magento\Download;
 use MagedIn\Lab\Helper\DockerLab\DirList;
-use MagedIn\Lab\Helper\Github\DownloadRepo;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Filesystem\Filesystem;
 
 class MagentoDownloadCommand extends Command
 {
     const ARG_VERSION = 'version';
-    const ARG_PATH = 'path';
-
-    const FILE_EXTENSION = '.tar.gz';
+    const OPTION_PATH = 'path';
 
     /**
      * @inheritdoc
@@ -39,26 +34,15 @@ class MagentoDownloadCommand extends Command
     protected bool $isPrivate = false;
 
     /**
-     * @var Filesystem
+     * @var Download
      */
-    private Filesystem $filesystem;
-
-    /**
-     * @var HttpClient
-     */
-    private HttpClient $httpClient;
-
-    private DirList $dirList;
+    private Download $commandExecutor;
 
     public function __construct(
-        Filesystem $filesystem,
-        HttpClient $httpClient,
-        DirList $dirList,
+        Download $commandExecutor,
         string $name = null
     ) {
-        $this->filesystem = $filesystem;
-        $this->httpClient = $httpClient;
-        $this->dirList = $dirList;
+        $this->commandExecutor = $commandExecutor;
         parent::__construct($name);
     }
 
@@ -70,15 +54,16 @@ class MagentoDownloadCommand extends Command
         $this->addArgument(
             self::ARG_VERSION,
             InputArgument::OPTIONAL,
-            'Magento Version',
+            'Magento 2 Version',
             'latest'
         );
 
-        $this->addArgument(
-            self::ARG_PATH,
-            InputArgument::OPTIONAL,
-            'The path where Magento will be downloaded to.',
-            $this->dirList->getSrcDir()
+        $this->addOption(
+            self::OPTION_PATH,
+            'p',
+            InputOption::VALUE_OPTIONAL,
+            'The path on your machine where Magento 2 copy will be downloaded to.',
+            realpath('.')
         );
     }
 
@@ -86,105 +71,21 @@ class MagentoDownloadCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws GuzzleException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $version = $input->getArgument(self::ARG_VERSION);
-        $this->checkIfVersionExists($version);
-
-        $path = $input->getArgument(self::ARG_PATH);
-        $filepath = "$path/" . $this->getFilename($version);
-
-        if ($this->filesystem->exists($filepath)) {
-            $helper = $this->getHelper('question');
-            $question = new ConfirmationQuestion(
-                "There is already a file on $filepath. Do you want to replace it (y/n)?",
-                false
-            );
-
-            if (!$helper->ask($input, $output, $question)) {
-                $output->writeln("Ok. Nothing will be downloaded at this moment.");
-                return Command::FAILURE;
-            }
-            $this->filesystem->remove($filepath);
+        $path = $input->getOption(self::OPTION_PATH);
+        if (realpath($path) === false) {
+            throw new InvalidOptionException('This path does not exist or is invalid.');
         }
 
-        $output->writeln("Your Magento copy will be downloaded to: $filepath.");
-        $progressBar = $this->createProgressBar($output);
-        $this->performDownload($version, $filepath, $progressBar);
-        $output->writeln('');
-        $output->writeln('Your file was successfully downloaded!');
-        return Command::SUCCESS;
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @return ProgressBar
-     */
-    private function createProgressBar(OutputInterface $output): ProgressBar
-    {
-        $progressBar = new ProgressBar($output);
-        $progressBar->setFormat('debug');
-        $progressBar->setRedrawFrequency(1);
-        return $progressBar;
-    }
-
-    /**
-     * @param string $version
-     * @param string $filepath
-     * @param ProgressBar $progressBar
-     * @return void
-     * @throws GuzzleException
-     */
-    private function performDownload(string $version, string $filepath, ProgressBar $progressBar)
-    {
-        $progress = function ($downloadTotal, $downloadedBytes) use ($progressBar) {
-            $progressBar->setMaxSteps($downloadTotal);
-            $progressBar->setProgress($downloadedBytes);
-        };
-
-        $options = [
-            RequestOptions::SINK => $filepath,
-            RequestOptions::PROGRESS => $progress,
+        $config = [
+            'version' => $version,
+            'path' => $path,
+            'output' => $output
         ];
-        $progressBar->start();
-        $this->httpClient->get($this->getDownloadUrl($version), $options);
-        $progressBar->finish();
-    }
-
-    /**
-     * @param string $version
-     * @return void
-     * @throws GuzzleException
-     * @throws Exception
-     */
-    private function checkIfVersionExists(string $version): void
-    {
-        try {
-            $this->httpClient->head($this->getDownloadUrl($version), ['timeout' => 1]);
-        } catch (Exception $e) {
-            if (404 === $e->getCode()) {
-                throw new Exception('This version of Magento does not exist. Please try another one.');
-            }
-        }
-    }
-
-    /**
-     * @param string $version
-     * @return string
-     */
-    private function getDownloadUrl(string $version): string
-    {
-        return DownloadRepo::buildDownloadUrl($this->getFilename($version));
-    }
-
-    /**
-     * @param string $version
-     * @return string
-     */
-    private function getFilename(string $version): string
-    {
-        return "$version" . self::FILE_EXTENSION;
+        $this->commandExecutor->execute([], $config);
+        return Command::SUCCESS;
     }
 }

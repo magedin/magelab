@@ -14,7 +14,6 @@ namespace MagedIn\Lab\Command\Magento;
 
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandBuilder\Magento;
-use MagedIn\Lab\Helper\Console\NonDefaultOptions;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
