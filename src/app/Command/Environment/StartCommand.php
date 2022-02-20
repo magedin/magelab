@@ -14,6 +14,7 @@ namespace MagedIn\Lab\Command\Environment;
 
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandBuilder\DockerCompose;
+use MagedIn\Lab\CommandExecutor\Environment\Start;
 use MagedIn\Lab\Console\Output\OutputWrapperBuilder;
 use MagedIn\Lab\Helper\DockerServiceState;
 use MagedIn\Lab\Model\Process;
@@ -38,16 +39,20 @@ class StartCommand extends Command
      */
     private OutputWrapperBuilder $outputWrapperBuilder;
 
+    private Start $commandExecutor;
+
     public function __construct(
         DockerServiceState $dockerServiceState,
         DockerCompose $dockerComposeCommandBuilder,
         OutputWrapperBuilder $outputWrapperBuilder,
+        Start $commandExecutor,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dockerServiceState = $dockerServiceState;
         $this->dockerComposeCommandBuilder = $dockerComposeCommandBuilder;
         $this->outputWrapperBuilder = $outputWrapperBuilder;
+        $this->commandExecutor = $commandExecutor;
     }
 
     protected function configure()
@@ -72,10 +77,9 @@ class StartCommand extends Command
             return Command::SUCCESS;
         }
 
-        $command = $this->dockerComposeCommandBuilder->build(['up', '-d']);
         $output->writelnInfo('Starting the containers.');
         $outputWrapper = $this->outputWrapperBuilder->build($output);
-        Process::run($command, [
+        $this->commandExecutor->execute([], [
             'callback' => function ($type, $buffer) use ($outputWrapper) {
                 $outputWrapper->overwrite($buffer);
             }

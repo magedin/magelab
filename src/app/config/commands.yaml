@@ -292,3 +292,10 @@ commands:
         aliases:
         description: Get or set the project name.
         class: \MagedIn\Lab\Command\Project\NameCommand
+
+    project:setup:
+        code: project:setup
+        aliases:
+            - setup
+        description: Setup a new Magento 2 installation.
+        class: \MagedIn\Lab\Command\Project\SetupCommand

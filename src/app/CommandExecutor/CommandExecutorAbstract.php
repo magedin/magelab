@@ -28,7 +28,7 @@ abstract class CommandExecutorAbstract implements CommandExecutorInterface
     public function execute(array $commands = [], array $config = [])
     {
         $this->config = array_merge($this->config, $config);
-        $this->doExecute($commands, $config);
+        return $this->doExecute($commands, $config);
     }
 
     /**

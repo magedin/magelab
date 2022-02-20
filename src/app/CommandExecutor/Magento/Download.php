@@ -76,6 +76,7 @@ class Download extends CommandExecutorAbstract
         $this->performDownload($version, $filepath, $progressBar);
         $output->writeln('');
         $output->writeln('Your file was successfully downloaded!');
+        return $filepath;
     }
 
     /**
@@ -101,7 +102,7 @@ class Download extends CommandExecutorAbstract
     private function performDownload(string $version, string $filepath, ProgressBar $progressBar)
     {
         $downloadUrl = $this->getRealDownloadUrl($version);
-        $contentLength = $this->getContentLength($downloadUrl);
+        $contentLength = $this->getContentLength($downloadUrl, $progressBar);
 
         $progress = function ($downloadTotal, $downloadedBytes, $uploadTotal, $uploadedBytes) use ($progressBar) {
             $progressBar->setProgress($downloadedBytes);
@@ -123,13 +124,14 @@ class Download extends CommandExecutorAbstract
      * @return int
      * @throws GuzzleException
      */
-    private function getContentLength(string $downloadUrl): int
+    private function getContentLength(string $downloadUrl, ProgressBar $progressBar): int
     {
         try {
             $length = 0;
             $this->httpClient->get($downloadUrl, [
-                RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$length) {
+                RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$length, $progressBar) {
                     $length = (int) $response->getHeaderLine('Content-Length');
+                    $progressBar->setMaxSteps($length);
                     throw new \Exception('Max steps is set.');
                 }
             ]);
