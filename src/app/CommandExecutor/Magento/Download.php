@@ -135,7 +135,10 @@ class Download extends CommandExecutorAbstract
                     throw new \Exception('Max steps is set.');
                 }
             ]);
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            /** @todo Workaround to always have the Content-Length response before starting the download process. */
+            sleep(1);
+        }
         return $length;
     }
 

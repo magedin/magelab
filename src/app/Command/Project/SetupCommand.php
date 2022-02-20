@@ -78,7 +78,7 @@ class SetupCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->prepareApplicationCode($input, $output);
-        $this->setupHosts($input, $output);
+        $this->setupVhost($input, $output);
         $this->startContainers($input, $output);
         $this->installApplication($input, $output);
         return Command::SUCCESS;
@@ -119,7 +119,7 @@ class SetupCommand extends Command
      * @param OutputInterface $output
      * @return void
      */
-    private function setupHost(InputInterface $input, OutputInterface $output)
+    private function setupVhost(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Setting up hosts.');
         /** @todo Setup Host code goes here. */
@@ -134,6 +134,7 @@ class SetupCommand extends Command
     {
         $output->writeln('Running composer installation.');
         $this->composerExecutor->execute(['install', '--no-interaction']);
+        $this->installMagento($input, $output);
     }
 
     /**
