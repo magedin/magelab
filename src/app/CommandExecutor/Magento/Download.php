@@ -71,8 +71,8 @@ class Download extends CommandExecutorAbstract
         $this->checkIfVersionExists($version);
 
         $output->writeln("Your Magento copy will be downloaded to: $filepath.");
-
         $progressBar = $this->createProgressBar($output);
+        $progressBar->setMessage("Your Magento copy will be downloaded to: $filepath.");
         $this->performDownload($version, $filepath, $progressBar);
         $output->writeln('');
         $output->writeln('Your file was successfully downloaded!');
@@ -100,10 +100,10 @@ class Download extends CommandExecutorAbstract
      */
     private function performDownload(string $version, string $filepath, ProgressBar $progressBar)
     {
+        $downloadUrl = $this->getRealDownloadUrl($version);
+        $contentLength = $this->getContentLength($downloadUrl);
+
         $progress = function ($downloadTotal, $downloadedBytes, $uploadTotal, $uploadedBytes) use ($progressBar) {
-            if ($downloadTotal) {
-                $progressBar->setMaxSteps($downloadTotal);
-            }
             $progressBar->setProgress($downloadedBytes);
         };
 
@@ -111,25 +111,47 @@ class Download extends CommandExecutorAbstract
             RequestOptions::SINK => $filepath,
             RequestOptions::PROGRESS => $progress,
         ];
+
+        $progressBar->setMaxSteps($contentLength);
         $progressBar->start();
-        $response = $this->httpClient->get($this->getDownloadUrl($version), [
-            RequestOptions::ALLOW_REDIRECTS => false
-        ]);
-        $downloadUrl = $response->getHeaderLine('Location');
+        $this->httpClient->get($downloadUrl, $options);
+        $progressBar->finish();
+    }
+
+    /**
+     * @param string $downloadUrl
+     * @return int
+     * @throws GuzzleException
+     */
+    private function getContentLength(string $downloadUrl): int
+    {
         try {
+            $length = 0;
             $this->httpClient->get($downloadUrl, [
-                RequestOptions::ON_HEADERS => function (ResponseInterface $response) use ($progressBar) {
+                RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$length) {
                     $length = (int) $response->getHeaderLine('Content-Length');
-                    if ($length) {
-                        $progressBar->setMaxSteps($length);
-                    }
                     throw new \Exception('Max steps is set.');
                 }
             ]);
         } catch (\Exception $e) {}
+        return $length;
+    }
 
-        $this->httpClient->get($downloadUrl, $options);
-        $progressBar->finish();
+    /**
+     * @param string $version
+     * @return string|null
+     * @throws GuzzleException
+     */
+    private function getRealDownloadUrl(string $version): ?string
+    {
+        $response = $this->httpClient->get($this->getDownloadUrl($version), [
+            RequestOptions::ALLOW_REDIRECTS => false
+        ]);
+        $downloadUrl = $response->getHeaderLine('Location');
+        if (empty($downloadUrl)) {
+            return null;
+        }
+        return $downloadUrl;
     }
 
     /**
