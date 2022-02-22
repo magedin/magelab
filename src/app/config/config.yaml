@@ -3,3 +3,5 @@ application:
     version: 1.0.0
     mode: production
 config:
+    default:
+        installation_base_url: "https://magento2.test"

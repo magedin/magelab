@@ -15,6 +15,7 @@ namespace MagedIn\Lab\Command\Project;
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandExecutor\Environment\Start;
 use MagedIn\Lab\CommandExecutor\Magento\Download;
+use MagedIn\Lab\CommandExecutor\Magento\Install;
 use MagedIn\Lab\CommandExecutor\Php\Composer;
 use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper\DockerLab\DirList;
@@ -23,6 +24,7 @@ use MagedIn\Lab\Model\Config\LocalConfig\Writer;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SetupCommand extends Command
@@ -43,21 +45,35 @@ class SetupCommand extends Command
     private Composer $composerExecutor;
 
     /**
+     * @var Install
+     */
+    private Install $installExecutor;
+
+    /**
      * @var DirList
      */
     private DirList $dirList;
+
+    /**
+     * @var Install\DefaultOptions
+     */
+    private Install\DefaultOptions $installationDefaultOptions;
 
     public function __construct(
         Download $magentoDownloadExecutor,
         Start $envStartExecutor,
         Composer $composerExecutor,
+        Install $installExecutor,
         DirList $dirList,
+        Install\DefaultOptions $installationDefaultOptions,
         string $name = null
     ) {
         $this->magentoDownloadExecutor = $magentoDownloadExecutor;
         $this->envStartExecutor = $envStartExecutor;
         $this->composerExecutor = $composerExecutor;
+        $this->installExecutor = $installExecutor;
         $this->dirList = $dirList;
+        $this->installationDefaultOptions = $installationDefaultOptions;
         parent::__construct($name);
     }
 
@@ -67,6 +83,14 @@ class SetupCommand extends Command
             'version',
             InputArgument::REQUIRED,
             'The Magento version you want to install'
+        );
+
+        $this->addOption(
+            'base_url',
+            'u',
+            InputOption::VALUE_OPTIONAL,
+            'The base URL Magento 2 will use.',
+            $this->installationDefaultOptions->getDefaultInstallBaseUrl(),
         );
     }
 
@@ -145,6 +169,7 @@ class SetupCommand extends Command
     private function installMagento(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Installing Magento application.');
-        /** @todo Install Magento application. */
+        $baseUrl = $input->getOption('base_url');
+        $this->installExecutor->execute([], ['base_url' => $baseUrl]);
     }
 }
