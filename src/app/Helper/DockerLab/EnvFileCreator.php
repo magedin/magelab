@@ -79,6 +79,13 @@ class EnvFileCreator
             'SEARCH_ENGINE' => 'elasticsearch7',
             'ES_HOST' => 'elasticsearch',
         ],
+        'blackfire' => [
+            'BLACKFIRE_CLIENT_ID' => null,
+            'BLACKFIRE_CLIENT_TOKEN' => null,
+            'BLACKFIRE_SERVER_ID' => null,
+            'BLACKFIRE_SERVER_TOKEN' => null,
+            'BLACKFIRE_LOG_LEVEL' => 4,
+        ],
     ];
 
     /**

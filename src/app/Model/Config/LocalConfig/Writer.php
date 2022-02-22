@@ -104,6 +104,9 @@ class Writer
             'varnish' => [
                 'enabled' => false,
             ],
+            'blackfire' => [
+                'enabled' => false,
+            ],
         ],
     ];
 
