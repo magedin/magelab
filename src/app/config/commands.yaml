@@ -299,3 +299,17 @@ commands:
             - setup
         description: Setup a new Magento 2 installation.
         class: \MagedIn\Lab\Command\Project\SetupCommand
+
+    nginx:config:reload:
+        code: nginx:config:reload
+        aliases:
+            - nginx:reload
+        description: Reload Nginx
+        class: \MagedIn\Lab\Command\Nginx\ReloadCommand
+
+    nginx:config:validate:
+        code: nginx:config:validate
+        aliases:
+            - nginx:validate
+        description: Validate Nginx configuration.
+        class: \MagedIn\Lab\Command\Nginx\ValidateCommand
