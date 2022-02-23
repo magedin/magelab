@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\Container\Php\XdebugInfo;
@@ -29,6 +30,11 @@ abstract class XdebugAbstractCommand extends Command
     private DockerComposePhpExec $dockerComposePhpExecCommandBuilder;
 
     /**
+     * @var DockerComposeExec
+     */
+    private DockerComposeExec $dockerComposeExec;
+
+    /**
      * @var XdebugInfo
      */
     protected XdebugInfo $xdebugInfo;
@@ -40,14 +46,16 @@ abstract class XdebugAbstractCommand extends Command
 
     public function __construct(
         DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
+        DockerComposeExec $dockerComposeExec,
         XdebugInfo $xdebugInfo,
         ArrayInputFactory $arrayInputFactory,
         string $name = null
     ) {
-        parent::__construct($name);
         $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
+        $this->dockerComposeExec = $dockerComposeExec;
         $this->xdebugInfo = $xdebugInfo;
         $this->arrayInputFactory = $arrayInputFactory;
+        parent::__construct($name);
     }
 
     protected function configure()
@@ -87,7 +95,7 @@ abstract class XdebugAbstractCommand extends Command
         $command = $this->dockerComposePhpExecCommandBuilder->build($subcommand);
         Process::run($command, ['tty' => true]);
         $this->writeEndResult($input, $output);
-        $this->restartServices($output);
+        $this->reloadServices($output);
         return Command::SUCCESS;
     }
 
@@ -96,13 +104,12 @@ abstract class XdebugAbstractCommand extends Command
      * @return void
      * @throws \Exception
      */
-    protected function restartServices(OutputInterface $output)
+    protected function reloadServices(OutputInterface $output)
     {
-        $xdebugCommand = $this->getApplication()->find('restart');
-        $input = $this->arrayInputFactory->create([
-            'services' => ['php'],
-        ]);
-        $xdebugCommand->run($input, $output);
+        $output->writeInfo('Reloading PHP-FPM service...', true);
+        $reloadCommand = $this->dockerComposeExec->build(['php', 'kill', '-USR2', '1']);
+        Process::run($reloadCommand, ['pty' => true]);
+        $output->writeInfo('PHP-FPM services has been reloaded!', true);
     }
 
     /**
