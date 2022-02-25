@@ -10,16 +10,15 @@
 
 declare(strict_types=1);
 
-namespace MagedIn\Lab\CommandBuilder\DockerCompose;
+namespace MagedIn\Lab\Helper\DockerLab\DockerCompose;
 
 use MagedIn\Lab\Helper\DockerLab\DirList;
-use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileWriter;
 use MagedIn\Lab\Helper\DockerLab\EnvFileCreator;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\ConfigFacade;
 use Symfony\Component\Filesystem\Filesystem;
 
-class DockerComposeFiles
+class DockerComposeFilesCollector
 {
     /**
      * @var string
@@ -56,13 +55,22 @@ class DockerComposeFiles
      */
     private EnvFileCreator $envFileCreator;
 
+    /**
+     * @var DockerComposeFileValidator
+     */
+    private DockerComposeFileValidator $dockerComposeFileValidator;
+
+    private DockerComposeFilenameResolver $dockerComposeFilenameResolver;
+
     public function __construct(
         OperatingSystem $operatingSystem,
         Filesystem $filesystem,
         ConfigFacade $configFacade,
         DirList $dirList,
         CustomFileWriter $customFileWriter,
-        EnvFileCreator $envFileCreator
+        EnvFileCreator $envFileCreator,
+        DockerComposeFileValidator $dockerComposeFileValidator,
+        DockerComposeFilenameResolver $dockerComposeFilenameResolver
     ) {
         $this->operatingSystem = $operatingSystem;
         $this->filesystem = $filesystem;
@@ -70,6 +78,8 @@ class DockerComposeFiles
         $this->dirList = $dirList;
         $this->customFileWriter = $customFileWriter;
         $this->envFileCreator = $envFileCreator;
+        $this->dockerComposeFileValidator = $dockerComposeFileValidator;
+        $this->dockerComposeFilenameResolver = $dockerComposeFilenameResolver;
     }
 
     /**
@@ -89,45 +99,35 @@ class DockerComposeFiles
     }
 
     /**
-     * @return string
-     */
-    public function getDockerComposeMainFilename(): string
-    {
-        return $this->mainDockerComposeFile;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDockerComposeCustomFilename(): string
-    {
-        return $this->buildDockerComposeServiceFilename('custom');
-    }
-
-    /**
-     * @param string $service
-     * @return string
-     */
-    public function buildDockerComposeServiceFilename(string $service): string
-    {
-        $service = preg_replace('[â-zA-Z0-9\.\_\-]', '', $service);
-        return 'services' . DS . sprintf('docker-compose.%s.yml', $service);
-    }
-
-    /**
      * @return void
      */
     private function collectFiles(): void
     {
-        $isMacOs = $this->operatingSystem->isMacOs();
-        $this->loadedFiles = [$this->mainDockerComposeFile];
-        if (true === $isMacOs) {
-            $this->loadedFiles[] = 'services' . DS . 'docker-compose.dev.mac.yml';
+        /** Always append the main docker-compose file. */
+        $this->appendFile($this->dockerComposeFilenameResolver->getDockerComposeMainFilename());
+        if (true === $this->operatingSystem->isMacOs()) {
+            $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('dev.mac'));
+            $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('mac'));
+        } elseif (true === $this->operatingSystem->isLinux()) {
+            $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('dev'));
+            $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('linux'));
         } else {
-            $this->loadedFiles[] = 'services' . DS . 'docker-compose.dev.yml';
+            $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('dev'));
+            $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('windows'));
         }
         $this->loadOptionalServices();
         $this->loadCustomerDockerComposeFile();
+    }
+
+    /**
+     * @param string $filename
+     * @return void
+     */
+    private function appendFile(string $filename): void
+    {
+        if ($this->dockerComposeFileValidator->validate($filename)) {
+            $this->loadedFiles[] = $filename;
+        }
     }
 
     /**
@@ -139,7 +139,7 @@ class DockerComposeFiles
         $validations = [];
         foreach ($services as $service) {
             $validations[] = [
-                'file' => $this->buildDockerComposeServiceFilename($service),
+                'file' => $this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename($service),
                 'is_enabled' => $this->configFacade->services()->isEnabled($service),
             ];
         }
@@ -156,25 +156,9 @@ class DockerComposeFiles
     {
         $file      = $validation['file'];
         $isEnabled = $validation['is_enabled'] ?? false;
-        if ($this->validateFile($file) && $isEnabled === true) {
-            $this->loadedFiles[] = $file;
+        if ($isEnabled === true) {
+            $this->appendFile($file);
         }
-    }
-
-    /**
-     * @param string $filename
-     * @return bool
-     */
-    private function validateFile(string $filename): bool
-    {
-        $absoluteFilename = $this->dirList->getRootDir() . DS . $filename;
-        if (!$this->filesystem->exists($absoluteFilename)) {
-            return false;
-        }
-        if (!is_readable($absoluteFilename)) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -182,11 +166,8 @@ class DockerComposeFiles
      */
     private function loadCustomerDockerComposeFile()
     {
-        $filename = $this->getDockerComposeCustomFilename();
-        if (!$this->validateFile($filename)) {
-            $this->customFileWriter->write();
-        }
-        $this->loadedFiles[] = $filename;
+        $this->customFileWriter->write();
+        $this->appendFile($this->dockerComposeFilenameResolver->getDockerComposeCustomFilename());
         $this->envFileCreator->create();
     }
 }

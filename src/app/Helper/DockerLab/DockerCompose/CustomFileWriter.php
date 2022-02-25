@@ -12,13 +12,10 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Helper\DockerLab\DockerCompose;
 
-use MagedIn\Lab\CommandBuilder\DockerCompose\DockerComposeFiles;
-use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\Config\ConfigParser;
 use MagedIn\Lab\Helper\Config\ConfigWriter;
 use MagedIn\Lab\Helper\DockerIp;
-use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\LocalConfig\Writer;
@@ -27,6 +24,20 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class CustomFileWriter
 {
+    /**
+     * @var array
+     */
+    private array $defaultConfig = [
+        'version' => "3.5",
+        'services' => [
+            'php' => [],
+            'nginx' => [],
+            'db' => [],
+            'redis' => [],
+            'elasticsearch' => [],
+        ],
+    ];
+
     /**
      * @var ConfigMerger
      */
@@ -46,25 +57,6 @@ class CustomFileWriter
      * @var Filesystem
      */
     private Filesystem $filesystem;
-
-    /**
-     * @var DirList
-     */
-    private DirList $dirList;
-
-    /**
-     * @var array
-     */
-    private array $defaultConfig = [
-        'version' => "3.5",
-        'services' => [
-            'php' => [],
-            'nginx' => [],
-            'db' => [],
-            'redis' => [],
-            'elasticsearch' => [],
-        ],
-    ];
 
     /**
      * @var Services
@@ -91,35 +83,34 @@ class CustomFileWriter
      */
     private Writer $localConfigWriter;
 
-    /**
-     * @var DockerComposeFiles
-     */
-    private DockerComposeFiles $dockerComposeFiles;
+    private DockerComposeFileValidator $dockerComposeFileValidator;
+
+    private DockerComposeFilenameResolver $dockerComposeFilenameResolver;
 
     public function __construct(
         ConfigMerger $configMerger,
         ConfigWriter $configWriter,
         ConfigParser $configParser,
         Filesystem $filesystem,
-        DirList $dirList,
         Services $services,
         OperatingSystem $operatingSystem,
         Installation $installation,
         DockerIp $dockerIp,
         Writer $localConfigWriter,
-        DockerComposeFiles $dockerComposeFiles
+        DockerComposeFileValidator $dockerComposeFileValidator,
+        DockerComposeFilenameResolver $dockerComposeFilenameResolver
     ) {
         $this->configMerger = $configMerger;
         $this->configWriter = $configWriter;
         $this->configParser = $configParser;
         $this->filesystem = $filesystem;
-        $this->dirList = $dirList;
         $this->services = $services;
         $this->operatingSystem = $operatingSystem;
         $this->installation = $installation;
         $this->dockerIp = $dockerIp;
         $this->localConfigWriter = $localConfigWriter;
-        $this->dockerComposeFiles = $dockerComposeFiles;
+        $this->dockerComposeFileValidator = $dockerComposeFileValidator;
+        $this->dockerComposeFilenameResolver = $dockerComposeFilenameResolver;
     }
 
     private function prepareDefaultConfig()
@@ -161,11 +152,15 @@ class CustomFileWriter
 
     /**
      * @param array $config
+     * @param bool $onlyIfValidated
      * @return void
      */
-    public function write(array $config = []): void
+    public function write(array $config = [], bool $onlyIfValidated = false): void
     {
         if (!$this->installation->isInstalled()) {
+            return;
+        }
+        if ($onlyIfValidated === true && !$this->dockerComposeFileValidator->validate($this->getConfigFilename())) {
             return;
         }
         $this->prepareDefaultConfig();
@@ -185,7 +180,7 @@ class CustomFileWriter
      */
     public function getConfigFilename(): string
     {
-        return $this->dockerComposeFiles->getDockerComposeCustomFilename();
+        return $this->dockerComposeFilenameResolver->getDockerComposeCustomFilename();
     }
 
     /**

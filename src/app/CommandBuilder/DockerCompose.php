@@ -12,16 +12,15 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\CommandBuilder;
 
-use MagedIn\Lab\CommandBuilder\DockerCompose\DockerComposeFiles;
-use MagedIn\Lab\Helper\DockerLab\BasePath;
+use MagedIn\Lab\Helper\DockerLab\DockerCompose\DockerComposeFilesCollector;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 
 class DockerCompose implements CommandBuilderInterface
 {
     /**
-     * @var DockerComposeFiles
+     * @var DockerComposeFilesCollector
      */
-    private DockerComposeFiles $dockerComposeFiles;
+    private DockerComposeFilesCollector $dockerComposeFilesCollector;
 
     /**
      * @var DirList
@@ -29,10 +28,10 @@ class DockerCompose implements CommandBuilderInterface
     private DirList $dirList;
 
     public function __construct(
-        DockerComposeFiles $dockerComposeFiles,
+        DockerComposeFilesCollector $dockerComposeFilesCollector,
         DirList $dirList
     ) {
-        $this->dockerComposeFiles = $dockerComposeFiles;
+        $this->dockerComposeFilesCollector = $dockerComposeFilesCollector;
         $this->dirList = $dirList;
     }
 
@@ -64,6 +63,6 @@ class DockerCompose implements CommandBuilderInterface
         array_map(function ($file) use ($rootDir, &$command) {
             $this->command[] = '-f';
             $this->command[] = $rootDir . DIRECTORY_SEPARATOR . $file;
-        }, $this->dockerComposeFiles->load());
+        }, $this->dockerComposeFilesCollector->load());
     }
 }
