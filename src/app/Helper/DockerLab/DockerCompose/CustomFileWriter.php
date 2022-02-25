@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Helper\DockerLab\DockerCompose;
 
+use MagedIn\Lab\CommandBuilder\DockerCompose\DockerComposeFiles;
 use MagedIn\Lab\Config;
 use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\Config\ConfigParser;
@@ -90,6 +91,11 @@ class CustomFileWriter
      */
     private Writer $localConfigWriter;
 
+    /**
+     * @var DockerComposeFiles
+     */
+    private DockerComposeFiles $dockerComposeFiles;
+
     public function __construct(
         ConfigMerger $configMerger,
         ConfigWriter $configWriter,
@@ -100,7 +106,8 @@ class CustomFileWriter
         OperatingSystem $operatingSystem,
         Installation $installation,
         DockerIp $dockerIp,
-        Writer $localConfigWriter
+        Writer $localConfigWriter,
+        DockerComposeFiles $dockerComposeFiles
     ) {
         $this->configMerger = $configMerger;
         $this->configWriter = $configWriter;
@@ -112,6 +119,7 @@ class CustomFileWriter
         $this->installation = $installation;
         $this->dockerIp = $dockerIp;
         $this->localConfigWriter = $localConfigWriter;
+        $this->dockerComposeFiles = $dockerComposeFiles;
     }
 
     private function prepareDefaultConfig()
@@ -177,7 +185,7 @@ class CustomFileWriter
      */
     public function getConfigFilename(): string
     {
-        return $this->dirList->getRootDir() . DS . 'docker-compose.custom.yml';
+        return $this->dockerComposeFiles->getDockerComposeCustomFilename();
     }
 
     /**

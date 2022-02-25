@@ -22,6 +22,11 @@ use Symfony\Component\Filesystem\Filesystem;
 class DockerComposeFiles
 {
     /**
+     * @var string
+     */
+    private string $mainDockerComposeFile = 'docker-compose.yml';
+
+    /**
      * @var OperatingSystem
      */
     private OperatingSystem $operatingSystem;
@@ -84,16 +89,42 @@ class DockerComposeFiles
     }
 
     /**
+     * @return string
+     */
+    public function getDockerComposeMainFilename(): string
+    {
+        return $this->mainDockerComposeFile;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDockerComposeCustomFilename(): string
+    {
+        return $this->buildDockerComposeServiceFilename('custom');
+    }
+
+    /**
+     * @param string $service
+     * @return string
+     */
+    public function buildDockerComposeServiceFilename(string $service): string
+    {
+        $service = preg_replace('[â-zA-Z0-9\.\_\-]', '', $service);
+        return 'services' . DS . sprintf('docker-compose.%s.yml', $service);
+    }
+
+    /**
      * @return void
      */
     private function collectFiles(): void
     {
         $isMacOs = $this->operatingSystem->isMacOs();
-        $this->loadedFiles = ['docker-compose.yml'];
+        $this->loadedFiles = [$this->mainDockerComposeFile];
         if (true === $isMacOs) {
-            $this->loadedFiles[] = 'docker-compose.dev.mac.yml';
+            $this->loadedFiles[] = 'services' . DS . 'docker-compose.dev.mac.yml';
         } else {
-            $this->loadedFiles[] = 'docker-compose.dev.yml';
+            $this->loadedFiles[] = 'services' . DS . 'docker-compose.dev.yml';
         }
         $this->loadOptionalServices();
         $this->loadCustomerDockerComposeFile();
@@ -105,11 +136,10 @@ class DockerComposeFiles
     private function loadOptionalServices(): void
     {
         $services = $this->configFacade->services()->getNames();
-        $filePattern = 'docker-compose.%s.yml';
         $validations = [];
         foreach ($services as $service) {
             $validations[] = [
-                'file' => sprintf($filePattern, $service),
+                'file' => $this->buildDockerComposeServiceFilename($service),
                 'is_enabled' => $this->configFacade->services()->isEnabled($service),
             ];
         }
@@ -137,7 +167,11 @@ class DockerComposeFiles
      */
     private function validateFile(string $filename): bool
     {
-        if (!$this->filesystem->exists($this->dirList->getRootDir() . DS . $filename)) {
+        $absoluteFilename = $this->dirList->getRootDir() . DS . $filename;
+        if (!$this->filesystem->exists($absoluteFilename)) {
+            return false;
+        }
+        if (!is_readable($absoluteFilename)) {
             return false;
         }
         return true;
@@ -148,7 +182,7 @@ class DockerComposeFiles
      */
     private function loadCustomerDockerComposeFile()
     {
-        $filename = 'docker-compose.custom.yml';
+        $filename = $this->getDockerComposeCustomFilename();
         if (!$this->validateFile($filename)) {
             $this->customFileWriter->write();
         }

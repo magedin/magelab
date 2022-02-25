@@ -80,9 +80,8 @@ class BasePath
         $verificationFiles = [
             "var/.dockerlab",
             "docker-compose.yml",
-            "docker-compose.dev.yml",
-            "docker-compose.dev.mac.yml",
-            "docker-compose.mailhog.yml",
+            "services/docker-compose.dev.yml",
+            "services/docker-compose.dev.mac.yml",
             "var/template/nginx/upstream.conf",
             "var/template/nginx/magento2.conf",
             "var/template/nginx/magento2-ssl.conf",
