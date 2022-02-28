@@ -16,6 +16,7 @@ use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\Config\ConfigParser;
 use MagedIn\Lab\Helper\Config\ConfigWriter;
 use MagedIn\Lab\Helper\DockerIp;
+use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Installation;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\LocalConfig\Writer;
@@ -93,6 +94,8 @@ class CustomFileWriter
      */
     private DockerComposeFilenameResolver $dockerComposeFilenameResolver;
 
+    private DirList $dirList;
+
     public function __construct(
         ConfigMerger $configMerger,
         ConfigWriter $configWriter,
@@ -104,7 +107,8 @@ class CustomFileWriter
         DockerIp $dockerIp,
         Writer $localConfigWriter,
         DockerComposeFileValidator $dockerComposeFileValidator,
-        DockerComposeFilenameResolver $dockerComposeFilenameResolver
+        DockerComposeFilenameResolver $dockerComposeFilenameResolver,
+        DirList $dirList
     ) {
         $this->configMerger = $configMerger;
         $this->configWriter = $configWriter;
@@ -117,6 +121,7 @@ class CustomFileWriter
         $this->localConfigWriter = $localConfigWriter;
         $this->dockerComposeFileValidator = $dockerComposeFileValidator;
         $this->dockerComposeFilenameResolver = $dockerComposeFilenameResolver;
+        $this->dirList = $dirList;
     }
 
     private function prepareDefaultConfig()
@@ -154,17 +159,10 @@ class CustomFileWriter
 
     /**
      * @param array $config
-     * @param bool $onlyIfValidated
      * @return void
      */
-    public function write(array $config = [], bool $onlyIfValidated = false): void
+    public function write(array $config = []): void
     {
-        if (!$this->installation->isInstalled()) {
-            return;
-        }
-        if ($onlyIfValidated === true && !$this->dockerComposeFileValidator->validate($this->getConfigFilename())) {
-            return;
-        }
         $this->prepareDefaultConfig();
         $finalConfig = $this->defaultConfig;
         if ($this->filesystem->exists($this->getConfigFilename())) {
@@ -182,7 +180,8 @@ class CustomFileWriter
      */
     public function getConfigFilename(): string
     {
-        return $this->dockerComposeFilenameResolver->getDockerComposeCustomFilename();
+        return $this->dirList
+            ->absolutePathFromRoot($this->dockerComposeFilenameResolver->getDockerComposeCustomFilename());
     }
 
     /**

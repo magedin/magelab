@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Helper\DockerLab\DockerCompose;
 
-use MagedIn\Lab\Helper\DockerLab\DirList;
 use Symfony\Component\Filesystem\Filesystem;
 
 class DockerComposeFileValidator
@@ -22,17 +21,10 @@ class DockerComposeFileValidator
      */
     private Filesystem $filesystem;
 
-    /**
-     * @var DirList
-     */
-    private DirList $dirList;
-
     public function __construct(
-        Filesystem $filesystem,
-        DirList $dirList
+        Filesystem $filesystem
     ) {
         $this->filesystem = $filesystem;
-        $this->dirList = $dirList;
     }
 
     /**
@@ -41,7 +33,7 @@ class DockerComposeFileValidator
      */
     public function validate(string $filename): bool
     {
-        $absoluteFilename = $this->dirList->getRootDir() . DS . $filename;
+        $absoluteFilename = $filename;
         if (!$this->filesystem->exists($absoluteFilename)) {
             return false;
         }

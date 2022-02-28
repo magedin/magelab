@@ -13,8 +13,7 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\Command\Command;
-use MagedIn\Lab\Config;
-use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileWriter;
+use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileManager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,9 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class SwitchVersionCommand extends Command
 {
     /**
-     * @var CustomFileWriter
+     * @var CustomFileManager
      */
-    private CustomFileWriter $customFileWriter;
+    private CustomFileManager $customFileManager;
 
     /**
      * @var array|string[]
@@ -32,11 +31,11 @@ class SwitchVersionCommand extends Command
     private array $availableVersions = ['7.2', '7.3', '7.4', '8.0', '8.1'];
 
     public function __construct(
-        CustomFileWriter $customFileWriter,
+        CustomFileManager $customFileManager,
         string $name = null
     ) {
+        $this->customFileManager = $customFileManager;
         parent::__construct($name);
-        $this->customFileWriter = $customFileWriter;
     }
 
     protected function configure()
@@ -78,7 +77,7 @@ class SwitchVersionCommand extends Command
                 ]
             ]
         ];
-        $this->customFileWriter->write($config);
+        $this->customFileManager->write($config, true);
         $output->writelnInfo(sprintf('Your PHP version was switched to %s', $version));
         $output->writelnInfo(sprintf('In order for this change to take effect, please restart your containers.'));
         return Command::SUCCESS;
@@ -100,7 +99,7 @@ class SwitchVersionCommand extends Command
      */
     private function matchVersions(string $newVersion): bool
     {
-        $currentCustomConfig = $this->customFileWriter->loadCurrentContent();
+        $currentCustomConfig = $this->customFileManager->loadCurrentContent();
         $phpImage = $currentCustomConfig['services']['php']['image'] ?? null;
         if (!$phpImage || !strpos($phpImage, ':')) {
             return false;

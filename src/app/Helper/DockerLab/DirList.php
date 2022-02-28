@@ -117,4 +117,14 @@ class DirList
         $this->filesystem->mkdir($srcDir);
         return $srcDir;
     }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function absolutePathFromRoot(string $path): string
+    {
+        $path = ltrim($path, DS);
+        return $this->getRootDir() . DS . $path;
+    }
 }

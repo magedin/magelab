@@ -14,7 +14,7 @@ namespace MagedIn\Lab\Command\Project;
 
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\Config;
-use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileWriter;
+use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileManager;
 use MagedIn\Lab\Model\Config\LocalConfig\Writer;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,18 +28,18 @@ class NameCommand extends Command
     private Writer $localConfigWriter;
 
     /**
-     * @var CustomFileWriter
+     * @var CustomFileManager
      */
-    private CustomFileWriter $customFileWriter;
+    private CustomFileManager $customFileManager;
 
     public function __construct(
         Writer $localConfigWriter,
-        CustomFileWriter $customFileWriter,
+        CustomFileManager $customFileManager,
         string $name = null
     ) {
-        parent::__construct($name);
         $this->localConfigWriter = $localConfigWriter;
-        $this->customFileWriter = $customFileWriter;
+        $this->customFileManager = $customFileManager;
+        parent::__construct($name);
     }
 
     protected function configure()
@@ -73,7 +73,7 @@ class NameCommand extends Command
         $name = $this->sanitizeName($name);
         $localConfig = ['project' => ['name' => $name]];
         $this->localConfigWriter->write($localConfig);
-        $this->customFileWriter->write();
+        $this->customFileManager->write([], true);
         $output->writelnInfo("You project now is called '$name'");
         return Command::SUCCESS;
     }

@@ -46,9 +46,9 @@ class DockerComposeFilesCollector
     private DirList $dirList;
 
     /**
-     * @var CustomFileWriter
+     * @var CustomFileManager
      */
-    private CustomFileWriter $customFileWriter;
+    private CustomFileManager $customFileManager;
 
     /**
      * @var EnvFileCreator
@@ -67,7 +67,7 @@ class DockerComposeFilesCollector
         Filesystem $filesystem,
         ConfigFacade $configFacade,
         DirList $dirList,
-        CustomFileWriter $customFileWriter,
+        CustomFileManager $customFileManager,
         EnvFileCreator $envFileCreator,
         DockerComposeFileValidator $dockerComposeFileValidator,
         DockerComposeFilenameResolver $dockerComposeFilenameResolver
@@ -76,7 +76,7 @@ class DockerComposeFilesCollector
         $this->filesystem = $filesystem;
         $this->configFacade = $configFacade;
         $this->dirList = $dirList;
-        $this->customFileWriter = $customFileWriter;
+        $this->customFileManager = $customFileManager;
         $this->envFileCreator = $envFileCreator;
         $this->dockerComposeFileValidator = $dockerComposeFileValidator;
         $this->dockerComposeFilenameResolver = $dockerComposeFilenameResolver;
@@ -168,7 +168,7 @@ class DockerComposeFilesCollector
      */
     private function loadCustomDockerComposeFile()
     {
-        $this->customFileWriter->write();
+        $this->customFileManager->write();
         $this->appendFile($this->dockerComposeFilenameResolver->getDockerComposeCustomFilename());
         $this->envFileCreator->create();
     }
