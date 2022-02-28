@@ -110,13 +110,15 @@ class DockerComposeFilesCollector
             $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('mac'));
         } elseif (true === $this->operatingSystem->isLinux()) {
             $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('dev'));
+            /** @todo Create a custom docker-compose.linux.yml file if it does not exit. */
             $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('linux'));
         } else {
             $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('dev'));
+            /** @todo Create a custom docker-compose.windows.yml file if it does not exit. */
             $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('windows'));
         }
         $this->loadOptionalServices();
-        $this->loadCustomerDockerComposeFile();
+        $this->loadCustomDockerComposeFile();
     }
 
     /**
@@ -164,7 +166,7 @@ class DockerComposeFilesCollector
     /**
      * @return void
      */
-    private function loadCustomerDockerComposeFile()
+    private function loadCustomDockerComposeFile()
     {
         $this->customFileWriter->write();
         $this->appendFile($this->dockerComposeFilenameResolver->getDockerComposeCustomFilename());

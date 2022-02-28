@@ -83,8 +83,14 @@ class CustomFileWriter
      */
     private Writer $localConfigWriter;
 
+    /**
+     * @var DockerComposeFileValidator
+     */
     private DockerComposeFileValidator $dockerComposeFileValidator;
 
+    /**
+     * @var DockerComposeFilenameResolver
+     */
     private DockerComposeFilenameResolver $dockerComposeFilenameResolver;
 
     public function __construct(
@@ -140,11 +146,7 @@ class CustomFileWriter
      */
     private function rebuildContainerNames(array $config): array
     {
-        $defaultServices = ['php', 'nginx', 'db', 'redis', 'elasticsearch'];
-        $optionalServices = $this->services->getEnabledServices();
-        $services = array_merge($defaultServices, $optionalServices);
-
-        foreach ($services as $service) {
+        foreach ($this->services->getAllEnabledServices() ?? [] as $service) {
             $config['services'][$service]['container_name'] = $this->buildContainerName($service);
         }
         return $config;

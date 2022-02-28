@@ -17,6 +17,12 @@ use MagedIn\Lab\Config;
 class Services
 {
     /**
+     * @todo Remove this hard coded and use the configuration if possible.
+     * @var array|string[]
+     */
+    private array $defaultServices = ['php', 'nginx', 'db', 'redis', 'elasticsearch'];
+
+    /**
      * @param string $service
      * @return bool
      */
@@ -37,7 +43,7 @@ class Services
     /**
      * @return array
      */
-    public function getEnabledServices(): array
+    public function getOptionalEnabledServices(): array
     {
         $services = Config::get('services');
         foreach ($services as $key => $config) {
@@ -47,5 +53,15 @@ class Services
             }
         }
         return array_keys($services);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllEnabledServices(): array
+    {
+        $optionalServices = $this->getOptionalEnabledServices();
+        $services = array_merge($this->defaultServices, $optionalServices);
+        return array_unique($services);
     }
 }
