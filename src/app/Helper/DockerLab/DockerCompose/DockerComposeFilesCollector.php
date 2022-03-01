@@ -13,17 +13,11 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Helper\DockerLab\DockerCompose;
 
 use MagedIn\Lab\Helper\DockerLab\DirList;
-use MagedIn\Lab\Helper\DockerLab\EnvFileCreator;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\ConfigFacade;
 
 class DockerComposeFilesCollector
 {
-    /**
-     * @var string
-     */
-    private string $mainDockerComposeFile = 'docker-compose.yml';
-
     /**
      * @var OperatingSystem
      */
@@ -33,16 +27,6 @@ class DockerComposeFilesCollector
      * @var ConfigFacade
      */
     private ConfigFacade $configFacade;
-
-    /**
-     * @var CustomFileManager
-     */
-    private CustomFileManager $customFileManager;
-
-    /**
-     * @var EnvFileCreator
-     */
-    private EnvFileCreator $envFileCreator;
 
     /**
      * @var DockerComposeFileValidator
@@ -62,16 +46,12 @@ class DockerComposeFilesCollector
     public function __construct(
         OperatingSystem $operatingSystem,
         ConfigFacade $configFacade,
-        CustomFileManager $customFileManager,
-        EnvFileCreator $envFileCreator,
         DockerComposeFileValidator $dockerComposeFileValidator,
         DockerComposeFilenameResolver $dockerComposeFilenameResolver,
         DirList $dirList
     ) {
         $this->operatingSystem = $operatingSystem;
         $this->configFacade = $configFacade;
-        $this->customFileManager = $customFileManager;
-        $this->envFileCreator = $envFileCreator;
         $this->dockerComposeFileValidator = $dockerComposeFileValidator;
         $this->dockerComposeFilenameResolver = $dockerComposeFilenameResolver;
         $this->dirList = $dirList;
@@ -113,7 +93,7 @@ class DockerComposeFilesCollector
             $this->appendFile($this->dockerComposeFilenameResolver->resolveDockerComposeServiceFilename('windows'));
         }
         $this->loadOptionalServices();
-        $this->loadCustomDockerComposeFile();
+        $this->appendFile($this->dockerComposeFilenameResolver->getDockerComposeCustomFilename());
     }
 
     /**
@@ -157,15 +137,5 @@ class DockerComposeFilesCollector
         if ($isEnabled === true) {
             $this->appendFile($file);
         }
-    }
-
-    /**
-     * @return void
-     */
-    private function loadCustomDockerComposeFile()
-    {
-        $this->customFileManager->write();
-        $this->appendFile($this->dockerComposeFilenameResolver->getDockerComposeCustomFilename());
-        $this->envFileCreator->create();
     }
 }

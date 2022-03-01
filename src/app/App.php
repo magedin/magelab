@@ -25,23 +25,16 @@ class App
     private ConsoleBuilder $consoleBuilder;
 
     /**
-     * @var EnvLoader
+     * @var App\Initializer
      */
-    private EnvLoader $envLoader;
-
-    /**
-     * @var DirList
-     */
-    private DirList $dirList;
+    private App\Initializer $initializer;
 
     public function __construct(
         ConsoleBuilder $consoleBuilder,
-        EnvLoader $envLoader,
-        DirList $dirList
+        App\Initializer $initializer
     ) {
         $this->consoleBuilder = $consoleBuilder;
-        $this->envLoader = $envLoader;
-        $this->dirList = $dirList;
+        $this->initializer = $initializer;
     }
 
     /**
@@ -52,8 +45,7 @@ class App
     {
         try {
             $application = $this->consoleBuilder->build();
-            $this->envLoader->load();
-            $this->dirList->init();
+            $this->initializer->initialize();
             $application->execute();
         } catch (\Exception $e) {
             echo $e->getMessage() . "\n";
