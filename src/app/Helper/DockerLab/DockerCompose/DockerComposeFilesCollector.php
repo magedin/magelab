@@ -16,7 +16,6 @@ use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\EnvFileCreator;
 use MagedIn\Lab\Helper\OperatingSystem;
 use MagedIn\Lab\Model\Config\ConfigFacade;
-use Symfony\Component\Filesystem\Filesystem;
 
 class DockerComposeFilesCollector
 {
@@ -31,19 +30,9 @@ class DockerComposeFilesCollector
     private OperatingSystem $operatingSystem;
 
     /**
-     * @var Filesystem
-     */
-    private Filesystem $filesystem;
-
-    /**
      * @var ConfigFacade
      */
     private ConfigFacade $configFacade;
-
-    /**
-     * @var DirList
-     */
-    private DirList $dirList;
 
     /**
      * @var CustomFileManager
@@ -60,26 +49,32 @@ class DockerComposeFilesCollector
      */
     private DockerComposeFileValidator $dockerComposeFileValidator;
 
+    /**
+     * @var DockerComposeFilenameResolver
+     */
     private DockerComposeFilenameResolver $dockerComposeFilenameResolver;
+
+    /**
+     * @var DirList
+     */
+    private DirList $dirList;
 
     public function __construct(
         OperatingSystem $operatingSystem,
-        Filesystem $filesystem,
         ConfigFacade $configFacade,
-        DirList $dirList,
         CustomFileManager $customFileManager,
         EnvFileCreator $envFileCreator,
         DockerComposeFileValidator $dockerComposeFileValidator,
-        DockerComposeFilenameResolver $dockerComposeFilenameResolver
+        DockerComposeFilenameResolver $dockerComposeFilenameResolver,
+        DirList $dirList
     ) {
         $this->operatingSystem = $operatingSystem;
-        $this->filesystem = $filesystem;
         $this->configFacade = $configFacade;
-        $this->dirList = $dirList;
         $this->customFileManager = $customFileManager;
         $this->envFileCreator = $envFileCreator;
         $this->dockerComposeFileValidator = $dockerComposeFileValidator;
         $this->dockerComposeFilenameResolver = $dockerComposeFilenameResolver;
+        $this->dirList = $dirList;
     }
 
     /**
@@ -127,6 +122,7 @@ class DockerComposeFilesCollector
      */
     private function appendFile(string $filename): void
     {
+        $filename = $this->dirList->absolutePathFromRoot($filename);
         if ($this->dockerComposeFileValidator->validate($filename)) {
             $this->loadedFiles[] = $filename;
         }

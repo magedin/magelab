@@ -56,13 +56,12 @@ class DockerCompose implements CommandBuilderInterface
      */
     private function buildCommand(): void
     {
-        $rootDir = $this->dirList->getRootDir();
         $this->command = ['docker-compose'];
 
         $command = &$this->command;
-        array_map(function ($file) use ($rootDir, &$command) {
+        array_map(function ($file) use (&$command) {
             $this->command[] = '-f';
-            $this->command[] = $rootDir . DIRECTORY_SEPARATOR . $file;
+            $this->command[] = $file;
         }, $this->dockerComposeFilesCollector->load());
     }
 }
