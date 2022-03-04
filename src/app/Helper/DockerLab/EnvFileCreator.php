@@ -88,7 +88,6 @@ class EnvFileCreator
         ],
         'newrelic' => [
             'NR_INSTALL_SILENT' => true,
-            'NR_INSTALL_NOKSH' => true,
             'NR_INSTALL_KEY' => null,
         ],
     ];
