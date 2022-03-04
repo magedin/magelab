@@ -319,3 +319,9 @@ commands:
         aliases:
         description: Setup NewRelic locally.
         class: \MagedIn\Lab\Command\NewRelic\SetupCommand
+
+    newrelic:appname:set:
+        code: newrelic:appname:set
+        aliases:
+        description: Set the app name displayed on New Relic.
+        class: \MagedIn\Lab\Command\NewRelic\AppNameSetupCommand

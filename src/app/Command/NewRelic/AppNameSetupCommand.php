@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SetupCommand extends Command
+class AppNameSetupCommand extends Command
 {
     /**
      * @var DockerComposePhpExec
@@ -55,9 +55,9 @@ class SetupCommand extends Command
     protected function configure()
     {
         $this->addArgument(
-            'key',
-            InputArgument::OPTIONAL,
-            'The NewRelic key.'
+            'name',
+            InputArgument::REQUIRED,
+            'The App Name that will be displayed on NewRelic.'
         );
     }
 
@@ -68,22 +68,12 @@ class SetupCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $installedKey = trim((string) getenv('NR_INSTALL_KEY'));
-        $newKey = trim((string) $input->getArgument('key'));
-
-        if (!$installedKey && !$newKey) {
-            throw new InvalidArgumentException(
-                "Since it's the first installation you need to provide a valid NewRelic key."
-            );
-        }
-
-        if (!$installedKey || ($newKey && $installedKey !== $newKey)) {
-            $this->validateNewRelicKey($newKey);
-            $this->updateKey($newKey);
-        }
-
-        $command = $this->dockerComposePhpExec->build(['newrelic-install', 'install'], ['root' => true]);
+        $appName = trim((string) $input->getArgument('name'));
+        $pattern = 's/newrelic.appname.*/newrelic.appname = \"' . $appName . '\"/g';
+        $filename = '/usr/local/etc/php/conf.d/newrelic.ini';
+        $command = $this->dockerComposePhpExec->build(['sed', '-i', '-e', $pattern, $filename]);
         $process = Process::run($command, ['pty' => true]);
+
         if ($process->getOutput()) {
             /** On silent install, NewRelic doesn't return any message. */
             throw new RuntimeException($process->getOutput());
