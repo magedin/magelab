@@ -86,6 +86,11 @@ class EnvFileCreator
             'BLACKFIRE_SERVER_TOKEN' => null,
             'BLACKFIRE_LOG_LEVEL' => 4,
         ],
+        'newrelic' => [
+            'NR_INSTALL_SILENT' => true,
+            'NR_INSTALL_NOKSH' => true,
+            'NR_INSTALL_KEY' => null,
+        ],
     ];
 
     /**
