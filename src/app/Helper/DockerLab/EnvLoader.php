@@ -30,11 +30,19 @@ class EnvLoader
     public function load()
     {
         if (BasePath::isValid()) {
-            $rootDir = BasePath::getAbsoluteRootDir();
-            $enviFile = $rootDir . '/.env';
+            $enviFile = $this->getFileLocation();
             if (file_exists($enviFile) && is_readable($enviFile)) {
                 $this->dotenv->usePutenv(true)->loadEnv($enviFile);
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileLocation(): string
+    {
+        $rootDir = BasePath::getAbsoluteRootDir();
+        return $rootDir . DS . '.env';
     }
 }

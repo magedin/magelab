@@ -313,3 +313,9 @@ commands:
             - nginx:validate
         description: Validate Nginx configuration.
         class: \MagedIn\Lab\Command\Nginx\ValidateCommand
+
+    newrelic:setup:
+        code: newrelic:setup
+        aliases:
+        description: Setup NewRelic locally.
+        class: \MagedIn\Lab\Command\NewRelic\SetupCommand

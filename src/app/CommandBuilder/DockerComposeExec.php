@@ -19,6 +19,12 @@ class DockerComposeExec extends DockerCompose
      */
     public function build(array $subcommands = [], array $options = []): array
     {
-        return array_merge(parent::build(['exec']), $options, $subcommands);
+        $command = ['exec'];
+        $root = $options['root'] ?? false;
+        if (true === $root) {
+            array_push($command, '-u', 'root');
+        }
+        unset($options['root']);
+        return array_merge(parent::build($command, $options), $subcommands);
     }
 }

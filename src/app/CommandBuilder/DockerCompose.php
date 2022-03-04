@@ -22,17 +22,10 @@ class DockerCompose implements CommandBuilderInterface
      */
     private DockerComposeFilesCollector $dockerComposeFilesCollector;
 
-    /**
-     * @var DirList
-     */
-    private DirList $dirList;
-
     public function __construct(
-        DockerComposeFilesCollector $dockerComposeFilesCollector,
-        DirList $dirList
+        DockerComposeFilesCollector $dockerComposeFilesCollector
     ) {
         $this->dockerComposeFilesCollector = $dockerComposeFilesCollector;
-        $this->dirList = $dirList;
     }
 
     /**

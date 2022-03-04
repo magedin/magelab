@@ -20,6 +20,6 @@ class DockerComposePhpExec extends DockerComposeExec
      */
     public function build(array $subcommands = [], array $options = []): array
     {
-        return array_merge(parent::build(['php']), $options, $subcommands);
+        return array_merge(parent::build(['php'], $options), $subcommands);
     }
 }
