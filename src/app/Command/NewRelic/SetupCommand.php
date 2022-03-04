@@ -14,6 +14,7 @@ namespace MagedIn\Lab\Command\NewRelic;
 
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
+use MagedIn\Lab\CommandExecutor\Php\PhpFpmReload;
 use MagedIn\Lab\Helper\DockerLab\EnvLoader;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -24,18 +25,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class SetupCommand extends Command
 {
-
+    /**
+     * @var DockerComposePhpExec
+     */
     private DockerComposePhpExec $dockerComposePhpExec;
 
+    /**
+     * @var EnvLoader
+     */
     private EnvLoader $envLoader;
+
+    /**
+     * @var PhpFpmReload 
+     */
+    private PhpFpmReload $phpFpmReload;
 
     public function __construct(
         DockerComposePhpExec $dockerComposePhpExec,
         EnvLoader $envLoader,
+        PhpFpmReload $phpFpmReload,
         string $name = null
     ) {
         $this->dockerComposePhpExec = $dockerComposePhpExec;
         $this->envLoader = $envLoader;
+        $this->phpFpmReload = $phpFpmReload;
         parent::__construct($name);
     }
 
@@ -75,9 +88,8 @@ class SetupCommand extends Command
             /** On silent install, NewRelic doesn't return any message. */
             throw new RuntimeException($process->getOutput());
         }
-        $reloadPhpFpm = $this->dockerComposePhpExec->build(['kill', '-USR2', '1']);
         $output->writelnInfo("Reloading PHP-FPM service...");
-        Process::run($reloadPhpFpm, ['pty' => true]);
+        $this->phpFpmReload->execute();
         $output->writelnInfo("NewRelic is now installed and running.");
         return Command::SUCCESS;
     }

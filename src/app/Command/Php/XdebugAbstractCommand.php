@@ -15,6 +15,7 @@ namespace MagedIn\Lab\Command\Php;
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
+use MagedIn\Lab\CommandExecutor\Php\PhpFpmReload;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\Container\Php\XdebugInfo;
 use MagedIn\Lab\Model\Process;
@@ -44,17 +45,24 @@ abstract class XdebugAbstractCommand extends Command
      */
     protected ArrayInputFactory $arrayInputFactory;
 
+    /**
+     * @var PhpFpmReload
+     */
+    private PhpFpmReload $phpFpmReload;
+
     public function __construct(
         DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
         DockerComposeExec $dockerComposeExec,
         XdebugInfo $xdebugInfo,
         ArrayInputFactory $arrayInputFactory,
+        PhpFpmReload $phpFpmReload,
         string $name = null
     ) {
         $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
         $this->dockerComposeExec = $dockerComposeExec;
         $this->xdebugInfo = $xdebugInfo;
         $this->arrayInputFactory = $arrayInputFactory;
+        $this->phpFpmReload = $phpFpmReload;
         parent::__construct($name);
     }
 
@@ -107,8 +115,7 @@ abstract class XdebugAbstractCommand extends Command
     protected function reloadServices(OutputInterface $output)
     {
         $output->writeInfo('Reloading PHP-FPM service...', true);
-        $reloadCommand = $this->dockerComposeExec->build(['php', 'kill', '-USR2', '1']);
-        Process::run($reloadCommand, ['pty' => true]);
+        $this->phpFpmReload->execute();
         $output->writeInfo('PHP-FPM services has been reloaded!', true);
     }
 
