@@ -83,27 +83,4 @@ class AppNameSetupCommand extends Command
         $output->writelnInfo("NewRelic is now installed and running.");
         return Command::SUCCESS;
     }
-
-    /**
-     * @param string $key
-     * @return bool
-     */
-    private function validateNewRelicKey(string $key): bool
-    {
-        if (strlen($key) !== 40) {
-            throw new InvalidArgumentException('The NewRelic key provided is not valid. It should 40 characters.');
-        }
-        return true;
-    }
-
-    /**
-     * @param string $key
-     * @return void
-     */
-    private function updateKey(string $key): void
-    {
-        $pattern = "s/NR_INSTALL_KEY\=.*/NR_INSTALL_KEY\=$key/g";
-        $command = ['sed', '-i', '-e', $pattern, $this->envLoader->getFileLocation()];
-        Process::run($command);
-    }
 }
