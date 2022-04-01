@@ -107,7 +107,7 @@ class SshCommand extends Command
         $subcommands = [$service, 'bash'];
         $options = [];
         if ($input->getOption('root')) {
-            $options = ['-u', 'root'];
+            $options = ['root' => true];
         }
         $command = $this->dockerComposeExecCommandBuilder->build($subcommands, $options);
         Process::run($command, [
