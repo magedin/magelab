@@ -102,12 +102,19 @@ class EnvFileCreator
      */
     private DirList $dirList;
 
+    /**
+     * @var Installation
+     */
+    private Installation $installation;
+
     public function __construct(
         Filesystem $filesystem,
-        DirList $dirList
+        DirList $dirList,
+        Installation $installation
     ) {
         $this->filesystem = $filesystem;
         $this->dirList = $dirList;
+        $this->installation = $installation;
     }
 
     /**
@@ -116,7 +123,7 @@ class EnvFileCreator
      */
     public function create(bool $force = false)
     {
-        if ($force === false && $this->fileExists()) {
+        if (!$this->installation->isInstalled() || ($force === false && $this->fileExists())) {
             return;
         }
         $this->createEnvFile();
