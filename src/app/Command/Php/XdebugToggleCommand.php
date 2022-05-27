@@ -25,10 +25,10 @@ class XdebugToggleCommand extends XdebugAbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $resultCode = $this->checkXdebugStatus($output);
+        $isEnabled = $this->xdebugStatusCommandExecutor->execute();
 
         /** Xdebug is Currently DISABLED */
-        if ($resultCode === Command::FAILURE) {
+        if ($isEnabled === false) {
             /** Enable Xdebug */
             $xdebugCommand = $this->getApplication()->find('xdebug:enable');
         } else {

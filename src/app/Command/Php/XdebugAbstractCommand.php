@@ -16,6 +16,7 @@ use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\CommandBuilder\DockerComposePhpExec;
 use MagedIn\Lab\CommandExecutor\Php\PhpFpmReload;
+use MagedIn\Lab\CommandExecutor\Php\XdebugStatus;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\Container\Php\XdebugInfo;
 use MagedIn\Lab\Model\Process;
@@ -50,12 +51,18 @@ abstract class XdebugAbstractCommand extends Command
      */
     private PhpFpmReload $phpFpmReload;
 
+    /**
+     * @var XdebugStatus
+     */
+    protected XdebugStatus $xdebugStatusCommandExecutor;
+
     public function __construct(
         DockerComposePhpExec $dockerComposePhpExecCommandBuilder,
         DockerComposeExec $dockerComposeExec,
         XdebugInfo $xdebugInfo,
         ArrayInputFactory $arrayInputFactory,
         PhpFpmReload $phpFpmReload,
+        XdebugStatus $xdebugStatusCommandExecutor,
         string $name = null
     ) {
         $this->dockerComposePhpExecCommandBuilder = $dockerComposePhpExecCommandBuilder;
@@ -63,6 +70,7 @@ abstract class XdebugAbstractCommand extends Command
         $this->xdebugInfo = $xdebugInfo;
         $this->arrayInputFactory = $arrayInputFactory;
         $this->phpFpmReload = $phpFpmReload;
+        $this->xdebugStatusCommandExecutor = $xdebugStatusCommandExecutor;
         parent::__construct($name);
     }
 
@@ -86,10 +94,11 @@ abstract class XdebugAbstractCommand extends Command
     {
         $skipChecks = $this->skipChecks($input);
         if (!$skipChecks) {
-            $returnCode = $this->checkXdebugStatus($output);
+            $output->writeinfo('<fg=yellow>Checking Xdebug current status...</>', true);
+            $isEnabled = $this->xdebugStatusCommandExecutor->execute();
         }
 
-        if (!$skipChecks && $returnCode === $this->getCheckCode()) {
+        if (!$skipChecks && $isEnabled === $this->getCheckCode()) {
             $this->writeCheckResult($output);
             return Command::SUCCESS;
         }
@@ -114,6 +123,10 @@ abstract class XdebugAbstractCommand extends Command
      */
     protected function reloadServices(OutputInterface $output)
     {
+        if (!$this->canReloadServices()) {
+            $output->writeInfo('No need to reload PHP-FPM service...', true);
+            return;
+        }
         $output->writeInfo('Reloading PHP-FPM service...', true);
         $this->phpFpmReload->execute();
         $output->writeInfo('PHP-FPM services has been reloaded!', true);
@@ -138,5 +151,13 @@ abstract class XdebugAbstractCommand extends Command
     protected function skipChecks(InputInterface $input): bool
     {
         return (bool) $input->getOption('skip-checks');
+    }
+
+    /**
+     * @return bool
+     */
+    protected function canReloadServices(): bool
+    {
+        return true;
     }
 }

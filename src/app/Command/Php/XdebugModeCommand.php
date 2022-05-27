@@ -60,10 +60,10 @@ class XdebugModeCommand extends XdebugAbstractCommand implements XdebugEnableDis
     /**
      * @inheritDoc
      */
-    public function getCheckCode(): int
+    public function getCheckCode(): bool
     {
         /** Xdebug is already ENABLED. */
-        return Command::SUCCESS;
+        return true;
     }
 
     /**

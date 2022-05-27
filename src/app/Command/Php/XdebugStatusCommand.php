@@ -14,6 +14,7 @@ namespace MagedIn\Lab\Command\Php;
 
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandBuilder\DockerComposeExec;
+use MagedIn\Lab\CommandExecutor\Php\XdebugStatus;
 use MagedIn\Lab\Model\Process;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,12 +27,19 @@ class XdebugStatusCommand extends Command
      */
     private DockerComposeExec $dockerComposeExecCommandBuilder;
 
+    /**
+     * @var XdebugStatus
+     */
+    private XdebugStatus $xdebugStatusCommandExecutor;
+
     public function __construct(
         DockerComposeExec $dockerComposeExecCommandBuilder,
+        XdebugStatus $xdebugStatusCommandExecutor,
         string $name = null
     ) {
         parent::__construct($name);
         $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
+        $this->xdebugStatusCommandExecutor = $xdebugStatusCommandExecutor;
     }
 
     protected function configure()
@@ -51,17 +59,8 @@ class XdebugStatusCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $command = $this->dockerComposeExecCommandBuilder->build();
-        $command[] = 'php';
-        $command[] = 'php';
-        $command[] = '--version';
-
-        $process = Process::run($command, ['pty' => true]);
-        $result = $process->getOutput();
-
-        preg_match("/.*Xdebug.*Copyright.*/", $result, $matches);
-
-        if (empty($matches)) {
+        $isEnabled = $this->xdebugStatusCommandExecutor->execute();
+        if ($isEnabled === false) {
             $messages = [
                 "<fg=yellow>Xdebug is currently DISABLED.</>",
             ];

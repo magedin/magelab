@@ -29,9 +29,9 @@ interface XdebugEnableDisableInterface
     public function writeEndResult(InputInterface $input, OutputInterface $output): void;
 
     /**
-     * @return int
+     * @return bool
      */
-    public function getCheckCode(): int;
+    public function getCheckCode(): bool;
 
     /**
      * @param InputInterface $input

@@ -36,6 +36,7 @@ class Php extends CommandExecutorAbstract
     {
         $command = $this->dockerComposePhpExecCommandBuilder->build();
         $command[] = 'php';
+        $command = array_merge($command, $commands);
         $command = array_merge($command, $this->getShiftedArgv());
 
         Process::run($command, [

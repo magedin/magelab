@@ -59,10 +59,10 @@ class XdebugRequestModeCommand extends XdebugAbstractCommand implements XdebugEn
     /**
      * @inheritDoc
      */
-    public function getCheckCode(): int
+    public function getCheckCode(): bool
     {
         /** Xdebug is already ENABLED. */
-        return Command::SUCCESS;
+        return true;
     }
 
     /**
@@ -79,6 +79,15 @@ class XdebugRequestModeCommand extends XdebugAbstractCommand implements XdebugEn
     protected function skipChecks(InputInterface $input): bool
     {
         return true;
+    }
+
+    /**
+     * If Xdebug is disabled then no need to reload the FPM service.
+     * @return bool
+     */
+    protected function canReloadServices(): bool
+    {
+        return $this->xdebugStatusCommandExecutor->execute();
     }
 
     /**
