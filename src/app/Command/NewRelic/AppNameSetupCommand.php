@@ -31,23 +31,21 @@ class AppNameSetupCommand extends Command
     private DockerComposePhpExec $dockerComposePhpExec;
 
     /**
-     * @var EnvLoader
-     */
-    private EnvLoader $envLoader;
-
-    /**
      * @var PhpFpmReload
      */
     private PhpFpmReload $phpFpmReload;
 
+    /**
+     * @param DockerComposePhpExec $dockerComposePhpExec
+     * @param PhpFpmReload $phpFpmReload
+     * @param string|null $name
+     */
     public function __construct(
         DockerComposePhpExec $dockerComposePhpExec,
-        EnvLoader $envLoader,
         PhpFpmReload $phpFpmReload,
         string $name = null
     ) {
         $this->dockerComposePhpExec = $dockerComposePhpExec;
-        $this->envLoader = $envLoader;
         $this->phpFpmReload = $phpFpmReload;
         parent::__construct($name);
     }

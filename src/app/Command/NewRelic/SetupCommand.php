@@ -21,6 +21,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SetupCommand extends Command
@@ -59,6 +60,13 @@ class SetupCommand extends Command
             InputArgument::OPTIONAL,
             'The NewRelic key.'
         );
+
+        $this->addOption(
+            'app-name',
+            'a',
+            InputOption::VALUE_OPTIONAL,
+            'The NewRelic app name'
+        );
     }
 
     /**
@@ -68,30 +76,63 @@ class SetupCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $installedKey = trim((string) getenv('NR_INSTALL_KEY'));
-        $newKey = trim((string) $input->getArgument('key'));
+        $file = '/usr/local/etc/php/conf.d/newrelic.ini';
+        $existCommand = $this->dockerComposePhpExec->build(['test', '-e', $file], ['root' => true]);
+        $process = Process::run($existCommand, ['pty' => true]);
+        $reloadFpm = false;
 
-        if (!$installedKey && !$newKey) {
-            throw new InvalidArgumentException(
-                "Since it's the first installation you need to provide a valid NewRelic key."
-            );
+        /** If New Relic is not installed. */
+        if ($process->getExitCode() === 1) {
+            $installedKey = trim((string) getenv('NR_INSTALL_KEY'));
+            $newKey = trim((string) $input->getArgument('key'));
+
+            if (!$installedKey && !$newKey) {
+                throw new InvalidArgumentException(
+                    "Since it's the first installation you need to provide a valid NewRelic key."
+                );
+            }
+
+            if (!$installedKey || ($newKey && $installedKey !== $newKey)) {
+                $this->validateNewRelicKey($newKey);
+                $this->updateKey($newKey);
+            }
+
+            $command = $this->dockerComposePhpExec->build(['newrelic-install', 'install'], ['root' => true]);
+            $process = Process::run($command, ['pty' => true]);
+            if ($process->getOutput()) {
+                /** On silent install, NewRelic doesn't return any message. */
+                throw new RuntimeException($process->getOutput());
+            }
+
+            $reloadFpm = true;
+            $output->writelnInfo("NewRelic is now installed and running.");
+        } else {
+            $output->writelnInfo("NewRelic is already installed and running.");
         }
 
-        if (!$installedKey || ($newKey && $installedKey !== $newKey)) {
-            $this->validateNewRelicKey($newKey);
-            $this->updateKey($newKey);
+        if ($appName = $input->getOption('app-name')) {
+            $pattern = 's/newrelic.appname.*/newrelic.appname = \"' . $appName . '\"/g';
+            $command = $this->dockerComposePhpExec->build(['sed', '-i', '-e', $pattern, $file]);
+            Process::run($command, ['pty' => true]);
+            $output->writelnInfo("NewRelic app name was updated to '$appName'");
+            $reloadFpm = true;
         }
 
-        $command = $this->dockerComposePhpExec->build(['newrelic-install', 'install'], ['root' => true]);
-        $process = Process::run($command, ['pty' => true]);
-        if ($process->getOutput()) {
-            /** On silent install, NewRelic doesn't return any message. */
-            throw new RuntimeException($process->getOutput());
+        if (true === $reloadFpm) {
+            $this->reloadFpm($output);
         }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function reloadFpm(OutputInterface $output): void
+    {
         $output->writelnInfo("Reloading PHP-FPM service...");
         $this->phpFpmReload->execute();
-        $output->writelnInfo("NewRelic is now installed and running.");
-        return Command::SUCCESS;
     }
 
     /**
