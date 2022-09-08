@@ -99,19 +99,27 @@ class EnvFileCreateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $filePath = $this->magentoDirList->getAppConfigDir();
-        $filename = 'env.php';
-        $file = $filePath . $filename;
+        $file = $this->getEnvFilepath();
         if ($this->filesystem->exists($file)) {
             $output->writeln("The file '$file' already exists and will not be overwritten.");
-            $newFilename = "env." . date('YmdHis') . ".php";
-            $file = $filePath . $newFilename;
+            $file = $this->getEnvFilepath(true);
             $output->writeln("The new file '$file' will be created instead.");
         }
-        $baseConfig = $this->getBaseConfig($input);
-        $finalConfig = implode("\n", $this->convertArrayToString($baseConfig));
-        file_put_contents($file, "<?php \nreturn [\n" . $finalConfig . "\n];\n");
+        $finalConfig = $this->getConfigString($input);
+        file_put_contents($file, $finalConfig);
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return string
+     */
+    private function getConfigString(InputInterface $input): string
+    {
+        $baseConfig = $this->getBaseConfig($input);
+        $parsedConfig = $this->parseConfiguration($baseConfig);
+        $finalConfigString = implode("\n", $parsedConfig);
+        return "<?php\nreturn [\n" . $finalConfigString . "\n];\n";
     }
 
     /**
@@ -120,14 +128,14 @@ class EnvFileCreateCommand extends Command
      * @param int $spaces
      * @return array
      */
-    private function convertArrayToString(array $data, array &$return = [], int $spaces = 4): array
+    private function parseConfiguration(array $data, array &$return = [], int $spaces = 4): array
     {
         foreach ($data as $key => $value) {
             if (!is_array($value)) {
                 $return[] = $this->buildLine($spaces, $key, $value);
             } else {
                 $return[] = $this->buildLine($spaces, $key);
-                $this->convertArrayToString($value, $return, $spaces+4);
+                $this->parseConfiguration($value, $return, $spaces+4);
                 $return[] = $this->buildLine($spaces);
             }
         }
@@ -296,6 +304,20 @@ class EnvFileCreateCommand extends Command
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param bool $unique
+     * @return string
+     */
+    private function getEnvFilepath(bool $unique = false): string
+    {
+        $filename = 'env';
+        $extension = 'php';
+        if ($unique) {
+            $filename .= '.' . date('YmdHis');
+        }
+        return $this->magentoDirList->getAppConfigDir() . $filename . '.' . $extension;
     }
 
     /**
