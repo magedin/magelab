@@ -23,6 +23,9 @@ use Symfony\Component\Filesystem\Filesystem;
 class EnvFileCreateCommand extends Command
 {
     const OPTION_DOMAIN = 'domain';
+    const OPTION_ADMIN_FRONT_NAME = 'admin-front-name';
+    const OPTION_CRYPT_KEY = 'crypt-key';
+    const OPTION_MAGE_MODE = 'mage-mode';
 
     /**
      * @var EnvironmentVariables
@@ -65,6 +68,27 @@ class EnvFileCreateCommand extends Command
             InputOption::VALUE_REQUIRED,
             'The domain of the website.',
             'magento2.test'
+        );
+        $this->addOption(
+            self::OPTION_ADMIN_FRONT_NAME,
+            'a',
+            InputOption::VALUE_REQUIRED,
+            'The front name of the admin area.',
+            'backend'
+        );
+        $this->addOption(
+            self::OPTION_CRYPT_KEY,
+            'c',
+            InputOption::VALUE_OPTIONAL,
+            'The crypt key for your installation (if you have one).',
+            '{{YOUR CRYPT KEY}}'
+        );
+        $this->addOption(
+            self::OPTION_MAGE_MODE,
+            'm',
+            InputOption::VALUE_OPTIONAL,
+            'The MAGE_MODE of your Magento (Modes: default, production, or developer).',
+            'developer'
         );
     }
 
@@ -129,11 +153,15 @@ class EnvFileCreateCommand extends Command
         return str_repeat(' ', $spaces) . $lineString;
     }
 
+    /**
+     * @param InputInterface $input
+     * @return array
+     */
     private function getBaseConfig(InputInterface $input): array
     {
         return [
             'backend' => [
-                'frontName' => 'backend'
+                'frontName' => $input->getOption(self::OPTION_ADMIN_FRONT_NAME),
             ],
             'queue' => [
                 'amqp' => [
@@ -161,7 +189,7 @@ class EnvFileCreateCommand extends Command
                 'table_prefix' => ''
             ],
             'crypt' => [
-                'key' => '{{YOUR CRYPT KEY}}'
+                'key' => $input->getOption(self::OPTION_CRYPT_KEY)
             ],
             'resource' => [
                 'default_setup' => [
@@ -169,7 +197,7 @@ class EnvFileCreateCommand extends Command
                 ]
             ],
             'x-frame-options' => 'SAMEORIGIN',
-            'MAGE_MODE' => 'developer',
+            'MAGE_MODE' => $input->getOption(self::OPTION_MAGE_MODE),
             'session' => [
                 'save' => 'redis',
                 'redis' => [
