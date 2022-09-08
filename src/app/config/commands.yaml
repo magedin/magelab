@@ -241,12 +241,20 @@ commands:
         class: \MagedIn\Lab\Command\Magento\FixOwnsCommand
 
     magento:fix:perm:
-        name: Fix permissinos for Magento project files.
+        name: Fix permissions for Magento project files.
         code: magento:fix:perm
         aliases:
             - fix:perm
         description: Fix permissinos for Magento project files.
         class: \MagedIn\Lab\Command\Magento\FixPermsCommand
+
+    magento:env-file:create:
+        name: Create a base env.php file into the ./app/etc/ directory.
+        code: magento:env-file:create
+        aliases:
+            - env-file:create
+        description: Create a base env.php file into the ./app/etc/ directory.
+        class: \MagedIn\Lab\Command\Magento\EnvFileCreateCommand
 
     n98:
         name: n98 Magerun Script
