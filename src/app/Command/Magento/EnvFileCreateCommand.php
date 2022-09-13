@@ -280,15 +280,28 @@ class EnvFileCreateCommand extends Command
                     'web' => [
                         'unsecure' => [
                             'base_url' => $this->getWebsiteDomain($input),
-                            'base_link_url' => $this->getWebsiteDomain($input),
-                            'base_static_url' => $this->getWebsiteDomain($input, 'static'),
-                            'base_media_url' => $this->getWebsiteDomain($input, 'media'),
+                            'base_link_url' => '{{unsecure_base_url}}',
+                            'base_static_url' => '{{unsecure_base_url}}/static/',
+                            'base_media_url' => '{{unsecure_base_url}}/media/',
                         ],
                         'secure' => [
                             'base_url' => $this->getWebsiteDomain($input),
-                            'base_link_url' => $this->getWebsiteDomain($input),
-                            'base_static_url' => $this->getWebsiteDomain($input, 'static'),
-                            'base_media_url' => $this->getWebsiteDomain($input, 'media'),
+                            'base_link_url' => '{{secure_base_url}}',
+                            'base_static_url' => '{{secure_base_url}}/static/',
+                            'base_media_url' => '{{secure_base_url}}/media/',
+                        ],
+                        'seo' => [
+                            'use_rewrites' => '1'
+                        ],
+                    ],
+                    'catalog' => [
+                        'search' => [
+                            'engine' => 'elasticsearch7',
+                            'elasticsearch7_server_hostname' => 'elasticsearch',
+                            'elasticsearch7_server_port' => '9200',
+                            'elasticsearch7_index_prefix' => 'magento2',
+                            'elasticsearch7_enable_auth' => '0',
+                            'elasticsearch7_server_timeout' => '15'
                         ]
                     ],
                     'csp' => [
@@ -300,6 +313,30 @@ class EnvFileCreateCommand extends Command
                                 'report_only' => 1,
                             ],
                         ],
+                    ],
+                    'dev' => [
+                        'static' => [
+                            'sign' => 0
+                        ],
+                        'js' => [
+                            'merge_files' => 0,
+                            'minify_files' => 0
+                        ],
+                        'css' => [
+                            'merge_css_files' => 0
+                        ],
+                        'template' => [
+                            'minify_html' => 0
+                        ],
+                    ],
+                    'admin' => [
+                        'security' => [
+                            'session_lifetime' => '86400',
+                            'password_is_forced' => '0'
+                        ],
+                        'url' => [
+                            'use_custom_path' => 0
+                        ]
                     ],
                 ],
             ],
