@@ -293,6 +293,12 @@ class EnvFileCreateCommand extends Command
                         'seo' => [
                             'use_rewrites' => '1'
                         ],
+                        'cookie' => [
+                            'cookie_lifetime' => 86400,
+                            'cookie_path' => null,
+                            'cookie_domain' => null,
+                            'cookie_httponly' => 1,
+                        ],
                     ],
                     'catalog' => [
                         'search' => [
@@ -336,10 +342,21 @@ class EnvFileCreateCommand extends Command
                         ],
                         'url' => [
                             'use_custom_path' => 0
+                        ],
+                        'captcha' => [
+                            'enable' => 0
+                        ]
+                    ],
+                    'customer' => [
+                        'captcha' => [
+                            'enable' => 0,
                         ]
                     ],
                 ],
             ],
+            'modules' => [
+                'Magento_TwoFactorAuth' => 0,
+            ]
         ];
     }
 
