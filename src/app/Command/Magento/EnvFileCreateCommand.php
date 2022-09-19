@@ -295,8 +295,8 @@ class EnvFileCreateCommand extends Command
                         ],
                         'cookie' => [
                             'cookie_lifetime' => 86400,
-                            'cookie_path' => null,
-                            'cookie_domain' => null,
+                            'cookie_path' => '',
+                            'cookie_domain' => '',
                             'cookie_httponly' => 1,
                         ],
                     ],
@@ -307,7 +307,9 @@ class EnvFileCreateCommand extends Command
                             'elasticsearch7_server_port' => '9200',
                             'elasticsearch7_index_prefix' => 'magento2',
                             'elasticsearch7_enable_auth' => '0',
-                            'elasticsearch7_server_timeout' => '15'
+                            'elasticsearch7_username' => '',
+                            'elasticsearch7_password' => '',
+                            'elasticsearch7_server_timeout' => '15',
                         ]
                     ],
                     'csp' => [
@@ -338,13 +340,15 @@ class EnvFileCreateCommand extends Command
                     'admin' => [
                         'security' => [
                             'session_lifetime' => '86400',
-                            'password_is_forced' => '0'
+                            'password_is_forced' => 0,
+                            'password_lifetime' => '',
                         ],
                         'url' => [
-                            'use_custom_path' => 0
+                            'use_custom_path' => 0,
+                            'use_custom' => 0,
                         ],
                         'captcha' => [
-                            'enable' => 0
+                            'enable' => 0,
                         ]
                     ],
                     'customer' => [
@@ -353,6 +357,8 @@ class EnvFileCreateCommand extends Command
                         ]
                     ],
                 ],
+                'websites' => [],
+                'stores' => [],
             ],
             'modules' => [
                 'Magento_TwoFactorAuth' => 0,
