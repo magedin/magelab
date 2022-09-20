@@ -54,7 +54,6 @@ class SwitchVersionCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $image = 'magedin/magento2-php';
         $version = $input->getArgument('version');
 
         if (!$this->validateVersion($version)) {
@@ -73,9 +72,12 @@ class SwitchVersionCommand extends Command
         $config = [
             'services' => [
                 'php' => [
-                    'image' => "$image:$version"
-                ]
-            ]
+                    'image' => "magedin/magento2-php:$version"
+                ],
+                'php-debug' => [
+                    'image' => "magedin/magento2-php-debug:$version"
+                ],
+            ],
         ];
         $this->customFileManager->write($config, true);
         $output->writelnInfo(sprintf('Your PHP version was switched to %s', $version));
