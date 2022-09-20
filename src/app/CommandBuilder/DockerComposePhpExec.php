@@ -16,10 +16,42 @@ class DockerComposePhpExec extends DockerComposeExec
 {
     /**
      * @param array $subcommands
+     * @param array $options
      * @return array
      */
     public function build(array $subcommands = [], array $options = []): array
     {
-        return array_merge(parent::build(['php'], $options), $subcommands);
+        $container = $this->getExecutionContainer();
+        return array_merge(parent::build([$container], $options), $subcommands);
+    }
+
+    /**
+     * @return string
+     */
+    private function getExecutionContainer(): string
+    {
+        $arguments = $_SERVER['argv'] ?? [];
+        foreach ($arguments as $key => $argument) {
+            if ($this->validateArgument($argument)) {
+                unset($_SERVER['argv'][$key]);
+                return 'php-debug';
+            }
+        }
+        return 'php';
+    }
+
+    /**
+     * @param string $argument
+     * @return bool
+     */
+    private function validateArgument(string $argument = ''): bool
+    {
+        if (strpos($argument, '--debug') !== false) {
+            return true;
+        }
+        if (strpos($argument, '--xdebug') !== false) {
+            return true;
+        }
+        return false;
     }
 }
