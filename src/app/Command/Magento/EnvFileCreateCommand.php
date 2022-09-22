@@ -151,9 +151,17 @@ class EnvFileCreateCommand extends Command
     private function buildLine(int $spaces, string $key = null, $value = null): string
     {
         $lineString = "";
-        if ($key && null !== $value) {
+        if ($key && 'null' === $value) {
+            /** If value needs to be null. */
+            $lineString .= "'$key' => null,";
+        } elseif ($key && is_int($value)) {
+            /** If value is integer, so we don't need to put into an apostrophe. */
+            $lineString .= "'$key' => $value,";
+        } elseif ($key && null !== $value) {
+            /** If value is a string. */
             $lineString .= "'$key' => '$value',";
         } elseif ($key && null === $value) {
+            /** If has no value. */
             $lineString .= "'$key' => [";
         } else {
             $lineString .= "],";
@@ -356,13 +364,28 @@ class EnvFileCreateCommand extends Command
                             'enable' => 0,
                         ]
                     ],
+                    'recaptcha_frontend' => [
+                        'type_for' => [
+                            'customer_login' => 'null',
+                            'customer_forgot_password' => 'null',
+                            'customer_create' => 'null',
+                            'customer_edit' => 'null',
+                            'contact' => 'null',
+                            'product_review' => 'null',
+                            'newsletter' => 'null',
+                            'sendfriend' => 'null',
+                            'place_order' => 'null',
+                            'paypal_payflowpro' => 'null',
+                            'braintree' => 'null',
+                        ]
+                    ]
                 ],
                 'websites' => [],
                 'stores' => [],
             ],
             'modules' => [
                 'Magento_TwoFactorAuth' => 0,
-            ]
+            ],
         ];
     }
 
