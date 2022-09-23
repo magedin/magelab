@@ -377,8 +377,14 @@ class EnvFileCreateCommand extends Command
                             'place_order' => 'null',
                             'paypal_payflowpro' => 'null',
                             'braintree' => 'null',
-                        ]
-                    ]
+                        ],
+                    ],
+                    'recaptcha_backend' => [
+                        'type_for' => [
+                            'user_login' => 'null',
+                            'user_forgot_password' => 'null',
+                        ],
+                    ],
                 ],
                 'websites' => [],
                 'stores' => [],
