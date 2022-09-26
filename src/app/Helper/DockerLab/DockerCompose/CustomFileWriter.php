@@ -140,7 +140,12 @@ class CustomFileWriter
             'php' => [
                 'extra_hosts' => [
                     "host.docker.internal:$dockerIp",
-                ]
+                ],
+            ],
+            'php-debug' => [
+                'extra_hosts' => [
+                    "host.docker.internal:$dockerIp",
+                ],
             ],
         ];
     }

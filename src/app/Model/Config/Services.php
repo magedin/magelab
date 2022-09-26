@@ -20,7 +20,14 @@ class Services
      * @todo Remove this hard coded and use the configuration if possible.
      * @var array|string[]
      */
-    private array $defaultServices = ['php', 'nginx', 'db', 'redis', 'elasticsearch'];
+    private array $defaultServices = [
+        'php',
+        'php-debug',
+        'nginx',
+        'db',
+        'redis',
+        'elasticsearch'
+    ];
 
     /**
      * @param string $service
