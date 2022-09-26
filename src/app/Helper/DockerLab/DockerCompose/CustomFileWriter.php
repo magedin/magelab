@@ -134,18 +134,23 @@ class CustomFileWriter
             return;
         }
 
+
+        $this->defaultConfig['services'] = [
+            'php' => $this->getDefaultPhpDefinition(),
+            'php-debug' => $this->getDefaultPhpDefinition(),
+        ];
+    }
+
+    /**
+     * @return \string[][]
+     */
+    private function getDefaultPhpDefinition(): array
+    {
         /** Format $dockerIp = "172.17.0.1" */
         $dockerIp = $this->dockerIp->get();
-        $this->defaultConfig['services'] = [
-            'php' => [
-                'extra_hosts' => [
-                    "host.docker.internal:$dockerIp",
-                ],
-            ],
-            'php-debug' => [
-                'extra_hosts' => [
-                    "host.docker.internal:$dockerIp",
-                ],
+        return [
+            'extra_hosts' => [
+                "host.docker.internal:$dockerIp",
             ],
         ];
     }
