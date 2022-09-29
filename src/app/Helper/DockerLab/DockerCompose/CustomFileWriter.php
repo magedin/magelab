@@ -134,7 +134,6 @@ class CustomFileWriter
             return;
         }
 
-
         $this->defaultConfig['services'] = [
             'php' => $this->getDefaultPhpDefinition(),
             'php-debug' => $this->getDefaultPhpDefinition(),

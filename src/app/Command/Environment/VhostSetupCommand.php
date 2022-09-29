@@ -12,17 +12,24 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Environment;
 
+use Exception;
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\Console\Input\ArrayInputFactory;
 use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\Template\TemplateLoader;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 class VhostSetupCommand extends Command
 {
+    const ARGUMENT_DOMAIN = 'domain';
+    const ARGUMENT_MAGE_RUN_TYPE = 'type';
+    const ARGUMENT_MAGE_RUN_CODE = 'code';
+
     /**
      * @var DirList
      */
@@ -63,9 +70,21 @@ class VhostSetupCommand extends Command
     protected function configure()
     {
         $this->addArgument(
-            'domains',
-            InputArgument::REQUIRED | InputArgument::IS_ARRAY,
+            self::ARGUMENT_DOMAIN,
+            InputArgument::REQUIRED,
             'The domain to setup on Nginx.'
+        )->addOption(
+            self::ARGUMENT_MAGE_RUN_TYPE,
+            't',
+            InputOption::VALUE_OPTIONAL,
+            'The type of scope Magento will run. It is the same as MAGE_RUN_TYPE property.',
+            'website'
+        )->addOption(
+            self::ARGUMENT_MAGE_RUN_CODE,
+            'c',
+            InputOption::VALUE_OPTIONAL,
+            'The code of the scope Magento will run. It is the same as MAGE_RUN_CODE property.',
+            'base'
         );
     }
 
@@ -73,14 +92,16 @@ class VhostSetupCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $domains = $input->getArgument('domains');
-        foreach ($domains as $domain) {
-            $this->setupCertificates($domain, $output);
-            $this->setupDomain($domain);
-        }
+        $domain = $input->getArgument(self::ARGUMENT_DOMAIN);
+        $type   = $input->getOption(self::ARGUMENT_MAGE_RUN_TYPE);
+        $code   = $input->getOption(self::ARGUMENT_MAGE_RUN_CODE);
+        $this->assertMageRunType($type);
+        $this->setupCertificates($domain, $output);
+        $this->setupDomain($domain, $type, $code);
         return Command::SUCCESS;
     }
 
@@ -88,7 +109,7 @@ class VhostSetupCommand extends Command
      * @param string $domain
      * @param OutputInterface $output
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     private function setupCertificates(string $domain, OutputInterface $output)
     {
@@ -101,9 +122,11 @@ class VhostSetupCommand extends Command
 
     /**
      * @param string $domain
+     * @param string $type
+     * @param string $code
      * @return void
      */
-    private function setupDomain(string $domain)
+    private function setupDomain(string $domain, string $type, string $code): void
     {
         $upstream = md5($domain);
         $this->dirList->getNginxConfigDir($domain);
@@ -111,6 +134,8 @@ class VhostSetupCommand extends Command
         foreach ($this->getVhostFilesMap($domain) as $templateFile => $configFile) {
             $content = $this->templateLoader->load($templateFile, [
                 'host'     => $domain,
+                'run_type' => $type,
+                'run_code' => $code,
                 'upstream' => $upstream,
             ]);
             $file = $this->buildNginxConfigFileLocation($configFile);
@@ -139,5 +164,19 @@ class VhostSetupCommand extends Command
             'nginx' . DS . 'magento2-vars.conf' => $domain . DS . 'magento2-vars.conf',
             'nginx' . DS . 'upstream.conf'      => "$domain.conf",
         ];
+    }
+
+    /**
+     * @param string $type
+     * @return void
+     */
+    private function assertMageRunType(string $type): void
+    {
+        $allowedTypes = ['website', 'websites', 'store', 'stores'];
+        if (!in_array($type, $allowedTypes)) {
+            throw new InvalidOptionException(
+                'Invalid type for MAGE_RUN_TYPE. Allowed types are: ' . implode(', ', $allowedTypes)
+            );
+        }
     }
 }
