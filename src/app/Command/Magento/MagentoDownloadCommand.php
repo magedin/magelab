@@ -3,7 +3,7 @@
  * MagedIn Technology
  *
  * @category  MagedIn MageLab
- * @copyright Copyright (c) 2021 MagedIn Technology.
+ * @copyright Copyright (c) 2022 MagedIn Technology.
  *
  * @author    Tiago Sampaio <tiago.sampaio@magedin.com>
  */
@@ -12,16 +12,13 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
-use GuzzleHttp\Client as HttpClient;
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandExecutor\Magento\Download;
-use MagedIn\Lab\Helper\DockerLab\DirList;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 class MagentoDownloadCommand extends Command
 {
@@ -38,6 +35,10 @@ class MagentoDownloadCommand extends Command
      */
     private Download $commandExecutor;
 
+    /**
+     * @param Download $commandExecutor
+     * @param string|null $name
+     */
     public function __construct(
         Download $commandExecutor,
         string $name = null
@@ -56,9 +57,7 @@ class MagentoDownloadCommand extends Command
             InputArgument::OPTIONAL,
             'Magento 2 Version',
             'latest'
-        );
-
-        $this->addOption(
+        )->addOption(
             self::OPTION_PATH,
             'p',
             InputOption::VALUE_OPTIONAL,

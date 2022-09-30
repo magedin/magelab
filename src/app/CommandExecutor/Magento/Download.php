@@ -121,24 +121,20 @@ class Download extends CommandExecutorAbstract
 
     /**
      * @param string $downloadUrl
+     * @param ProgressBar $progressBar
      * @return int
      * @throws GuzzleException
      */
     private function getContentLength(string $downloadUrl, ProgressBar $progressBar): int
     {
-        try {
-            $length = 0;
-            $this->httpClient->get($downloadUrl, [
-                RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$length, $progressBar) {
-                    $length = (int) $response->getHeaderLine('Content-Length');
-                    $progressBar->setMaxSteps($length);
-                    throw new \Exception('Max steps is set.');
-                }
-            ]);
-        } catch (\Exception $e) {
-            /** @todo Workaround to always have the Content-Length response before starting the download process. */
-            sleep(1);
-        }
+        $length = 0;
+        $this->httpClient->get($downloadUrl, [
+            RequestOptions::ALLOW_REDIRECTS => true,
+            RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$length, $progressBar) {
+                $length = (int) $response->getHeaderLine('Content-Length');
+                $progressBar->setMaxSteps($length);
+            }
+        ]);
         return $length;
     }
 
@@ -186,7 +182,7 @@ class Download extends CommandExecutorAbstract
     private function checkIfVersionExists(string $version): void
     {
         try {
-            $this->httpClient->head($this->getDownloadUrl($version), ['timeout' => 2]);
+            $this->httpClient->head($this->getDownloadUrl($version), ['timeout' => 5]);
         } catch (\Exception $e) {
             if (404 === $e->getCode()) {
                 throw new InvalidArgumentException('This version of Magento does not exist. Please try another one.');
