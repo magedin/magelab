@@ -50,16 +50,10 @@ class FixPermsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $basePath = '/var/www/html';
-//        $subdirectories = $input->getArgument('subdirectory');
-//        if (empty($subdirectories)) {
-//            $subdirectories[] = $basePath;
-//        }
-
         foreach ($this->getFileTypesAndPermissions() as $fileType => $filePerm) {
             $mainCommand = ['-type', $fileType, '-exec', 'chmod', $filePerm, '{}', ' \;'];
             $subcommand = array_merge(['php', 'find'], $this->getMagentoDirs(), $mainCommand);
-            $rootNoTtyOptions = ['-u', 'root', '-T'];
+            $rootNoTtyOptions = ['root' => true];
             $command = $this->dockerComposeExecCommandBuilder->build($subcommand, $rootNoTtyOptions);
             Process::run($command, [
                 'tty' => true,
@@ -69,19 +63,6 @@ class FixPermsCommand extends Command
                 },
             ]);
         }
-
-
-//        $subcommands = ['php', 'find', 'var', 'vendor', 'pub/static', 'pub/media', 'app/etc', '-type', 'f', '-exec', 'chmod', 'u+w', '{}', '\\'];
-//        $subcommands = ['php', 'find', 'var', 'vendor', 'pub/static', 'pub/media', 'app/etc', '-type', 'd', '-exec', 'chmod', 'u+w', '{}', '\\'];
-//        $rootNoTtyOptions = ['-u', 'root', '-T'];
-//        $command = $this->dockerComposeExecCommandBuilder->build($subcommands, $rootNoTtyOptions);
-//        Process::run($command, [
-//            'tty' => true,
-//            'callback' => function ($type, $buffer) use ($output) {
-//                $output->writeln($buffer);
-//            },
-//        ]);
-
         return Command::SUCCESS;
     }
 

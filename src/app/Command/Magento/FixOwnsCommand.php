@@ -56,7 +56,7 @@ class FixOwnsCommand extends Command
 //            $subdirectories[] = $basePath;
 //        }
         $subcommands = ['php', 'chown', '-R', 'www:', $basePath];
-        $rootNoTtyOptions = ['-u', 'root', '-T'];
+        $rootNoTtyOptions = ['root' => true];
         $command = $this->dockerComposeExecCommandBuilder->build($subcommands, $rootNoTtyOptions);
         Process::run($command, [
             'tty' => true,

@@ -48,9 +48,7 @@ class CopyCommand extends Command
             'origin',
             InputArgument::REQUIRED,
             'The origin file or directory you want to copy. (E.g. /web/somefile.txt | php:/var/www/html)'
-        );
-
-        $this->addArgument(
+        )->addArgument(
             'destination',
             InputArgument::REQUIRED,
             'The destination of your file or directory. (E.g. /web/somefile.txt | php:/var/www/html)'
