@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
+use MagedIn\Lab\Helper\Config\ConfigMerger;
 use MagedIn\Lab\Helper\Magento\MagentoDirList;
 use MagedIn\Lab\Model\Config\EnvironmentVariables;
 use MagedIn\Lab\Command\Command;
@@ -26,6 +27,7 @@ class EnvFileCreateCommand extends Command
     const OPTION_ADMIN_FRONT_NAME = 'admin-front-name';
     const OPTION_CRYPT_KEY = 'crypt-key';
     const OPTION_MAGE_MODE = 'mage-mode';
+    const OPTION_CLEAN_CONFIG = 'clean';
 
     /**
      * @var EnvironmentVariables
@@ -43,21 +45,29 @@ class EnvFileCreateCommand extends Command
     private MagentoDirList $magentoDirList;
 
     /**
+     * @var ConfigMerger
+     */
+    private ConfigMerger $configMerger;
+
+    /**
      * @param EnvironmentVariables $environmentVariables
      * @param Filesystem $filesystem
      * @param MagentoDirList $magentoDirList
+     * @param ConfigMerger $configMerger
      * @param string|null $name
      */
     public function __construct(
         EnvironmentVariables $environmentVariables,
         Filesystem $filesystem,
         MagentoDirList $magentoDirList,
+        ConfigMerger $configMerger,
         string $name = null
     ) {
         parent::__construct($name);
         $this->environmentVariables = $environmentVariables;
         $this->filesystem = $filesystem;
         $this->magentoDirList = $magentoDirList;
+        $this->configMerger = $configMerger;
     }
 
     protected function configure()
@@ -90,6 +100,12 @@ class EnvFileCreateCommand extends Command
             'The MAGE_MODE of your Magento (Modes: default, production, or developer).',
             'developer'
         );
+        $this->addOption(
+            self::OPTION_CLEAN_CONFIG,
+            null,
+            InputOption::VALUE_NONE,
+            'By default the existing app/etc/env.php file is merged with the new one if it exists. This option generates the config file without this merge.'
+        );
     }
 
     /**
@@ -116,8 +132,8 @@ class EnvFileCreateCommand extends Command
      */
     private function getConfigString(InputInterface $input): string
     {
-        $baseConfig = $this->getBaseConfig($input);
-        $parsedConfig = $this->parseConfiguration($baseConfig);
+        $config = $this->getMergedConfig($input);
+        $parsedConfig = $this->parseConfiguration($config);
         $finalConfigString = implode("\n", $parsedConfig);
         return "<?php\nreturn [\n" . $finalConfigString . "\n];\n";
     }
@@ -135,7 +151,7 @@ class EnvFileCreateCommand extends Command
                 $return[] = $this->buildLine($spaces, $key, $value);
             } else {
                 $return[] = $this->buildLine($spaces, $key);
-                $this->parseConfiguration($value, $return, $spaces+4);
+                $this->parseConfiguration($value, $return, $spaces + 4);
                 $return[] = $this->buildLine($spaces);
             }
         }
@@ -167,6 +183,50 @@ class EnvFileCreateCommand extends Command
             $lineString .= "],";
         }
         return str_repeat(' ', $spaces) . $lineString;
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return array
+     */
+    private function getMergedConfig(InputInterface $input): array
+    {
+        $baseConfig = $this->getBaseConfig($input);
+        if (false === $input->getOption(self::OPTION_CLEAN_CONFIG)) {
+            $currentConfig = $this->getCurrentConfig();
+            $this->configMerger->merge($currentConfig, $baseConfig);
+        }
+        return (array) $baseConfig;
+    }
+
+    /**
+     * @return array
+     */
+    private function getCurrentConfig(): array
+    {
+        $currentConfig = [];
+        $currentEnvConfigFile = $this->getEnvFilepath();
+        if ($this->filesystem->exists($currentEnvConfigFile)) {
+            $currentConfig = (array) include_once($currentEnvConfigFile);
+            $this->convertNullValues($currentConfig);
+        }
+        return $currentConfig;
+    }
+
+    /**
+     * @param array $config
+     */
+    private function convertNullValues(array &$config): void
+    {
+        foreach ($config as $key => &$data) {
+            if (is_array($data)) {
+                $this->convertNullValues($data);
+                continue;
+            }
+            if (null === $data) {
+                $data = 'null';
+            }
+        }
     }
 
     /**
@@ -218,23 +278,23 @@ class EnvFileCreateCommand extends Command
                 'save' => 'redis',
                 'redis' => [
                     'host' => 'redis',
-                    'port' => '6379',
+                    'port' => 6379,
                     'password' => '',
                     'timeout' => '2.5',
                     'persistent_identifier' => '',
-                    'database' => '0',
-                    'compression_threshold' => '2048',
+                    'database' => 0,
+                    'compression_threshold' => 2048,
                     'compression_library' => 'gzip',
-                    'log_level' => '1',
-                    'max_concurrency' => '6',
-                    'break_after_frontend' => '5',
-                    'break_after_adminhtml' => '30',
-                    'first_lifetime' => '600',
-                    'bot_first_lifetime' => '60',
-                    'bot_lifetime' => '7200',
-                    'disable_locking' => '0',
-                    'min_lifetime' => '60',
-                    'max_lifetime' => '2592000'
+                    'log_level' => 1,
+                    'max_concurrency' => 6,
+                    'break_after_frontend' => 5,
+                    'break_after_adminhtml' => 30,
+                    'first_lifetime' => 600,
+                    'bot_first_lifetime' => 60,
+                    'bot_lifetime' => 7200,
+                    'disable_locking' => 0,
+                    'min_lifetime' => 60,
+                    'max_lifetime' => 2592000
                 ]
             ],
             'cache' => [
@@ -243,17 +303,17 @@ class EnvFileCreateCommand extends Command
                         'backend' => 'Cm_Cache_Backend_Redis',
                         'backend_options' => [
                             'server' => 'redis',
-                            'port' => '6379',
-                            'database' => '1'
+                            'port' => 6379,
+                            'database' => 1
                         ]
                     ],
                     'page_cache' => [
                         'backend' => 'Cm_Cache_Backend_Redis',
                         'backend_options' => [
                             'server' => 'redis',
-                            'port' => '6379',
-                            'database' => '2',
-                            'compress_data' => '0'
+                            'port' => 6379,
+                            'database' => 2,
+                            'compress_data' => 0
                         ]
                     ]
                 ]
@@ -299,12 +359,12 @@ class EnvFileCreateCommand extends Command
                             'base_media_url' => '{{secure_base_url}}/media/',
                         ],
                         'seo' => [
-                            'use_rewrites' => '1'
+                            'use_rewrites' => 1
                         ],
                         'cookie' => [
                             'cookie_lifetime' => 86400,
-                            'cookie_path' => '',
-                            'cookie_domain' => '',
+                            'cookie_path' => 'null',
+                            'cookie_domain' => 'null',
                             'cookie_httponly' => 1,
                         ],
                     ],
@@ -312,13 +372,19 @@ class EnvFileCreateCommand extends Command
                         'search' => [
                             'engine' => 'elasticsearch7',
                             'elasticsearch7_server_hostname' => 'elasticsearch',
-                            'elasticsearch7_server_port' => '9200',
+                            'elasticsearch7_server_port' => 9200,
                             'elasticsearch7_index_prefix' => 'magento2',
-                            'elasticsearch7_enable_auth' => '0',
-                            'elasticsearch7_username' => '',
-                            'elasticsearch7_password' => '',
-                            'elasticsearch7_server_timeout' => '15',
+                            'elasticsearch7_enable_auth' => 0,
+                            'elasticsearch7_username' => 'null',
+                            'elasticsearch7_password' => 'null',
+                            'elasticsearch7_server_timeout' => 15,
                         ]
+                    ],
+                    'system' => [
+                        'security' => [
+                            'max_session_size_admin' => 2048000,
+                            'max_session_size_storefront' => 2048000,
+                        ],
                     ],
                     'csp' => [
                         'mode' => [
@@ -347,7 +413,7 @@ class EnvFileCreateCommand extends Command
                     ],
                     'admin' => [
                         'security' => [
-                            'session_lifetime' => '86400',
+                            'session_lifetime' => 86400,
                             'password_is_forced' => 0,
                             'password_lifetime' => '',
                         ],
@@ -418,8 +484,8 @@ class EnvFileCreateCommand extends Command
     {
         $uri = "https://{$input->getOption(self::OPTION_DOMAIN)}";
         if ($uriPath) {
-            $uri .= '/'.$uriPath;
+            $uri .= '/' . $uriPath;
         }
-        return $uri.'/';
+        return $uri . '/';
     }
 }
