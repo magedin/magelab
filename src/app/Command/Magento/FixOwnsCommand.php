@@ -12,26 +12,25 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Magento;
 
-use MagedIn\Lab\CommandBuilder\DockerComposeExec;
-use MagedIn\Lab\Model\Process;
+use MagedIn\Lab\CommandExecutor\Magento\FixOwns;
 use MagedIn\Lab\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class FixOwnsCommand extends Command
 {
-    /**
-     * @var DockerComposeExec
-     */
-    private DockerComposeExec $dockerComposeExecCommandBuilder;
+    private FixOwns $fixOwnsCommandExecutor;
 
+    /**
+     * @param FixOwns $fixOwnsCommandExecutor
+     * @param string|null $name
+     */
     public function __construct(
-        DockerComposeExec $dockerComposeExecCommandBuilder,
+        FixOwns $fixOwnsCommandExecutor,
         string $name = null
     ) {
         parent::__construct($name);
-        $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
+        $this->fixOwnsCommandExecutor = $fixOwnsCommandExecutor;
     }
 
     protected function configure()
@@ -50,21 +49,11 @@ class FixOwnsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $basePath = '/var/www/html';
-//        $subdirectories = $input->getArgument('subdirectory');
-//        if (empty($subdirectories)) {
-//            $subdirectories[] = $basePath;
-//        }
-        $subcommands = ['php', 'chown', '-R', 'www:', $basePath];
-        $rootNoTtyOptions = ['root' => true];
-        $command = $this->dockerComposeExecCommandBuilder->build($subcommands, $rootNoTtyOptions);
-        Process::run($command, [
-            'tty' => true,
+        $config = [
             'callback' => function ($type, $buffer) use ($output) {
                 $output->writeln($buffer);
-            },
-        ]);
-
-        return Command::SUCCESS;
+            }
+        ];
+        return $this->fixOwnsCommandExecutor->execute([], $config);
     }
 }

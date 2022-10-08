@@ -17,6 +17,7 @@ use MagedIn\Lab\CommandBuilder\DockerComposeExec;
 use MagedIn\Lab\CommandExecutor\Container\Copy;
 use MagedIn\Lab\CommandExecutor\Environment\Start;
 use MagedIn\Lab\CommandExecutor\Magento\Download;
+use MagedIn\Lab\CommandExecutor\Magento\FixOwns;
 use MagedIn\Lab\CommandExecutor\Magento\Install;
 use MagedIn\Lab\CommandExecutor\Php\Composer;
 use MagedIn\Lab\Helper\DockerLab\DirList;
@@ -37,6 +38,11 @@ class SetupCommand extends Command
      * @var Copy
      */
     private Copy $copyExecutor;
+
+    /**
+     * @var FixOwns
+     */
+    private FixOwns $fixOwnsExecutor;
 
     /**
      * @var DockerComposeExec
@@ -67,7 +73,6 @@ class SetupCommand extends Command
      * @var Install\DefaultOptions
      */
     private Install\DefaultOptions $installationDefaultOptions;
-
     /**
      * @var string|null
      */
@@ -76,6 +81,7 @@ class SetupCommand extends Command
     /**
      * @param Download $magentoDownloadExecutor
      * @param Copy $copyExecutor
+     * @param FixOwns $fixOwnsExecutor
      * @param DockerComposeExec $dockerComposeExecCommandBuilder
      * @param Start $envStartExecutor
      * @param Composer $composerExecutor
@@ -87,6 +93,7 @@ class SetupCommand extends Command
     public function __construct(
         Download $magentoDownloadExecutor,
         Copy $copyExecutor,
+        FixOwns $fixOwnsExecutor,
         DockerComposeExec $dockerComposeExecCommandBuilder,
         Start $envStartExecutor,
         Composer $composerExecutor,
@@ -97,6 +104,7 @@ class SetupCommand extends Command
     ) {
         $this->magentoDownloadExecutor = $magentoDownloadExecutor;
         $this->copyExecutor = $copyExecutor;
+        $this->fixOwnsExecutor = $fixOwnsExecutor;
         $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
         $this->envStartExecutor = $envStartExecutor;
         $this->composerExecutor = $composerExecutor;
@@ -147,6 +155,7 @@ class SetupCommand extends Command
     {
         $this->downloadedFile = $this->prepareApplicationDownload($input, $output);
         $this->prepareApplicationClean($output);
+        $this->prepareApplicationFixOwns();
         $this->prepareApplicationCopy($output);
         $this->prepareApplicationExtract($output);
         $this->prepareApplicationWrapUp();
@@ -178,6 +187,14 @@ class SetupCommand extends Command
         $subCommand = ['php', 'rm', '-rf', "$workingDir/", "$workingDir/app/"];
         $deleteCommand = $this->dockerComposeExecCommandBuilder->build($subCommand);
         $process = Process::run($deleteCommand);
+    }
+
+    /**
+     * @return void
+     */
+    private function prepareApplicationFixOwns(): void
+    {
+        $this->fixOwnsExecutor->execute();
     }
 
     /**
