@@ -164,21 +164,23 @@ class EnvFileCreateCommand extends Command
      * @param string|int|null $value
      * @return string
      */
-    private function buildLine(int $spaces, string $key = null, $value = null): string
+    private function buildLine(int $spaces, $key = null, $value = null): string
     {
         $lineString = "";
-        if ($key && 'null' === $value) {
+        $hasKey = $key !== null && $key !== false;
+        $keyValue = is_int($key) ? $key : "'$key'";
+        if ($hasKey && 'null' === $value) {
             /** If value needs to be null. */
-            $lineString .= "'$key' => null,";
-        } elseif ($key && is_int($value)) {
+            $lineString .= "$keyValue => null,";
+        } elseif ($hasKey && is_int($value)) {
             /** If value is integer, so we don't need to put into an apostrophe. */
-            $lineString .= "'$key' => $value,";
-        } elseif ($key && null !== $value) {
+            $lineString .= "$keyValue => $value,";
+        } elseif ($hasKey && null !== $value) {
             /** If value is a string. */
-            $lineString .= "'$key' => '$value',";
-        } elseif ($key && null === $value) {
+            $lineString .= "$keyValue => '$value',";
+        } elseif ($hasKey && null === $value) {
             /** If has no value. */
-            $lineString .= "'$key' => [";
+            $lineString .= "$keyValue => [";
         } else {
             $lineString .= "],";
         }

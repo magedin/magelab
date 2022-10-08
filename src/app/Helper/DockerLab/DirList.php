@@ -100,6 +100,18 @@ class DirList
     /**
      * @return string
      */
+    public function getVarDownloadDir(): string
+    {
+        $dir = $this->getVarDir() . DS . 'download';
+        if (!$this->filesystem->exists($dir)) {
+            $this->filesystem->mkdir($dir);
+        }
+        return $dir;
+    }
+
+    /**
+     * @return string
+     */
     public function getRootDir(): string
     {
         return realpath(BasePath::getRootDir(true));

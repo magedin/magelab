@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Project;
 
 use MagedIn\Lab\Command\Command;
+use MagedIn\Lab\CommandBuilder\DockerComposeExec;
+use MagedIn\Lab\CommandExecutor\Container\Copy;
 use MagedIn\Lab\CommandExecutor\Environment\Start;
 use MagedIn\Lab\CommandExecutor\Magento\Download;
 use MagedIn\Lab\CommandExecutor\Magento\Install;
@@ -30,6 +32,16 @@ class SetupCommand extends Command
      * @var Download
      */
     private Download $magentoDownloadExecutor;
+
+    /**
+     * @var Copy
+     */
+    private Copy $copyExecutor;
+
+    /**
+     * @var DockerComposeExec
+     */
+    private DockerComposeExec $dockerComposeExecCommandBuilder;
 
     /**
      * @var Start
@@ -56,8 +68,26 @@ class SetupCommand extends Command
      */
     private Install\DefaultOptions $installationDefaultOptions;
 
+    /**
+     * @var string|null
+     */
+    private string $downloadedFile = '';
+
+    /**
+     * @param Download $magentoDownloadExecutor
+     * @param Copy $copyExecutor
+     * @param DockerComposeExec $dockerComposeExecCommandBuilder
+     * @param Start $envStartExecutor
+     * @param Composer $composerExecutor
+     * @param Install $installExecutor
+     * @param DirList $dirList
+     * @param Install\DefaultOptions $installationDefaultOptions
+     * @param string|null $name
+     */
     public function __construct(
         Download $magentoDownloadExecutor,
+        Copy $copyExecutor,
+        DockerComposeExec $dockerComposeExecCommandBuilder,
         Start $envStartExecutor,
         Composer $composerExecutor,
         Install $installExecutor,
@@ -66,6 +96,8 @@ class SetupCommand extends Command
         string $name = null
     ) {
         $this->magentoDownloadExecutor = $magentoDownloadExecutor;
+        $this->copyExecutor = $copyExecutor;
+        $this->dockerComposeExecCommandBuilder = $dockerComposeExecCommandBuilder;
         $this->envStartExecutor = $envStartExecutor;
         $this->composerExecutor = $composerExecutor;
         $this->installExecutor = $installExecutor;
@@ -98,10 +130,11 @@ class SetupCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->startContainers($input, $output);
         $this->prepareApplicationCode($input, $output);
         $this->setupVhost($input, $output);
-        $this->startContainers($input, $output);
         $this->installApplication($input, $output);
+        $this->syncDirectories($input, $output);
         return Command::SUCCESS;
     }
 
@@ -112,16 +145,77 @@ class SetupCommand extends Command
      */
     private function prepareApplicationCode(InputInterface $input, OutputInterface $output)
     {
-        $downloadedFile = $this->magentoDownloadExecutor->execute([], [
+        $this->downloadedFile = $this->prepareApplicationDownload($input, $output);
+        $this->prepareApplicationClean($output);
+        $this->prepareApplicationCopy($output);
+        $this->prepareApplicationExtract($output);
+        $this->prepareApplicationWrapUp();
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return string
+     */
+    private function prepareApplicationDownload(InputInterface $input, OutputInterface $output): string
+    {
+        $output->writeln('Downloading the application code...');
+        return $this->magentoDownloadExecutor->execute([], [
             'version' => $input->getArgument('version'),
-            'path' => $this->dirList->getSrcDir(),
+            'path' => $this->dirList->getVarDownloadDir(),
             'output' => $output,
         ]);
+    }
 
-        $output->writeln('Extracting the application code...');
-        $command = ['tar', '-xzf', $downloadedFile, '--strip-components=1', '--directory', $this->dirList->getSrcDir()];
-        Process::run($command);
-        Process::run(['rm', '-rf', $downloadedFile]);
+    /**
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function prepareApplicationClean(OutputInterface $output): void
+    {
+        $workingDir = $this->getContainerWorkingDir();
+        $output->writeln('Cleaning the working directory inside the container before extracting Magento...');
+        $subCommand = ['php', 'rm', '-rf', "$workingDir/", "$workingDir/app/"];
+        $deleteCommand = $this->dockerComposeExecCommandBuilder->build($subCommand);
+        $process = Process::run($deleteCommand);
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function prepareApplicationCopy(OutputInterface $output): void
+    {
+        $output->writeln('Copying Magento to the PHP container...');
+        $this->copyExecutor->execute([], [
+            'origin' => $this->downloadedFile,
+            'destination' => "php:{$this->getContainerDestination()}",
+        ]);
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function prepareApplicationExtract(OutputInterface $output): void
+    {
+        $destination = $this->getContainerDestination();
+        $workingDir = $this->getContainerWorkingDir();
+        $output->writeln('Extracting Magento into the PHP container...');
+        $subCommand = ['php', 'tar', '-xzf', $destination, '--strip-components=1', '--directory', $workingDir];
+        $extractCommand = $this->dockerComposeExecCommandBuilder->build($subCommand);
+        $process = Process::run($extractCommand);
+    }
+
+    /**
+     * @return void
+     */
+    private function prepareApplicationWrapUp(): void
+    {
+        $subCommand = ['php', 'rm', '-rf', $this->getContainerDestination()];
+        $deleteCommand = $this->dockerComposeExecCommandBuilder->build($subCommand);
+        $process = Process::run($deleteCommand);
+        $process = Process::run(['rm', '-rf', $this->downloadedFile]);
     }
 
     /**
@@ -131,7 +225,7 @@ class SetupCommand extends Command
      */
     private function startContainers(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Starting the services.');
+        $output->writeln('Starting the services...');
         $this->envStartExecutor->execute();
     }
 
@@ -142,7 +236,19 @@ class SetupCommand extends Command
      */
     private function setupVhost(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Setting up hosts.');
+        $output->writeln('Setting up hosts...');
+        /** @todo Setup Host code goes here. */
+    }
+
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return void
+     */
+    private function syncDirectories(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln('Syncing directories between the container and the host...');
         /** @todo Setup Host code goes here. */
     }
 
@@ -153,7 +259,7 @@ class SetupCommand extends Command
      */
     private function installApplication(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Running composer installation.');
+        $output->writeln('Running composer installation...');
         $this->composerExecutor->execute(['install', '--no-interaction']);
         $this->installMagento($input, $output);
     }
@@ -165,8 +271,32 @@ class SetupCommand extends Command
      */
     private function installMagento(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Installing Magento application.');
+        $output->writeln('Installing Magento application...');
         $baseUrl = $input->getOption('base_url');
         $this->installExecutor->execute([], ['base_url' => $baseUrl]);
+    }
+
+    /**
+     * @return string
+     */
+    private function getContainerWorkingDir(): string
+    {
+        return '/var/www/html';
+    }
+
+    /**
+     * @return string
+     */
+    private function getContainerFilename(): string
+    {
+        return 'magento.tar.gz';
+    }
+
+    /**
+     * @return string
+     */
+    private function getContainerDestination(): string
+    {
+        return "{$this->getContainerWorkingDir()}/{$this->getContainerFilename()}";
     }
 }

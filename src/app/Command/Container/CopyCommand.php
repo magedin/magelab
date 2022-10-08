@@ -12,9 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Command\Container;
 
-use MagedIn\Lab\CommandBuilder\Docker;
-use MagedIn\Lab\Helper\DockerComposeServicesList;
-use MagedIn\Lab\Model\Process;
+use MagedIn\Lab\CommandExecutor\Container\Copy;
 use MagedIn\Lab\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,23 +21,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CopyCommand extends Command
 {
     /**
-     * @var Docker
+     * @var Copy
      */
-    private Docker $dockerCommandBuilder;
+    private Copy $copyCommandExecutor;
 
     /**
-     * @var DockerComposeServicesList
+     * @param Copy $copyCommandExecutor
+     * @param string|null $name
      */
-    private DockerComposeServicesList $dockerComposeServicesList;
-
     public function __construct(
-        Docker $dockerCommandBuilder,
-        DockerComposeServicesList $dockerComposeServicesList,
+        Copy $copyCommandExecutor,
         string $name = null
     ) {
         parent::__construct($name);
-        $this->dockerCommandBuilder = $dockerCommandBuilder;
-        $this->dockerComposeServicesList = $dockerComposeServicesList;
+        $this->copyCommandExecutor = $copyCommandExecutor;
     }
 
     protected function configure()
@@ -64,52 +59,11 @@ class CopyCommand extends Command
     {
         $origin = $input->getArgument('origin');
         $destination = $input->getArgument('destination');
-        $subcommand = $this->buildSubcommand($origin, $destination);
-
-        if (empty($subcommand)) {
-            return Command::FAILURE;
-        }
-
-        $command = $this->dockerCommandBuilder->build($subcommand);
-        $process = Process::run($command, [
-            'tty' => true,
-            'callback' => function ($type, $buffer) use ($output) {
-                $output->writeln($buffer);
-            },
-        ]);
-        return Command::SUCCESS;
-    }
-
-    /**
-     * @param string $origin
-     * @param string $destination
-     * @return array
-     */
-    private function buildSubcommand(string $origin, string $destination): array
-    {
-        $separator = ':';
-
-        if (strpos($origin, $separator)) {
-            list($service, $path) = explode($separator, $origin);
-            $serviceId = $this->findServiceId($service);
-            $origin = "$serviceId:$path";
-        }
-
-        if (strpos($destination, $separator)) {
-            list($service, $path) = explode($separator, $destination);
-            $serviceId = $this->findServiceId($service);
-            $destination = "$serviceId:$path";
-        }
-
-        return ['cp', $origin, $destination];
-    }
-
-    /**
-     * @param string $service
-     * @return string
-     */
-    private function findServiceId(string $service): string
-    {
-        return $this->dockerComposeServicesList->getId($service);
+        $config = [
+            'origin' => $origin,
+            'destination' => $destination,
+            'output' => $output,
+        ];
+        return $this->copyCommandExecutor->execute([], $config);
     }
 }
