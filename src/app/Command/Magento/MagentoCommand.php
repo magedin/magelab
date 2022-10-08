@@ -22,11 +22,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MagentoCommand extends ProxyCommand
 {
+    protected bool $requiresDocker = false;
+
     /**
      * @var Magento
      */
     private Magento $magentoCommandBuilder;
 
+    /**
+     * @param Magento $magentoCommandBuilder
+     * @param NonDefaultOptions $nonDefaultOptions
+     * @param string|null $name
+     */
     public function __construct(
         Magento $magentoCommandBuilder,
         NonDefaultOptions $nonDefaultOptions,

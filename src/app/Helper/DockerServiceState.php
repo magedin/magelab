@@ -33,10 +33,21 @@ class DockerServiceState
      */
     private DockerCompose $dockerComposeCommandBuilder;
 
+    /**
+     * @var DockerServiceState\ServiceExtractor
+     */
+    private DockerServiceState\ServiceExtractor $serviceExtractor;
+
+    /**
+     * @param DockerCompose $dockerComposeCommandBuilder
+     * @param DockerServiceState\ServiceExtractor $serviceExtractor
+     */
     public function __construct(
-        DockerCompose $dockerComposeCommandBuilder
+        DockerCompose $dockerComposeCommandBuilder,
+        DockerServiceState\ServiceExtractor $serviceExtractor
     ) {
         $this->dockerComposeCommandBuilder = $dockerComposeCommandBuilder;
+        $this->serviceExtractor = $serviceExtractor;
     }
 
     /**
@@ -123,6 +134,7 @@ class DockerServiceState
     {
         $command = $this->dockerComposeCommandBuilder->build(['ps', '--all']);
         $process = Process::run($command);
+        return $this->serviceExtractor->getServices($process->getOutput());
         $rows = explode(PHP_EOL, $process->getOutput());
         /** Strip away the first two lines (header and dash separator). */
         array_shift($rows);

@@ -27,6 +27,10 @@ class StatusCommand extends Command
      */
     private DockerCompose $dockerComposeCommandBuilder;
 
+    /**
+     * @param DockerCompose $dockerComposeCommandBuilder
+     * @param string|null $name
+     */
     public function __construct(
         DockerCompose $dockerComposeCommandBuilder,
         string $name = null

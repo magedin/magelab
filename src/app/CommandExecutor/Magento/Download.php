@@ -128,13 +128,21 @@ class Download extends CommandExecutorAbstract
     private function getContentLength(string $downloadUrl, ProgressBar $progressBar): int
     {
         $length = 0;
-        $this->httpClient->get($downloadUrl, [
-            RequestOptions::ALLOW_REDIRECTS => true,
-            RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$length, $progressBar) {
-                $length = (int) $response->getHeaderLine('Content-Length');
-                $progressBar->setMaxSteps($length);
+        $maxTimes = 10;
+        $currentTimes = 0;
+        while ($length === 0) {
+            if ($currentTimes >= $maxTimes) {
+                break;
             }
-        ]);
+            $this->httpClient->get($downloadUrl, [
+                RequestOptions::ALLOW_REDIRECTS => true,
+                RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$length, $progressBar) {
+                    $length = (int) $response->getHeaderLine('Content-Length');
+                    $progressBar->setMaxSteps($length);
+                }
+            ]);
+            $currentTimes++;
+        }
         return $length;
     }
 

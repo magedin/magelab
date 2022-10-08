@@ -71,7 +71,7 @@ class CopyCommand extends Command
         }
 
         $command = $this->dockerCommandBuilder->build($subcommand);
-        Process::run($command, [
+        $process = Process::run($command, [
             'tty' => true,
             'callback' => function ($type, $buffer) use ($output) {
                 $output->writeln($buffer);
