@@ -69,6 +69,9 @@ class EnvFileCreator
             'SERVER_HOST' => '0.0.0.0',
             'MONITORING_ENABLED' => 'true'
         ],
+        'elastichq' => [
+            'HQ_DEFAULT_URL' => 'http://elasticsearch:9200',
+        ],
         'aws' => [
             'AWS_S3_BUCKET' => null,
             'AWS_S3_PATH' => null,

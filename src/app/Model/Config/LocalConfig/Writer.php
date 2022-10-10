@@ -98,6 +98,9 @@ class Writer
             'kibana' => [
                 'enabled' => false,
             ],
+            'elastichq' => [
+                'enabled' => false,
+            ],
             'rabbitmq' => [
                 'enabled' => false,
             ],
