@@ -135,36 +135,5 @@ class DockerServiceState
         $command = $this->dockerComposeCommandBuilder->build(['ps', '--all']);
         $process = Process::run($command);
         return $this->serviceExtractor->getServices($process->getOutput());
-        $rows = explode(PHP_EOL, $process->getOutput());
-        /** Strip away the first two lines (header and dash separator). */
-        array_shift($rows);
-        array_shift($rows);
-        /** Remove all empty lines. */
-        $rows = array_filter($rows);
-
-        $services = [];
-        foreach ($rows as $row) {
-            $row = preg_replace('/\s+/', '|', trim($row));
-            $parts = array_filter(explode('|', $row));
-            $service = array_shift($parts);
-            $isRunning = $this->scanUpState($parts);
-            $services[$service] = $isRunning;
-        }
-
-        return $services;
-    }
-
-    /**
-     * @param array $parts
-     * @return bool
-     */
-    private function scanUpState(array $parts = []): bool
-    {
-        foreach ($parts as $part) {
-            if ('up' == substr(strtolower($part), 0, 2)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
