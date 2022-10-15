@@ -25,12 +25,10 @@ class OperatingSystem
      */
     public function getName(): string
     {
-        $operatingSystem = trim(Process::run(['uname'])->getOutput());
-
+        $operatingSystem = PHP_OS;
         if ($operatingSystem) {
             return $operatingSystem;
         }
-
         return self::UNKNOWN_OS;
     }
 
@@ -39,12 +37,10 @@ class OperatingSystem
      */
     public function getFullName(): string
     {
-        $operatingSystem = trim(Process::run(['uname', '-a'])->getOutput());
-
+        $operatingSystem = PHP_OS;
         if ($operatingSystem) {
             return $operatingSystem;
         }
-
         return self::UNKNOWN_OS;
     }
 
@@ -62,5 +58,16 @@ class OperatingSystem
     public function isLinux(): bool
     {
         return $this->getName() === self::LINUX_OS;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWindows(): bool
+    {
+        if (strtoupper(substr($this->getName(), 0, 3)) === 'WIN') {
+            return true;
+        }
+        return false;
     }
 }

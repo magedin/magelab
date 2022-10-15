@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\Helper\DockerLab;
 
+use MagedIn\Lab\Helper\OperatingSystem;
 use Symfony\Component\Filesystem\Filesystem;
 
 class DirList
@@ -26,12 +27,19 @@ class DirList
      */
     private Installation $installation;
 
+    /**
+     * @var OperatingSystem
+     */
+    private OperatingSystem $operatingSystem;
+
     public function __construct(
         Filesystem $filesystem,
-        Installation $installation
+        Installation $installation,
+        OperatingSystem $operatingSystem
     ) {
         $this->filesystem = $filesystem;
         $this->installation = $installation;
+        $this->operatingSystem = $operatingSystem;
     }
 
     /**
@@ -138,5 +146,30 @@ class DirList
     {
         $path = ltrim($path, DS);
         return $this->getRootDir() . DS . $path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMagelabHomeUserDir(): string
+    {
+        $homeDir = $this->getUserHomeDir() . DS . '.magelab';
+        if ($homeDir && !$this->filesystem->exists($homeDir)) {
+            $this->filesystem->mkdir($homeDir);
+        }
+        return $homeDir;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserHomeDir(): string
+    {
+        if ($this->operatingSystem->isWindows()) {
+            $home = $_SERVER['HOMEDRIVE'] . DS . $_SERVER['HOMEPATH'] ?? '';
+        } else {
+            $home = $_SERVER['HOME'] ?? '';
+        }
+        return realpath($home);
     }
 }

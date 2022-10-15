@@ -17,6 +17,7 @@ use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\DockerLab\DockerCompose\CustomFileManager;
 use MagedIn\Lab\Helper\DockerLab\EnvFileCreator;
 use MagedIn\Lab\Helper\DockerLab\EnvLoader;
+use MagedIn\Lab\Helper\User\Home\Initializer as UserHomeInitializer;
 
 class Initializer
 {
@@ -45,18 +46,25 @@ class Initializer
      */
     private EnvFileCreator $envFileCreator;
 
+    /**
+     * @var UserHomeInitializer
+     */
+    private UserHomeInitializer $userHomeInitializer;
+
     public function __construct(
         DependencyChecker $dependencyChecker,
         EnvLoader $envLoader,
         DirList $dirList,
         CustomFileManager $customFileManager,
-        EnvFileCreator $envFileCreator
+        EnvFileCreator $envFileCreator,
+        UserHomeInitializer $userHomeInitializer
     ) {
         $this->dependencyChecker = $dependencyChecker;
         $this->envLoader = $envLoader;
         $this->dirList = $dirList;
         $this->customFileManager = $customFileManager;
         $this->envFileCreator = $envFileCreator;
+        $this->userHomeInitializer = $userHomeInitializer;
     }
 
     /**
@@ -70,5 +78,6 @@ class Initializer
         $this->dirList->init();
         $this->customFileManager->write();
         $this->envFileCreator->create();
+        $this->userHomeInitializer->initialize();
     }
 }
