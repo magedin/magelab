@@ -232,7 +232,7 @@ class SetupCommand extends Command
         $subCommand = ['php', 'rm', '-rf', $this->getContainerDestination()];
         $deleteCommand = $this->dockerComposeExecCommandBuilder->build($subCommand);
         $process = Process::run($deleteCommand);
-        $process = Process::run(['rm', '-rf', $this->downloadedFile]);
+        // $process = Process::run(['rm', '-rf', $this->downloadedFile]);
     }
 
     /**
