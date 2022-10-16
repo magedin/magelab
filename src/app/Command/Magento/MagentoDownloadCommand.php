@@ -14,6 +14,7 @@ namespace MagedIn\Lab\Command\Magento;
 
 use MagedIn\Lab\Command\Command;
 use MagedIn\Lab\CommandExecutor\Magento\Download;
+use MagedIn\Lab\Helper\DockerLab\DirList;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MagentoDownloadCommand extends Command
 {
     const ARG_VERSION = 'version';
-    const OPTION_PATH = 'path';
+    const OPTION_FORCE = 'force';
 
     /**
      * @inheritdoc
@@ -31,19 +32,32 @@ class MagentoDownloadCommand extends Command
     protected bool $isPrivate = false;
 
     /**
+     * @var bool
+     */
+    protected bool $requiresDocker = false;
+
+    /**
      * @var Download
      */
     private Download $commandExecutor;
 
     /**
+     * @var DirList
+     */
+    private DirList $dirList;
+
+    /**
      * @param Download $commandExecutor
+     * @param DirList $dirList
      * @param string|null $name
      */
     public function __construct(
         Download $commandExecutor,
+        DirList $dirList,
         string $name = null
     ) {
         $this->commandExecutor = $commandExecutor;
+        $this->dirList = $dirList;
         parent::__construct($name);
     }
 
@@ -57,12 +71,13 @@ class MagentoDownloadCommand extends Command
             InputArgument::OPTIONAL,
             'Magento 2 Version',
             'latest'
-        )->addOption(
-            self::OPTION_PATH,
-            'p',
-            InputOption::VALUE_OPTIONAL,
-            'The path on your machine where Magento 2 copy will be downloaded to.',
-            realpath('.')
+        );
+        $this->addOption(
+            self::OPTION_FORCE,
+            'f',
+            InputOption::VALUE_NEGATABLE,
+            'For the download even if the Magento version is already downloaded.',
+            false
         );
     }
 
@@ -74,14 +89,10 @@ class MagentoDownloadCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $version = $input->getArgument(self::ARG_VERSION);
-        $path = $input->getOption(self::OPTION_PATH);
-        if (realpath($path) === false) {
-            throw new InvalidOptionException('This path does not exist or is invalid.');
-        }
-
         $config = [
             'version' => $version,
-            'path' => $path,
+            'force' => $input->getOption(self::OPTION_FORCE),
+            'path' => $this->dirList->getMagentoDownloadDir(),
             'output' => $output
         ];
         $this->commandExecutor->execute([], $config);

@@ -172,4 +172,16 @@ class DirList
         }
         return realpath($home);
     }
+
+    /**
+     * @return string
+     */
+    public function getMagentoDownloadDir(): string
+    {
+        $dir = $this->getMagelabHomeUserDir() . DS . 'downloads';
+        if ($dir && !$this->filesystem->exists($dir)) {
+            $this->filesystem->mkdir($dir);
+        }
+        return $dir;
+    }
 }

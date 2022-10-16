@@ -16,6 +16,7 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use MagedIn\Lab\CommandExecutor\CommandExecutorAbstract;
+use MagedIn\Lab\Helper\DockerLab\DirList;
 use MagedIn\Lab\Helper\Github\DownloadRepo;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -46,12 +47,24 @@ class Download extends CommandExecutorAbstract
      */
     private HttpClient $httpClient;
 
+    /**
+     * @var DirList
+     */
+    private DirList $dirList;
+
+    /**
+     * @param Filesystem $filesystem
+     * @param HttpClient $httpClient
+     * @param DirList $dirList
+     */
     public function __construct(
         Filesystem $filesystem,
-        HttpClient $httpClient
+        HttpClient $httpClient,
+        DirList $dirList
     ) {
         $this->filesystem = $filesystem;
         $this->httpClient = $httpClient;
+        $this->dirList = $dirList;
     }
 
     /**
@@ -59,12 +72,17 @@ class Download extends CommandExecutorAbstract
      */
     protected function doExecute(array $commands = [], array $config = [])
     {
+        $output  = $config['output'];
         $version = $config['version'];
-        $path = $config['path'];
-        $output = $config['output'];
-        $filepath = "$path" . DS . $this->getFilename($version);
+        $force   = $config['force'] ?? false;
+        $path    = $config['path'] ?? false;
+        $filepath = $path . DS . $this->getFilename($version);
 
         if ($this->filesystem->exists($filepath)) {
+            if (!$force) {
+                $output->writeln("The Magento version '$version' is already downloaded.");
+                return $filepath;
+            }
             $this->filesystem->remove($filepath);
         }
 
