@@ -412,6 +412,11 @@ class EnvFileCreateCommand extends Command
                         'template' => [
                             'minify_html' => 0
                         ],
+                        'debug' => [
+                            'template_hints_storefront' => 1,
+                            'template_hints_storefront_show_with_parameter' => 1,
+                            'template_hints_parameter_value' => 'magento',
+                        ],
                     ],
                     'admin' => [
                         'security' => [
