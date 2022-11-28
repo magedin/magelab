@@ -294,6 +294,22 @@ commands:
         description: Access DB console.
         class: \MagedIn\Lab\Command\Db\DbConsoleCommand
 
+    db:databases:
+        name: Show databases.
+        code: db:databases
+        aliases:
+            - db
+            - databases
+        description: Show databases.
+        class: \MagedIn\Lab\Command\Db\DbDatabasesCommand
+
+    db:size:
+        name: Show databases size.
+        code: db:size
+        aliases:
+        description: Show databases size.
+        class: \MagedIn\Lab\Command\Db\DbSizeCommand
+
     project:name:
         name: Get or set the project name.
         code: project:name

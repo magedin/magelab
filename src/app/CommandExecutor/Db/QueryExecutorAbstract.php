@@ -12,16 +12,21 @@ declare(strict_types=1);
 
 namespace MagedIn\Lab\CommandExecutor\Db;
 
-class DbConsole extends DbAbstract
+abstract class QueryExecutorAbstract extends DbAbstract
 {
+    /**
+     * @return string
+     */
+    abstract protected function getQuery(): string;
+
     /**
      * @return array
      */
     protected function getCommand(): array
     {
         $command = $this->getBaseCommand();
-        $command[] = '-A';
-        $command[] = $this->getDefaultDatabase();
+        $command[] = "-e";
+        $command[] = $this->getQuery();
         return $command;
     }
 }
