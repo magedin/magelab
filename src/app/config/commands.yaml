@@ -310,6 +310,20 @@ commands:
         description: Show databases size.
         class: \MagedIn\Lab\Command\Db\DbSizeCommand
 
+    db:create:
+        name: Create a database.
+        code: db:create
+        aliases:
+        description: Create a database.
+        class: \MagedIn\Lab\Command\Db\DbCreateCommand
+
+    db:drop:
+        name: Delete a database.
+        code: db:drop
+        aliases:
+        description: Delete a database.
+        class: \MagedIn\Lab\Command\Db\DbDropCommand
+
     project:name:
         name: Get or set the project name.
         code: project:name

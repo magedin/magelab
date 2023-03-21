@@ -13,22 +13,15 @@ declare(strict_types=1);
 namespace MagedIn\Lab\Command\Db;
 
 use MagedIn\Lab\Command\Command;
-use MagedIn\Lab\CommandExecutor\Db\DbSize as Executor;
+use MagedIn\Lab\CommandExecutor\Db\DbCreate as Executor;
 use MagedIn\Lab\Helper\Magento\DbConfig;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DbSizeCommand extends Command
+class DbCreateCommand extends DbCommandAbstract
 {
-    /**
-     * @var Executor
-     */
-    private Executor $executor;
-
-    /**
-     * @var DbConfig
-     */
-    private DbConfig $dbConfig;
+    const DB_NAME = 'name';
 
     /**
      * @param Executor $executor
@@ -40,13 +33,19 @@ class DbSizeCommand extends Command
         DbConfig $dbConfig,
         string $name = null
     ) {
-        parent::__construct($name);
-        $this->executor = $executor;
-        $this->dbConfig = $dbConfig;
+        parent::__construct($executor, $dbConfig, $name);
     }
 
+    /**
+     * @return void
+     */
     protected function configure()
     {
+        $this->addArgument(
+            self::DB_NAME,
+            InputArgument::REQUIRED,
+            'The database name.'
+        );
     }
 
     /**
@@ -56,6 +55,7 @@ class DbSizeCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->executor->setDbName($input->getArgument(self::DB_NAME));
         $this->executor->execute($this->dbConfig->get());
         return Command::SUCCESS;
     }
