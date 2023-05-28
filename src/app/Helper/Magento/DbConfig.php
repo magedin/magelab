@@ -48,6 +48,30 @@ class DbConfig
     }
 
     /**
+     * @return string|null
+     */
+    public function getDatabase(): ?string
+    {
+        return $this->get()['database'] ?? null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getUsername(): ?string
+    {
+        return $this->get()['username'] ?? null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPassword(): ?string
+    {
+        return $this->get()['password'] ?? null;
+    }
+
+    /**
      * @return string
      */
     private function getMagentoEnvFile(): string

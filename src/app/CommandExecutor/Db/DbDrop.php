@@ -15,9 +15,9 @@ namespace MagedIn\Lab\CommandExecutor\Db;
 class DbDrop extends DbCreate
 {
     /**
-     * @return string
+     * @return string|null
      */
-    protected function getQuery(): string
+    protected function getQuery(): ?string
     {
         return "DROP DATABASE `{$this->getDbName()}`;";
     }

@@ -324,6 +324,13 @@ commands:
         description: Delete a database.
         class: \MagedIn\Lab\Command\Db\DbDropCommand
 
+    db:dump:
+        name: Dump a database.
+        code: db:dump
+        aliases:
+        description: Dump a database.
+        class: \MagedIn\Lab\Command\Db\DbDumpCommand
+
     project:name:
         name: Get or set the project name.
         code: project:name

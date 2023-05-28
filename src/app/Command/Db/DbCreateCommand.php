@@ -21,8 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DbCreateCommand extends DbCommandAbstract
 {
-    const DB_NAME = 'name';
-
     /**
      * @param Executor $executor
      * @param DbConfig $dbConfig

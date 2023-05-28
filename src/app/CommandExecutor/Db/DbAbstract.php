@@ -46,6 +46,14 @@ abstract class DbAbstract extends CommandExecutorAbstract
         Process::run($this->getCommand(), [
             'tty' => true,
         ]);
+        $this->afterExecute();
+    }
+
+    /**
+     * @return void
+     */
+    protected function afterExecute(): void
+    {
     }
 
     /**

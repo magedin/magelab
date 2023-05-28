@@ -18,6 +18,8 @@ use MagedIn\Lab\Helper\Magento\DbConfig;
 
 abstract class DbCommandAbstract extends Command
 {
+    const DB_NAME = 'name';
+
     /**
      * @var Executor
      */

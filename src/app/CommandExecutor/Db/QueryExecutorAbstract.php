@@ -15,9 +15,41 @@ namespace MagedIn\Lab\CommandExecutor\Db;
 abstract class QueryExecutorAbstract extends DbAbstract
 {
     /**
-     * @return string
+     * @return string|null
      */
-    abstract protected function getQuery(): string;
+    abstract protected function getQuery(): ?string;
+
+    /**
+     * @var string|null
+     */
+    protected ?string $dbName = null;
+
+    /**
+     * @param string $dbName
+     * @return void
+     */
+    public function setDbName(string $dbName): void
+    {
+        $this->dbName = $dbName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDbName(): ?string
+    {
+        $dbName = $this->dbName;
+        // $this->resetDbName();
+        return $dbName;
+    }
+
+    /**
+     * @return void
+     */
+    protected function resetDbName(): void
+    {
+        $this->dbName = null;
+    }
 
     /**
      * @return array
@@ -25,8 +57,10 @@ abstract class QueryExecutorAbstract extends DbAbstract
     protected function getCommand(): array
     {
         $command = $this->getBaseCommand();
-        $command[] = "-e";
-        $command[] = $this->getQuery();
+        if ($this->getQuery()) {
+            $command[] = "-e";
+            $command[] = $this->getQuery();
+        }
         return $command;
     }
 }

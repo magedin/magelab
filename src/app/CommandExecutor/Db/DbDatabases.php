@@ -17,8 +17,8 @@ class DbDatabases extends QueryExecutorAbstract
     /**
      * @return string
      */
-    protected function getQuery(): string
+    protected function getQuery(): ?string
     {
-        return "show databases;";
+        return "SHOW DATABASES;";
     }
 }
